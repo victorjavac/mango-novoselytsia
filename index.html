@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин одягу та білизни МАНГО</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Скидаємо зайві відступання */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Обкладинка: Світла та чиста */
+        .main-header {
+            position: relative;
+            height: 100vh;
+            background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), url('bg.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Контент-блок: М'які круглі кути */
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 750px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 50px 40px;
+            backdrop-filter: blur(8px); /* Ефект матового скла */
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Повертаємо класичний витончений шрифт для логотипу */
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            letter-spacing: 8px; /* Красиві великі відступи між літерами */
+            margin-bottom: 30px;
+            font-weight: 500;
+            color: #111;
+            text-transform: uppercase;
+        }
+
+        /* Округлий ніжний шрифт для заголовка, опису та кнопки */
+        h1, p, .btn-cta {
+            font-family: 'Comfortaa', sans-serif;
+            color: #111;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700; /* Робимо заголовок чітким та виразним */
+            margin-bottom: 25px;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 40px;
+            max-width: 550px;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        /* Округла овальна кнопка */
+        .btn-cta {
+            display: inline-block;
+            background-color: #111;
+            color: #fff;
+            padding: 16px 45px;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid #111;
+        }
+
+        /* Ефект при наведенні мишки */
+        .btn-cta:hover {
+            background-color: transparent;
+            color: #111;
+            border: 1px solid #111;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Стилі для блоку каталогу */
+        .catalog-section {
+            padding: 80px 20px;
+            background-color: #fdfdfd; /* Світлий, чистий фон */
+            text-align: center;
+        }
+
+        .section-title {
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            color: #111;
+        }
+
+        /* Розумна сітка (адаптується під мобільні та ПК автоматично) */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px; /* Відступи між картками */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Стиль самої картки з м'якими кутами */
+        .catalog-item {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            background-color: #eee;
+            cursor: pointer;
+            border-radius: 20px; /* Заокруглюємо кути карток, як просила Оля */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Ефект підстрибування картки при наведенні */
+        .catalog-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .catalog-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Фото красиво вписується, не стискаючись */
+            transition: transform 0.5s ease;
+        }
+
+        /* Ефект легкого збільшення фото при наведенні */
+        .catalog-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Затемнення поверх фото для чіткості тексту */
+        .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25); /* М'який серпанок, щоб текст читався */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .catalog-item:hover .item-overlay {
+            background: rgba(0, 0, 0, 0.4); /* Трохи темнішає при наведенні */
+        }
+
+        /* Стиль назви категорії на картці */
+        .item-overlay h3 {
+            font-family: 'Comfortaa', sans-serif;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            text-align: center;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Стилі для блоку інформації та контактів */
+        .info-section {
+            padding: 80px 20px;
+            background-color: #fff;
+            font-family: 'Comfortaa', sans-serif;
+        }
+
+        .info-container {
+            display: flex;
+            flex-wrap: wrap; /* Щоб на телефонах колонки ставали одна під одну */
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        /* Розподіл колонок */
+        .info-text, .info-contacts {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .info-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: #111;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Елементи сервісу */
+        .feature-item {
+            margin-bottom: 30px;
+        }
+
+        .feature-item strong {
+            display: block;
+            font-size: 16px;
+            color: #111;
+            margin-bottom: 8px;
+        }
+
+        .feature-item p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        /* Блок контактів */
+        .info-contacts p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            max-width: 100%;
+        }
+
+        /* Кнопка в контактах */
+        .btn-contact {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: transparent;
+            color: #111;
+            border: 2px solid #111;
+            padding: 14px 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-contact:hover {
+            background-color: #111;
+            color: #fff;
+        }
+
+        /* Стиль підвалу */
+        .main-footer {
+            background-color: #111;
+            color: #777;
+            padding: 30px 20px;
+            text-align: center;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="hero-content">
+            <div class="logo">МАНГО</div>
+            <h1>Якісна та вишукана<br>жіноча нижня білизна,<br>купальники, піжамки</h1>
+            <p>Підкресли свою впевненість. Примірка в Новоселиці та доставка по всій Україні.</p>
+            <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta" target="_blank">Дивитися каталог в Instagram</a>
+        </div>
+    </header>
+
+    <section class="catalog-section">
+        <h2 class="section-title">Категорії нашого асортименту</h2>
+        
+        <div class="catalog-grid">
+            <div class="catalog-item">
+                <img src="cat16.jpg" alt="Вишукана білизна">
+                <div class="item-overlay">
+                    <h3>Вишукана білизна</h3>
+                </div>
+            </div>
+
+            <div class="catalog-item">
+                <img src="cat1.jpg" alt="Купальники">
+                <div class="item-overlay">
+                    <h3>Купальники</h3>
+                </div>
+            </div>
+
+            <div class="catalog-item">
+                <img src="cat11.jpg" alt="Піжамки">
+                <div class="item-overlay">
+                    <h3>Одяг для дому та піжами</h3>
+                </div>
+            </div>
+
+            <div class="catalog-item">
+                <img src="cat9.jpg" alt="Комфортні бюсти">
+                <div class="item-overlay">
+                    <h3>Комфортні бюсти</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <div class="info-container">
+            
+            <div class="info-text">
+                <h2>Чому обирають МАНГО?</h2>
+                <div class="feature-item">
+                    <strong>✨ Комфортна примірка</strong>
+                    <p>Чекаємо на вас у нашому затишному магазині в м. Новоселиця. Спокійна атмосфера, великі дзеркала та індивідуальний підхід.</p>
+                </div>
+                <div class="feature-item">
+                    <strong>📦 Швидка доставка</strong>
+                    <p>Немає можливості прийти? Відправимо ваше замовлення Новою Поштою або Укрпоштою в день оплати по всій Україні.</p>
+                </div>
+            </div>
+
+            <div class="info-contacts">
+                <h2>Контакти</h2>
+                <p class="address">📍 м. Новоселиця, Чернівецька область</p>
+                <p class="work-time">🕒 Працюємо для вас щодня</p>
+                <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-contact" target="_blank">Написати в Instagram Direct</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 Магазин МАНГО. Усі права захищені.</p>
+    </footer>
+
+</body>
+</html>
