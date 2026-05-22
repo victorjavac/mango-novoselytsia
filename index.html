@@ -160,33 +160,40 @@
             transform: scale(1.05);
         }
 
-        /* Затемнення поверх фото для чіткості тексту */
+        /* --- ОНОВЛЕНІ СТИЛІ ДЛЯ НАПИСІВ ВНИЗУ --- */
         .item-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.25); /* М'який серпанок, щоб текст читався */
+            /* Змінюємо center на flex-end, щоб текст упав вниз */
             display: flex;
-            align-items: center;
+            align-items: flex-end; 
             justify-content: center;
+            /* Додаємо градієнтний фон знизу для читабельності текста */
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0) 100%);
             transition: background 0.3s ease;
+            /* Додаємо відступ знизу, щоб текст не лип до краю */
+            padding-bottom: 30px; 
         }
 
         .catalog-item:hover .item-overlay {
-            background: rgba(0, 0, 0, 0.4); /* Трохи темнішає при наведенні */
+            /* При наведенні робимо градієнт трохи щільнішим */
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
         }
 
         /* Стиль назви категорії на картці */
         .item-overlay h3 {
             font-family: 'Comfortaa', sans-serif;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px; /* Трохи зменшив шрифт для акуратності */
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px; /* Більше відступів між літерами */
             text-transform: uppercase;
-            padding: 10px 20px;
+            padding: 0 20px;
             text-align: center;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            margin: 0; /* Прибираємо зайві відступи */
         }
+        /* --- КІНЕЦЬ ОНОВЛЕНИХ СТИЛІВ --- */
 
         /* Стилі для блоку інформації та контактів */
         .info-section {
@@ -292,36 +299,39 @@
     </header>
 
     <section class="catalog-section">
-        <h2 class="section-title">Категорії нашого асортименту</h2>
+        <h2 class="section-title">Колекція МАНГО</h2>
         
         <div class="catalog-grid">
-            <div class="catalog-item">
-                <img src="cat16.jpg" alt="Вишукана білизна">
-                <div class="item-overlay">
-                    <h3>Вишукана білизна</h3>
-                </div>
-            </div>
-
-            <div class="catalog-item">
-                <img src="cat1.jpg" alt="Купальники">
-                <div class="item-overlay">
-                    <h3>Купальники</h3>
-                </div>
-            </div>
-
-            <div class="catalog-item">
-                <img src="cat11.jpg" alt="Піжамки">
-                <div class="item-overlay">
-                    <h3>Одяг для дому та піжами</h3>
-                </div>
-            </div>
-
-            <div class="catalog-item">
-                <img src="cat9.jpg" alt="Комфортні бюсти">
-                <div class="item-overlay">
-                    <h3>Комфортні бюсти</h3>
-                </div>
-            </div>
+            <div class="catalog-item"><img src="cat1.jpg" alt="МАНГО"><div class="item-overlay"><h3>Естетика МАНГО</h3></div></div>
+            <div class="catalog-item"><img src="cat2.jpg" alt="МАНГО"><div class="item-overlay"><h3>Твій стиль</h3></div></div>
+            <div class="catalog-item"><img src="cat3.jpg" alt="МАНГО"><div class="item-overlay"><h3>Вишуканість</h3></div></div>
+            <div class="catalog-item"><img src="cat4.jpg" alt="МАНГО"><div class="item-overlay"><h3>Ніжність</h3></div></div>
+            <div class="catalog-item"><img src="cat5.jpg" alt="МАНГО"><div class="item-overlay"><h3>Комфорт</h3></div></div>
+            <div class="catalog-item"><img src="cat6.jpg" alt="МАНГО"><div class="item-overlay"><h3>Новинки</h3></div></div>
+            <div class="catalog-item"><img src="cat7.jpg" alt="МАНГО"><div class="item-overlay"><h3>Естетика МАНГО</h3></div></div>
+            <div class="catalog-item"><img src="cat8.jpg" alt="МАНГО"><div class="item-overlay"><h3>Твій стиль</h3></div></div>
+            <div class="catalog-item"><img src="cat9.jpg" alt="МАНГО"><div class="item-overlay"><h3>Комфортні бюсти</h3></div></div>
+            <div class="catalog-item"><img src="cat10.jpg" alt="МАНГО"><div class="item-overlay"><h3>Ніжність</h3></div></div>
+            <div class="catalog-item"><img src="cat11.jpg" alt="МАНГО"><div class="item-overlay"><h3>Піжами</h3></div></div>
+            <div class="catalog-item"><img src="cat12.jpg" alt="МАНГО"><div class="item-overlay"><h3>Бюсти на великі чашки</h3></div></div>
+            <div class="catalog-item"><img src="cat13.jpg" alt="МАНГО"><div class="item-overlay"><h3>Естетика МАНГО</h3></div></div>
+            <div class="catalog-item"><img src="cat14.jpg" alt="МАНГО"><div class="item-overlay"><h3>Твій стиль</h3></div></div>
+            <div class="catalog-item"><img src="cat15.jpg" alt="МАНГО"><div class="item-overlay"><h3>Вишуканість</h3></div></div>
+            <div class="catalog-item"><img src="cat16.jpg" alt="МАНГО"><div class="item-overlay"><h3>Вишукана білизна</h3></div></div>
+            <div class="catalog-item"><img src="cat17.jpg" alt="МАНГО"><div class="item-overlay"><h3>Комфорт</h3></div></div>
+            <div class="catalog-item"><img src="cat18.jpg" alt="МАНГО"><div class="item-overlay"><h3>Новинки</h3></div></div>
+            <div class="catalog-item"><img src="cat19.jpg" alt="МАНГО"><div class="item-overlay"><h3>Купальники</h3></div></div>
+            <div class="catalog-item"><img src="cat20.jpg" alt="МАНГО"><div class="item-overlay"><h3>Твій стиль</h3></div></div>
+            <div class="catalog-item"><img src="cat21.jpg" alt="МАНГО"><div class="item-overlay"><h3>Вишуканість</h3></div></div>
+            <div class="catalog-item"><img src="cat22.jpg" alt="МАНГО"><div class="item-overlay"><h3>Ніжність</h3></div></div>
+            <div class="catalog-item"><img src="cat23.jpg" alt="МАНГО"><div class="item-overlay"><h3>Комфорт</h3></div></div>
+            <div class="catalog-item"><img src="cat24.jpg" alt="МАНГО"><div class="item-overlay"><h3>Новинки</h3></div></div>
+            <div class="catalog-item"><img src="cat25.jpg" alt="МАНГО"><div class="item-overlay"><h3>Купальники</h3></div></div>
+            <div class="catalog-item"><img src="cat26.jpg" alt="МАНГО"><div class="item-overlay"><h3>Твій стиль</h3></div></div>
+            <div class="catalog-item"><img src="cat27.jpg" alt="МАНГО"><div class="item-overlay"><h3>Вишуканість</h3></div></div>
+            <div class="catalog-item"><img src="cat28.jpg" alt="МАНГО"><div class="item-overlay"><h3>Ніжність</h3></div></div>
+            <div class="catalog-item"><img src="cat29.jpg" alt="МАНГО"><div class="item-overlay"><h3>Комфорт</h3></div></div>
+            <div class="catalog-item"><img src="cat30.jpg" alt="МАНГО"><div class="item-overlay"><h3>Новинки</h3></div></div>
         </div>
     </section>
 
@@ -352,7 +362,7 @@
 
     <footer class="main-footer">
         <p>&copy; 2026 Магазин МАНГО. Усі права захищені.</p>
-    </footer>
+    </footer >
 
 </body>
 </html>
