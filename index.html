@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Магазин одягу та білизни МАНГО</title>
-    <title>Магазин одягу та білизни МАНГО</title>
     
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -121,7 +118,6 @@
             color: #111;
         }
 
-        /* --- ГОЛОВНІ ОБКЛАДИНКИ З ЕФЕКТОМ ЗБІЛЬШЕННЯ --- */
         .main-categories-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -150,11 +146,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease; /* Реакція на курсор */
+            transition: transform 0.5s ease;
         }
 
         .category-cover-item:hover img {
-            transform: scale(1.05); /* Фото плавно збільшується при наведенні */
+            transform: scale(1.05);
         }
 
         .cover-overlay {
@@ -185,7 +181,6 @@
             text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
         }
 
-        /* --- ВНУТРІШНЯ ГАЛЕРЕЯ КАРТОК ТОВАРІВ --- */
         .catalog-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -244,7 +239,6 @@
             gap: 30px;
         }
 
-        /* Адаптивна картка з білим фоном і реакцією курсору */
         .catalog-item {
             position: relative;
             height: 450px;
@@ -260,7 +254,7 @@
         }
 
         .catalog-item:hover {
-            transform: translateY(-4px); /* Картка підстрибує під курсором */
+            transform: translateY(-4px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
@@ -273,20 +267,18 @@
         }
 
         .catalog-item:hover img {
-            transform: scale(1.04); /* Фото всередині теж ніжно грає */
+            transform: scale(1.04);
         }
 
-        /* --- НАПИСИ ВНИЗУ ФОТО З ТЕМНИМ ГРАДІЄНТОМ --- */
         .item-text-overlay {
             position: absolute;
             inset: 0;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            /* М'який градієнт внизу картки, щоб білий текст читався */
             background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 30%);
             padding-bottom: 20px;
-            pointer-events: none; /* Щоб шар не заважав клікам */
+            pointer-events: none;
         }
 
         .item-text-overlay h4 {
@@ -299,7 +291,6 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
         }
 
-        /* --- СТИЛІ ІНФО-БЛОКУ ТА GOOGLE КАРТИ --- */
         .info-section {
             padding: 80px 20px;
             background-color: #fff;
@@ -352,7 +343,6 @@
             margin-bottom: 15px;
         }
 
-        /* Контейнер для вбудованої Google карти */
         .map-wrapper {
             width: 100%;
             height: 250px;
@@ -749,8 +739,8 @@
                 <p class="work-time">🕒 Працюємо для вас щодня</p>
                 
                 <div class="map-wrapper">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2621.8497675765956!2d26.2651478!3d48.3057134!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x473403328e1b3d0d%3A0xc3401569bebe69f2!2z0YPQYquy4gOKbQtdC90YRL0lRgNCw0LDRjcw0LDRjywG03Qtcy0L7RgdC10L_VQuNG0LAsINCn0XRs0LDRgndsiDYwMTAw!5e0!3m2!1suk!2sua!4v1716380000000!5m2!1suk!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-</div>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2621.8497675765956!2d26.2651478!3d48.3057134!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x43328e1b3d0d%3A0xc3401569bebe69f2!2z0YPQv9GA0YvR_0lR_090bDRjywg0J3Q3Qv_Q3cyQyt0Yg0L7R_0LRgdc00LAsV_0_0LAsINCR_0L_RGnc0_01BYsidYwMTAw!5e0!3m2!1suk!2sua!4v1716380000000!5m2!1suk!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
 
                 <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-contact" target="_blank">Написати в Instagram Direct</a>
             </div>
@@ -758,11 +748,10 @@
     </section>
 
     <footer class="main-footer">
-        <p>&copy; 2026 Магазин МАНГО. Усі права захищені.</p>
+        <p>© 2026 Магазин МАНГО. Усі права захищені.</p>
     </footer>
 
     <script>
-        // Функція відкриття категорії
         function openCategory(categoryId) {
             document.getElementById('categories-cover-menu').style.display = 'none';
             document.getElementById('main-title').style.display = 'none';
@@ -775,13 +764,10 @@
                 targetGroup.style.display = 'block';
             }
 
-            // Штовхаємо хеш в історію браузера, щоб працювала кнопка телефону "Назад"
             history.pushState({category: categoryId}, "", "#" + categoryId);
-            
             document.getElementById('catalog-anchor').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Функція закриття (повернення до меню)
         function closeCategory(isBackAction = false) {
             const groups = document.querySelectorAll('.category-group');
             groups.forEach(group => group.style.display = 'none');
@@ -789,7 +775,6 @@
             document.getElementById('categories-cover-menu').style.display = 'grid';
             document.getElementById('main-title').style.display = 'block';
 
-            // Якщо це не системне повернення кнопкою телефону, то очищаємо хеш вручну
             if (!isBackAction) {
                 history.pushState(null, "", window.location.pathname);
             }
@@ -797,10 +782,8 @@
             document.getElementById('catalog-anchor').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // СЛУХАЧ СИСТЕМНОЇ КНОПКИ "НАЗАД" НА ТЕЛЕФОНІ
         window.addEventListener('popstate', function(event) {
             if (event.state && event.state.category) {
-                // Якщо в історії є категорія — показуємо її
                 document.getElementById('categories-cover-menu').style.display = 'none';
                 document.getElementById('main-title').style.display = 'none';
                 
@@ -812,12 +795,10 @@
                     targetGroup.style.display = 'block';
                 }
             } else {
-                // Якщо історія порожня (ми на головній) — ховаємо папки, відкриваємо меню
                 closeCategory(true);
             }
         });
 
-        // Перевірка при початковому завантаженні (якщо посилання з хешем)
         document.addEventListener("DOMContentLoaded", function() {
             const currentHash = window.location.hash.replace('#', '');
             if (currentHash && document.getElementById(currentHash)) {
