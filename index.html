@@ -849,6 +849,13 @@
                 openCategory(currentHash);
             }
         });
+    // АВТОМАТИЗАЦІЯ: Усі товари тепер ведуть на головний Інстаграм
+document.querySelectorAll('.catalog-item').forEach(item => {
+    item.style.cursor = 'pointer'; // Робимо, щоб з'являвся пальчик при наведенні
+    item.addEventListener('click', function() {
+        window.open('https://www.instagram.com/mango_olya_lingeri/', '_blank');
+    });
+});
     </script>
 </body>
 </html>
