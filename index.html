@@ -6,10 +6,7 @@
     <title>Магазин одягу та білизни МАНГО</title>
     
     <link rel="icon" type="image/jpeg" href="favicon.jpg">
-    <meta property="og:title" content="МАНГО | Магазин вишуканої жіночої білизни та піжам">
-<meta property="og:description" content="Підкресли свою впевненість. Примірка в м. Новоселиця (вул. Хотинська, 9а) та швидка доставка по всій Україні.">
-<meta property="og:image" content="bg.jpg">
-<meta property="og:url" content="https://victorjavac.github.io/mango-novoselytsia/">
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3C72Z0WXNG"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -35,7 +32,7 @@
             background-color: #fdfdfd;
         }
 
-        /* --- НОВА ПРЕМІАЛЬНА ШАПКА САЙТУ --- */
+        /* --- ХЕДДЕР САЙТУ --- */
         .main-top-header {
             position: fixed;
             top: 0;
@@ -421,6 +418,120 @@
             font-family: 'Comfortaa', sans-serif;
             font-size: 12px;
         }
+
+        /* =========================================================
+           ⚡ НОВИЙ БЛОК: СНАЙПЕРСЬКА АДАПТИВНІСТЬ ДЛЯ СМАРТФОНІВ (IPHONE)
+           ========================================================= */
+        @media (max-width: 600px) {
+            /* Перебудова шапки: менше відступів, щоб іконки та логотип не налізали */
+            .main-top-header {
+                padding: 0 12px;
+                height: 60px;
+            }
+
+            .header-logo {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+
+            .header-social-icons {
+                gap: 12px; /* Компактна відстань між іконками */
+            }
+
+            .header-social-icons a {
+                font-size: 16px;
+            }
+
+            /* Коригування головного екрана */
+            .main-header {
+                padding-top: 60px;
+            }
+
+            .hero-content {
+                padding: 30px 20px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 20px;
+                line-height: 1.4;
+                margin-bottom: 15px;
+            }
+
+            p {
+                font-size: 13px;
+                line-height: 1.6;
+                margin-bottom: 25px;
+            }
+
+            .btn-cta {
+                padding: 14px 30px;
+                width: 100%; /* Кнопка на весь екран для зручності пальця */
+                justify-content: center;
+                font-size: 12px;
+            }
+
+            /* Сортування категорій в один акуратний стовпчик */
+            .main-categories-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 0 10px;
+            }
+
+            .category-cover-item {
+                height: 260px;
+                border-radius: 16px;
+            }
+
+            /* 🛒 ГОЛОВНЕ: Товари по 2 в ряд (як у топових брендів білизни) */
+            .catalog-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0 5px;
+            }
+
+            .catalog-item {
+                height: 250px; /* Красиві компактні картки на мобільному */
+                border-radius: 14px;
+            }
+
+            .catalog-item img {
+                padding: 4px;
+            }
+
+            .item-text-overlay h4 {
+                font-size: 11px;
+                letter-spacing: 0.5px;
+            }
+
+            .category-header-block {
+                margin-bottom: 20px;
+                padding: 0 5px 10px 5px;
+            }
+
+            .category-group-title {
+                font-size: 16px;
+            }
+
+            .btn-back {
+                padding: 8px 16px;
+                font-size: 11px;
+            }
+
+            /* Секція контактів */
+            .info-section {
+                padding: 40px 15px;
+            }
+
+            .info-container {
+                gap: 30px;
+            }
+
+            .info-section h2 {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -531,7 +642,7 @@
 
             <div class="category-group" id="sets">
                 <div class="category-header-block">
-                    <h3 class="category-group-title">Комплекти жіночої білизни</h3>
+                    <h3 class="category-group-title">Комплекти білизни</h3>
                     <button class="btn-back" onclick="closeCategory()">⬅ Назад</button>
                 </div>
                 <div class="catalog-grid">
@@ -553,7 +664,7 @@
                     <div class="catalog-item"><img src="sets/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
                     <div class="catalog-item"><img src="sets/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Вишуканість</h4></div></div>
                     <div class="catalog-item"><img src="sets/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Новинки</h4></div></div>
-                    <div class="catalog-item"><img src="sets/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
+                    <div class="catalog-item"><img src="sets/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій style</h4></div></div>
                     <div class="catalog-item"><img src="sets/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
                 </div>
             </div>
@@ -852,13 +963,14 @@
                 openCategory(currentHash);
             }
         });
-    // АВТОМАТИЗАЦІЯ: Усі товари тепер ведуть на головний Інстаграм
-document.querySelectorAll('.catalog-item').forEach(item => {
-    item.style.cursor = 'pointer'; // Робимо, щоб з'являвся пальчик при наведенні
-    item.addEventListener('click', function() {
-        window.open('https://www.instagram.com/mango_olya_lingeri/', '_blank');
-    });
-});
+
+        // АВТОМАТИЗАЦІЯ: Усі товари тепер ведуть на головний Інстаграм
+        document.querySelectorAll('.catalog-item').forEach(item => {
+            item.style.cursor = 'pointer'; 
+            item.addEventListener('click', function() {
+                window.open('https://www.instagram.com/mango_olya_lingeri/', '_blank');
+            });
+        });
     </script>
 </body>
 </html>
