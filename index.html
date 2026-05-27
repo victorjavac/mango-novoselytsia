@@ -30,6 +30,7 @@
 
         body {
             background-color: #fdfdfd;
+            overflow-x: hidden;
         }
 
         /* --- ХЕДДЕР САЙТУ --- */
@@ -39,14 +40,14 @@
             left: 0;
             width: 100%;
             height: 70px;
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
 
         .header-logo {
@@ -73,37 +74,66 @@
         }
 
         .header-social-icons a:hover {
-            color: #666;
+            color: #d4a373;
             transform: translateY(-2px);
         }
 
-        /* --- hero БАНЕР --- */
+        /* --- AUTOMATION: LUXURY BLURRY BACKGROUND SPOTS --- */
         .main-header {
             position: relative;
             height: 100vh;
-            /* ВАРІАНТ 3: ЧИСТИЙ ПРЕМІАЛЬНИЙ ГРАДІЄНТ */
-            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            background-color: #fffaf9;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 20px;
             padding-top: 70px;
+            overflow: hidden;
+        }
+
+        /* Рожева дизайнерська хмаринка зліва */
+        .main-header::before {
+            content: '';
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            top: 10%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255,192,203,0.4) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            filter: blur(50px);
+            z-index: 1;
+        }
+
+        /* Золотисто-пудрова хмаринка справа знизу */
+        .main-header::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            bottom: -10%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(212,163,115,0.2) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 1;
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 750px;
+            max-width: 700px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.75);
-            padding: 50px 40px;
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 60px 40px;
+            backdrop-filter: blur(15px);
+            border-radius: 32px;
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
         h1, p, .btn-cta, .category-cover-title, .btn-back, .social-title {
@@ -121,7 +151,7 @@
 
         p {
             font-size: 16px;
-            color: #444;
+            color: #555;
             margin-bottom: 40px;
             max-width: 550px;
             line-height: 1.7;
@@ -134,14 +164,14 @@
             gap: 12px;
             background-color: #111;
             color: #fff;
-            padding: 16px 45px;
+            padding: 18px 50px;
             text-decoration: none;
             font-weight: 600;
             letter-spacing: 1px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
             font-size: 13px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             border: 1px solid #111;
         }
 
@@ -149,17 +179,17 @@
             background-color: transparent;
             color: #111;
             border: 1px solid #111;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Адреса під кнопкою на головному */
         .hero-address {
             font-size: 13px;
-            color: #666;
-            margin-top: 15px;
+            color: #888;
+            margin-top: 20px;
             margin-bottom: 0;
             font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         /* --- КАТАЛОГ --- */
@@ -404,7 +434,6 @@
             margin-bottom: 15px;
         }
 
-        /* Реальне фото банера з магазину знизу */
         .shop-banner-img {
             width: 100%;
             height: auto;
@@ -440,7 +469,7 @@
         /* === АДАПТИВНІСТЬ ДЛЯ СМАРТФОНІВ === */
         @media (max-width: 600px) {
             .main-top-header {
-                padding: 0 12px;
+                padding: 0 16px;
                 height: 60px;
             }
 
@@ -461,25 +490,36 @@
                 padding-top: 60px;
             }
 
+            /* Дизайнерські кола на мобільних робимо трохи меншими */
+            .main-header::before {
+                width: 280px;
+                height: 280px;
+            }
+            .main-header::after {
+                width: 300px;
+                height: 300px;
+            }
+
             .hero-content {
-                padding: 30px 20px;
-                border-radius: 16px;
+                padding: 40px 20px;
+                border-radius: 24px;
+                box-shadow: 0 15px 35px rgba(212, 163, 115, 0.12);
             }
 
             h1 {
-                font-size: 20px;
+                font-size: 21px;
                 line-height: 1.4;
-                margin-bottom: 15px;
+                margin-bottom: 18px;
             }
 
             p {
                 font-size: 13px;
                 line-height: 1.6;
-                margin-bottom: 25px;
+                margin-bottom: 30px;
             }
 
             .btn-cta {
-                padding: 14px 30px;
+                padding: 16px 30px;
                 width: 100%;
                 justify-content: center;
                 font-size: 12px;
@@ -487,6 +527,7 @@
 
             .hero-address {
                 font-size: 11px;
+                margin-top: 15px;
             }
 
             .main-categories-grid {
@@ -569,7 +610,7 @@
             <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta" target="_blank">
                 <i class="fab fa-instagram"></i> Наш Інстаграм
             </a>
-            <p class="hero-address">м. Новоселиця, вул. Хотинська, 9а</p>
+            <p class="hero-address">📍 м. Новоселиця, вул. Хотинська, 9а</p>
         </div>
     </header>
 
@@ -861,7 +902,7 @@
 
             <div class="category-group" id="shop">
                 <div class="category-header-block">
-                    <h3 class="category-group-title">Вітрина та інтер'єр МАНГО</h3>
+                    <h3 class="category-group-title">Вітрина та編тер'єр МАНГО</h3>
                     <button class="btn-back" onclick="closeCategory()">⬅ Назад</button>
                 </div>
                 <div class="catalog-grid">
