@@ -81,7 +81,8 @@
         .main-header {
             position: relative;
             height: 100vh;
-            background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), url('bg.jpg') no-repeat center center/cover;
+            /* ВАРІАНТ 3: ЧИСТИЙ ПРЕМІАЛЬНИЙ ГРАДІЄНТ */
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -150,6 +151,15 @@
             border: 1px solid #111;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Адреса під кнопкою на головному */
+        .hero-address {
+            font-size: 13px;
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 0;
+            font-weight: 500;
         }
 
         /* --- КАТАЛОГ --- */
@@ -394,10 +404,18 @@
             margin-bottom: 15px;
         }
 
+        /* Реальне фото банера з магазину знизу */
+        .shop-banner-img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
         .map-wrapper {
             width: 100%;
             height: 250px;
-            margin-top: 20px;
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid #eee;
@@ -419,11 +437,8 @@
             font-size: 12px;
         }
 
-        /* =========================================================
-           ⚡ НОВИЙ БЛОК: СНАЙПЕРСЬКА АДАПТИВНІСТЬ ДЛЯ СМАРТФОНІВ (IPHONE)
-           ========================================================= */
+        /* === АДАПТИВНІСТЬ ДЛЯ СМАРТФОНІВ === */
         @media (max-width: 600px) {
-            /* Перебудова шапки: менше відступів, щоб іконки та логотип не налізали */
             .main-top-header {
                 padding: 0 12px;
                 height: 60px;
@@ -435,14 +450,13 @@
             }
 
             .header-social-icons {
-                gap: 12px; /* Компактна відстань між іконками */
+                gap: 12px;
             }
 
             .header-social-icons a {
                 font-size: 16px;
             }
 
-            /* Коригування головного екрана */
             .main-header {
                 padding-top: 60px;
             }
@@ -466,12 +480,15 @@
 
             .btn-cta {
                 padding: 14px 30px;
-                width: 100%; /* Кнопка на весь екран для зручності пальця */
+                width: 100%;
                 justify-content: center;
                 font-size: 12px;
             }
 
-            /* Сортування категорій в один акуратний стовпчик */
+            .hero-address {
+                font-size: 11px;
+            }
+
             .main-categories-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
@@ -483,7 +500,6 @@
                 border-radius: 16px;
             }
 
-            /* 🛒 ГОЛОВНЕ: Товари по 2 в ряд (як у топових брендів білизни) */
             .catalog-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
@@ -491,7 +507,7 @@
             }
 
             .catalog-item {
-                height: 250px; /* Красиві компактні картки на мобільному */
+                height: 250px;
                 border-radius: 14px;
             }
 
@@ -518,7 +534,6 @@
                 font-size: 11px;
             }
 
-            /* Секція контактів */
             .info-section {
                 padding: 40px 15px;
             }
@@ -554,6 +569,7 @@
             <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta" target="_blank">
                 <i class="fab fa-instagram"></i> Наш Інстаграм
             </a>
+            <p class="hero-address">м. Новоселиця, вул. Хотинська, 9а</p>
         </div>
     </header>
 
@@ -891,6 +907,8 @@
             
             <div class="info-contacts">
                 <h2>Контакти</h2>
+                <img src="physical-banner.png" alt="Банер магазину МАНГО в Новоселиці" class="shop-banner-img">
+                
                 <p class="address" onclick="scrollToMap()">📍 м. Новоселиця, вул. Хотинська, 9а (Показати на карті)</p>
                 <p class="work-time">🕒 Працюємо для вас щодня.</p>
                 
