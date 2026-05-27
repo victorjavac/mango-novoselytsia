@@ -40,14 +40,14 @@
             left: 0;
             width: 100%;
             height: 70px;
-            background-color: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
             z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .header-logo {
@@ -74,66 +74,37 @@
         }
 
         .header-social-icons a:hover {
-            color: #d4a373;
+            color: #666;
             transform: translateY(-2px);
         }
 
-        /* --- AUTOMATION: LUXURY BLURRY BACKGROUND SPOTS --- */
+        /* --- НОВИЙ ЖИВИЙ ФОН ІНТЕР'ЄРУ --- */
         .main-header {
             position: relative;
             height: 100vh;
-            background-color: #fffaf9;
+            background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), url('shop-bg.jpg') no-repeat center center/cover;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 20px;
             padding-top: 70px;
-            overflow: hidden;
-        }
-
-        /* Рожева дизайнерська хмаринка зліва */
-        .main-header::before {
-            content: '';
-            position: absolute;
-            width: 450px;
-            height: 450px;
-            top: 10%;
-            left: -10%;
-            background: radial-gradient(circle, rgba(255,192,203,0.4) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            filter: blur(50px);
-            z-index: 1;
-        }
-
-        /* Золотисто-пудрова хмаринка справа знизу */
-        .main-header::after {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            bottom: -10%;
-            right: -10%;
-            background: radial-gradient(circle, rgba(212,163,115,0.2) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            filter: blur(60px);
-            z-index: 1;
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 700px;
+            max-width: 750px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 60px 40px;
-            backdrop-filter: blur(15px);
-            border-radius: 32px;
-            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.88);
+            padding: 50px 40px;
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         h1, p, .btn-cta, .category-cover-title, .btn-back, .social-title {
@@ -151,7 +122,7 @@
 
         p {
             font-size: 16px;
-            color: #555;
+            color: #333;
             margin-bottom: 40px;
             max-width: 550px;
             line-height: 1.7;
@@ -164,14 +135,14 @@
             gap: 12px;
             background-color: #111;
             color: #fff;
-            padding: 18px 50px;
+            padding: 16px 45px;
             text-decoration: none;
             font-weight: 600;
             letter-spacing: 1px;
             border-radius: 50px;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.3s ease;
             font-size: 13px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
             border: 1px solid #111;
         }
 
@@ -179,16 +150,17 @@
             background-color: transparent;
             color: #111;
             border: 1px solid #111;
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
+        /* 👑 АПГРЕЙД: Адреса за запитом Олі (більша та жирна) */
         .hero-address {
-            font-size: 13px;
-            color: #888;
-            margin-top: 20px;
+            font-size: 16px;
+            color: #111;
+            margin-top: 22px;
             margin-bottom: 0;
-            font-weight: 500;
+            font-weight: 700;
             letter-spacing: 0.5px;
         }
 
@@ -438,7 +410,7 @@
             width: 100%;
             height: auto;
             border-radius: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
@@ -469,7 +441,7 @@
         /* === АДАПТИВНІСТЬ ДЛЯ СМАРТФОНІВ === */
         @media (max-width: 600px) {
             .main-top-header {
-                padding: 0 16px;
+                padding: 0 12px;
                 height: 60px;
             }
 
@@ -490,43 +462,32 @@
                 padding-top: 60px;
             }
 
-            /* Дизайнерські кола на мобільних робимо трохи меншими */
-            .main-header::before {
-                width: 280px;
-                height: 280px;
-            }
-            .main-header::after {
-                width: 300px;
-                height: 300px;
-            }
-
             .hero-content {
-                padding: 40px 20px;
-                border-radius: 24px;
-                box-shadow: 0 15px 35px rgba(212, 163, 115, 0.12);
+                padding: 35px 20px;
+                border-radius: 16px;
             }
 
             h1 {
-                font-size: 21px;
+                font-size: 20px;
                 line-height: 1.4;
-                margin-bottom: 18px;
+                margin-bottom: 15px;
             }
 
             p {
                 font-size: 13px;
                 line-height: 1.6;
-                margin-bottom: 30px;
+                margin-bottom: 25px;
             }
 
             .btn-cta {
-                padding: 16px 30px;
+                padding: 14px 30px;
                 width: 100%;
                 justify-content: center;
                 font-size: 12px;
             }
 
             .hero-address {
-                font-size: 11px;
+                font-size: 14px; /* Робимо виразним і на мобілці */
                 margin-top: 15px;
             }
 
@@ -735,23 +696,11 @@
                     <div class="catalog-item"><img src="pajamas/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Затишні піжамки</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Шовкова ніжність</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Солодкі сни</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфортний сон</h4></div></div>
+                    <div class="catalog-item"><img src="pajamas/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфортного сну</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика затишку</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Колекція МАНГО</h4></div></div>
                     <div class="catalog-item"><img src="pajamas/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Затишок дому</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика затишку</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Колекція МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Затишок дому</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика затишку</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Колекція МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Затишок дому</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика затишку</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Колекція МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="pajamas/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Затишок дому</h4></div></div>
                 </div>
             </div>
 
@@ -763,24 +712,6 @@
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="swim/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Пляжний сезон</h4></div></div>
                     <div class="catalog-item"><img src="swim/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Яскраві тренди</h4></div></div>
-                    <div class="catalog-item"><img src="swim/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Елегантний силует</h4></div></div>
-                    <div class="catalog-item"><img src="swim/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літня колекція</h4></div></div>
-                    <div class="catalog-item"><img src="swim/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний відпочинок</h4></div></div>
-                    <div class="catalog-item"><img src="swim/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="swim/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
-                    <div class="catalog-item"><img src="swim/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Літній тренд</h4></div></div>
-                    <div class="catalog-item"><img src="swim/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій стиль</h4></div></div>
                 </div>
             </div>
 
@@ -792,24 +723,6 @@
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="panties/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Щоденний комфорт</h4></div></div>
                     <div class="catalog-item"><img src="panties/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Мереживна краса</h4></div></div>
-                    <div class="catalog-item"><img src="panties/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Безшовні моделі</h4></div></div>
-                    <div class="catalog-item"><img src="panties/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="panties/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт та краса</h4></div></div>
-                    <div class="catalog-item"><img src="panties/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
-                    <div class="catalog-item"><img src="panties/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій вибір</h4></div></div>
-                    <div class="catalog-item"><img src="panties/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО стиль</h4></div></div>
                 </div>
             </div>
 
@@ -820,25 +733,6 @@
                 </div>
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="homewear/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Домашній затишок</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний халатик</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика дому</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфортний одяг</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твоя краса вдома</h4></div></div>
-                    <div class="catalog-item"><img src="homewear/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>МАНГО домашній стиль</h4></div></div>
                 </div>
             </div>
 
@@ -849,25 +743,6 @@
                 </div>
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="tops/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Базові топи</h4></div></div>
-                    <div class="catalog-item"><img src="tops/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Спортивний стиль</h4></div></div>
-                    <div class="catalog-item"><img src="tops/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Зручність щодня</h4></div></div>
-                    <div class="catalog-item"><img src="tops/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Твій комфорт</h4></div></div>
-                    <div class="catalog-item"><img src="tops/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="tops/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Стильний топ</h4></div></div>
-                    <div class="catalog-item"><img src="tops/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Естетика МАНГО</h4></div></div>
                 </div>
             </div>
 
@@ -878,54 +753,16 @@
                 </div>
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="teen/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний дизайн</h4></div></div>
-                    <div class="catalog-item"><img src="teen/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Перший бюстгальтер</h4></div></div>
-                    <div class="catalog-item"><img src="teen/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Натуральні тканини</h4></div></div>
-                    <div class="catalog-item"><img src="teen/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Колекція МАНГО</h4></div></div>
-                    <div class="catalog-item"><img src="teen/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
-                    <div class="catalog-item"><img src="teen/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
-                    <div class="catalog-item"><img src="teen/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжний захист</h4></div></div>
                 </div>
             </div>
 
             <div class="category-group" id="shop">
                 <div class="category-header-block">
-                    <h3 class="category-group-title">Вітрина та編тер'єр МАНГО</h3>
+                    <h3 class="category-group-title">Вітрина та інтер'єр МАНГО</h3>
                     <button class="btn-back" onclick="closeCategory()">⬅ Назад</button>
                 </div>
                 <div class="catalog-grid">
                     <div class="catalog-item"><img src="shop/1.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Запрошуємо на примірку</h4></div></div>
-                    <div class="catalog-item"><img src="shop/2.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Наш затишний зал</h4></div></div>
-                    <div class="catalog-item"><img src="shop/3.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Чекаємо на вас</h4></div></div>
-                    <div class="catalog-item"><img src="shop/4.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Наш асортимент</h4></div></div>
-                    <div class="catalog-item"><img src="shop/5.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/6.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/7.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Наш асортимент</h4></div></div>
-                    <div class="catalog-item"><img src="shop/8.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/9.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/10.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/11.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/12.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/13.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/14.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/15.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/16.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/17.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/18.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
-                    <div class="catalog-item"><img src="shop/19.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ласкаво просимо</h4></div></div>
-                    <div class="catalog-item"><img src="shop/20.jpg" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Світ комфорту</h4></div></div>
                 </div>
             </div>
 
@@ -944,6 +781,7 @@
                     <strong>📦 Швидка доставка</strong>
                     <p>Немає можливості прийти? Відправимо ваше замовлення Новою Поштою або Укрпоштою в день оплати по всій Україні.</p>
                 </div>
+                <img src="shop-interior.jpg" alt="Інтер'єр бутіка МАНГО Новоселиця" class="shop-banner-img">
             </div>
             
             <div class="info-contacts">
@@ -954,7 +792,7 @@
                 <p class="work-time">🕒 Працюємо для вас щодня.</p>
                 
                 <div class="map-wrapper" id="google-map-block">
-                    <iframe src="https://maps.google.com/maps?q=%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D0%B5%D0%BB%D0%B8%D1%86%D1%8F,%20%D0%A5%D0%BE%D1%82%D0%B8%D0%BD%D1%81%D1%8C%D0%BA%D0%B0%209%D0%B0&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2657.472856272391!2d26.2642594!3d48.2167389!2m3!1f0!2f0!3f0!3m2!1i1024!2i1024!4f13.1!3m3!1m2!1s0x4734011400d3d537%3A0x11be31003411c65b!2z0YPQuy4g0KXQvtGC0LjQvdGB0LrQsNGPLCA50LAsINCd0L7QstC-0YHQtdC70LjRhtCwLCDQp9C10YDQvdC90LLQtdGG0LrQsNGPINC-0LHQu9Cw0YHRgtGMLCDQo9C60YDQwNC40L3QsCwgNjAzMDA!5e0!3m2!1sru!2sua!4v1716800000000!5m2!1sru!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -1023,7 +861,6 @@
             }
         });
 
-        // АВТОМАТИЗАЦІЯ: Усі товари тепер ведуть на головний Інстаграм
         document.querySelectorAll('.catalog-item').forEach(item => {
             item.style.cursor = 'pointer'; 
             item.addEventListener('click', function() {
