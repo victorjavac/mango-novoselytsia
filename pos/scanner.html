@@ -2,35 +2,33 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мобільний Сканер МАНГО</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Сканер МАНГО</title>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #222; color: white; margin: 0; padding: 20px; }
-        #video { width: 100%; max-width: 500px; border-radius: 12px; background: #000; transform: scaleX(1); }
-        .status { padding: 15px; margin: 15px 0; border-radius: 8px; font-weight: bold; font-size: 18px; }
-        .online { background: #28a745; }
-        .offline { background: #dc3545; }
-        #last-barcode { font-size: 24px; color: #ffc107; margin-top: 10px; font-weight: bold; }
-        .btn { padding: 15px 30px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; background: #007bff; color: white; cursor: pointer; margin-top: 20px; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 15px; }
+        #video { width: 100%; max-width: 450px; border-radius: 12px; background: #000; border: 2px solid #333; }
+        .status { padding: 12px; margin: 10px 0; border-radius: 8px; font-weight: bold; font-size: 16px; background: #28a745; }
+        #last-barcode { font-size: 26px; color: #ffc107; margin: 15px 0; font-weight: bold; letter-spacing: 1px; }
+        .btn { padding: 18px 30px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; background: #007bff; color: white; cursor: pointer; width: 100%; max-width: 300px; }
     </style>
 </head>
 <body>
 
     <h2>📦 СКАНЕР МАНГО</h2>
-    <div id="status-line" class="status online">Зв'язок з Asus [192.168.0.103] активовано</div>
+    <div class="status">Зв'язок з Asus [192.168.0.103] готовий</div>
 
-    <div style="position: relative; display: inline-block; width: 100%;">
+    <div style="margin: 15px 0;">
         <video id="video"></video>
     </div>
 
-    <div>Останній відсканований код:</div>
+    <div>Останній код:</div>
     <div id="last-barcode">---</div>
 
     <button class="btn" id="start-btn">УВІМКНУТИ КАМЕРУ</button>
 
     <script>
-        const ASUS_IP = "192.168.0.103"; // Твій прецизійний IP з консолі Asus
+        const ASUS_IP = "192.168.0.103"; 
         const codeReader = new ZXing.BrowserMultiFormatReader();
         let isScanning = false;
 
@@ -43,20 +41,16 @@
                     const barcodeValue = result.text;
                     document.getElementById('last-barcode').innerText = barcodeValue;
                     
-                    // Вібро-відгук на телефоні при успішному піканні
-                    if (navigator.vibrate) navigator.vibrate(200);
+                    if (navigator.vibrate) navigator.vibrate(150);
 
-                    // Миттєво надсилаємо штрихкод на Asus через локальну мережу Wi-Fi
+                    // Надсилаємо штрихкод на Asus по локальній мережі
                     fetch(`http://${ASUS_IP}:5000/scan`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ barcode: barcodeValue })
                     })
-                    .then(response => response.json())
-                    .then(data => console.log('Успішно відправлено:', data))
                     .catch(error => {
-                        console.error('Помилка передачі:', error);
-                        alert("Збій мережі Wi-Fi! Перевірте, чи запущено чорне вікно на Asus.");
+                        console.error('Помилка:', error);
                     });
                 }
             });
