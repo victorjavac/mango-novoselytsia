@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каса МАНГО — Авторизація</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- ВІКНО ВХОДУ -->
+    <div id="auth-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f6f8;">
+        <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 320px;">
+            <img src="../favicon.jpg" alt="МАНГО" style="width: 80px; border-radius: 50%; margin-bottom: 20px;">
+            <h2 style="margin-bottom: 20px; font-family: sans-serif;">Вхід у Касу</h2>
+            <input type="email" id="auth-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
+            <input type="password" id="auth-password" placeholder="Пароль" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px;">
+            <button id="login-btn" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">УВІЙТИ</button>
+            <p id="auth-error" style="color: red; font-size: 13px; margin-top: 15px; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- ОСНОВНИЙ ІНТЕРФЕЙС КАСИ (ПРИХОВАНИЙ ДО ВХОДУ) -->
+    <div id="app-container" style="display: none;">
+        <div id="cart-section">
+            <h2>Поточний чек <span id="user-display" style="font-size: 14px; color: #666; font-weight: normal;"></span></h2>
+            <ul id="cart-items"></ul>
+            <div id="discount-section">
+                <input type="number" id="discount-input" placeholder="Знижка (грн)">
+                <button id="apply-discount-btn">Застосувати</button>
+            </div>
+            <div id="total-price">Разом до сплати: <span>0</span> грн</div>
+        </div>
+
+        <div id="control-section">
+            <input type="text" id="barcode-input" placeholder="Скануйте товар..." autocomplete="off">
+            <button id="pay-button">ОПЛАТИТИ ТА ДРУКУВАТИ ЧЕК</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="z-report-btn" style="background: #6c757d; color: white; flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📊 Z-Звіт</button>
+                <button id="open-warehouse-btn" style="background: #17a2b8; color: white; flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📦 СКЛАД</button>
+                <button id="logout-btn" style="background: #dc3545; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Вихід</button>
+            </div>
+
+            <div id="admin-section" style="margin-top: 20px;">
+                <h3>Прийом товару</h3>
+                <div class="admin-inputs">
+                    <input type="text" id="new-barcode" placeholder="Штрихкод">
+                    <input type="text" id="new-name" placeholder="Назва товару">
+                    <input type="number" id="new-price" placeholder="Ціна">
+                    <input type="number" id="new-quantity" placeholder="Кількість">
+                    <button id="add-product-btn">ДОДАТИ НА СКЛАД</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА СКЛАДУ -->
+    <div id="warehouse-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 style="border: none;">📦 Залишки на складі</h2>
+            <table id="warehouse-table">
+                <thead>
+                    <tr><th>Код</th><th>Назва</th><th>Ціна</th><th>К-сть</th><th>Дія</th></tr>
+                </thead>
+                <tbody id="warehouse-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="print-section"></div>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
