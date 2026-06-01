@@ -3,75 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Сканер МАНГО</title>
+    <title>Сканер МАНГО - PRO</title>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 15px; }
-        #video { width: 100%; max-width: 450px; border-radius: 12px; background: #000; border: 2px solid #333; }
-        .status { padding: 12px; margin: 10px 0; border-radius: 8px; font-weight: bold; font-size: 16px; background: #28a745; }
-        #last-barcode { font-size: 28px; color: #ffc107; margin: 15px 0; font-weight: bold; letter-spacing: 1px; }
-        .btn { padding: 18px 30px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; background: #007bff; color: white; cursor: pointer; width: 100%; max-width: 300px; }
-        .btn-next { background: #28a745; display: none; margin-top: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #131313 0%, #242424 100%);
+            color: white;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container { max-width: 500px; margin: 0 auto; width: 100%; }
+        h2 { font-size: 22px; margin-bottom: 15px; letter-spacing: 0.5px; color: #ffc107; }
+        
+        .status-container { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .status-badge { padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .status-badge.camera { background: #1e3a8a; color: #93c5fd; }
+        .status-badge.network { background: #2e2e2e; color: #ccc; }
+        .status-badge.success { background: #166534; color: #86efac; }
+        .status-badge.error { background: #7c2d12; color: #fed7aa; }
+        
+        .video-container { position: relative; margin: 15px 0; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid #333; }
+        #video { width: 100%; display: block; }
+        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 3px solid transparent; }
+        .video-overlay.scanning { border-color: #10b981; box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.3); }
+        .scanning-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #10b981, transparent); top: 50%; animation: scan 2s infinite; }
+        @keyframes scan { 0% { top: 20%; } 50% { top: 50%; } 100% { top: 80%; } }
+        
+        .info-section { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; margin: 10px 0; border: 1px solid rgba(255, 255, 255, 0.1); }
+        #last-barcode { font-size: 28px; color: #10b981; margin: 5px 0; font-weight: bold; font-family: monospace; }
+        
+        .btn { padding: 16px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.2s ease; width: 100%; text-transform: uppercase; margin-top: 10px; }
+        .btn-start { background: #0ea5e9; }
+        .btn-next { background: #10b981; display: none; }
+        .btn-torch { background: #6366f1; display: none; }
+        .btn-stop { background: #ef4444; display: none; }
+        
+        .config-section { background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 12px; margin-top: 20px; text-align: left; border: 1px solid #333; }
+        .config-section input { width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #444; border-radius: 6px; background: #222; color: white; }
+        
+        .barcode-history { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 10px; margin-top: 10px; max-height: 120px; overflow-y: auto; text-align: left; font-size: 13px; }
+        .history-item { padding: 5px; border-bottom: 1px solid #333; color: #bbb; }
+        .error-message, .success-message { padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; display: none; }
+        .error-message { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .success-message { background: rgba(16, 185, 129, 0.2); color: #86efac; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>📦 СКАНЕР МАНГО PRO</h2>
+        
+        <div class="status-container">
+            <div class="status-badge camera" id="camera-status">Камера: готовність</div>
+            <div class="status-badge network" id="network-status">Asus: очікування</div>
+        </div>
 
-    <h2>📦 СКАНЕР МАНГО</h2>
-    <div class="status">Зв'язок з Asus [192.168.0.103] готовий</div>
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
 
-    <div style="margin: 15px 0; position: relative;">
-        <video id="video"></video>
+        <div class="video-container">
+            <video id="video"></video>
+            <div class="video-overlay" id="video-overlay">
+                <div class="scanning-line"></div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div style="font-size: 12px; color: #aaa;">ЗЧИТАНИЙ ШТРИХКОД:</div>
+            <div id="last-barcode">---</div>
+        </div>
+
+        <button class="btn btn-start" id="start-btn">▶ УВІМКНУТИ КАМЕРУ</button>
+        <button class="btn btn-next" id="next-btn">👉 НАСТУПНИЙ ТОВАР</button>
+        <button class="btn btn-torch" id="torch-btn">💡 ЛІХТАР</button>
+        <button class="btn btn-stop" id="stop-btn">⏹ ЗУПИНИТИ</button>
+
+        <div class="barcode-history">
+            <div style="font-weight: bold; margin-bottom: 5px; color: #aaa;">Останні сканування:</div>
+            <div id="history-list"><div style="color:#666;">Список порожній</div></div>
+        </div>
+
+        <div class="config-section">
+            <span style="font-size: 12px; color: #888; font-weight: bold;">🔧 НАЛАШТУВАННЯ ЗВ'ЯЗКУ:</span>
+            <label style="display:block; font-size:12px; margin-top:5px;">IP комп'ютера Asus:</label>
+            <input type="text" id="server-ip" value="192.168.0.103">
+            <label style="display:block; font-size:12px;">Порт локального сервера:</label>
+            <input type="number" id="server-port" value="5000">
+        </div>
     </div>
 
-    <div>Зчитаний штрихкод:</div>
-    <div id="last-barcode">---</div>
-
-    <button class="btn" id="start-btn">УВІМКНУТИ КАМЕРУ</button>
-    <button class="btn btn-next" id="next-btn">👉 СЛЕДУЮЩИЙ ТОВАР</button>
-
     <script>
-        const ASUS_IP = "192.168.0.103"; 
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-        let controls = null;
+        let config = {
+            serverIp: localStorage.getItem('serverIp') || '192.168.0.103',
+            serverPort: localStorage.getItem('serverPort') || '5000'
+        };
 
-        // Запуск камеры
-        document.getElementById('start-btn').addEventListener('click', async () => {
-            document.getElementById('start-btn').style.display = 'none';
-            startScanning();
+        let state = { isScanning: false, codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, torchActive: false, history: [] };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('server-ip').value = config.serverIp;
+            document.getElementById('server-port').value = config.serverPort;
+            setupEvents();
         });
 
-        async function startScanning() {
-            document.getElementById('next-btn').style.display = 'none';
+        function setupEvents() {
+            document.getElementById('start-btn').addEventListener('click', startScanning);
+            document.getElementById('next-btn').addEventListener('click', startScanning);
+            document.getElementById('stop-btn').addEventListener('click', stopScanning);
+            document.getElementById('torch-btn').addEventListener('click', toggleTorch);
             
-            controls = await codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-                if (result) {
-                    const barcodeValue = result.text;
-                    document.getElementById('last-barcode').innerText = barcodeValue;
-                    
-                    if (navigator.vibrate) navigator.vibrate(150);
-
-                    // ОСТАНАВЛИВАЕМ СКАНЕР (Замораживаем процесс), чтобы избежать пулеметного спама
-                    if (controls) {
-                        controls.stop();
-                    }
-
-                    // Показываем кнопку "Следющий товар"
-                    document.getElementById('next-btn').style.display = 'inline-block';
-
-                    // Отправляем штрихкод на комп Asus
-                    fetch(`http://${ASUS_IP}:5000/scan`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ barcode: barcodeValue })
-                    }).catch(e => console.error('Ошибка сети:', e));
-                }
+            document.getElementById('server-ip').addEventListener('change', (e) => {
+                config.serverIp = e.target.value;
+                localStorage.setItem('serverIp', config.serverIp);
+            });
+            document.getElementById('server-port').addEventListener('change', (e) => {
+                config.serverPort = e.target.value;
+                localStorage.setItem('serverPort', config.serverPort);
             });
         }
 
-        // Кнопка спуска для следующего сканирования
-        document.getElementById('next-btn').addEventListener('click', () => {
-            startScanning();
-        });
+        async function startScanning() {
+            try {
+                document.getElementById('start-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('stop-btn').style.display = 'inline-block';
+                document.getElementById('torch-btn').style.display = 'inline-block';
+                document.getElementById('video-overlay').classList.add('scanning');
+                updateStatus('camera-status', 'status-badge camera success', 'Камера: активна');
+
+                state.controls = await state.codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+                    if (result) {
+                        handleCode(result.text);
+                    }
+                });
+            } catch (e) {
+                document.getElementById('error-message').innerText = "Помилка камери: " + e.message;
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+
+        function handleCode(code) {
+            if (navigator.vibrate) navigator.vibrate(150);
+            document.getElementById('last-barcode').innerText = code;
+            
+            if(state.controls) state.controls.stop();
+            document.getElementById('video-overlay').classList.remove('scanning');
+            document.getElementById('next-btn').style.display = 'inline-block';
+            
+            // Додавання в історію
+            state.history.unshift(code);
+            if(state.history.length > 5) state.history.pop();
+            document.getElementById('history-list').innerHTML = state.history.map(c => `<div class="history-item">🔹 ${c}</div>`).join('');
+
+            // Відправка на Asus
+            updateStatus('network-status', 'status-badge network', 'Відправка...');
+            fetch(`http://${config.serverIp}:${config.serverPort}/scan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ barcode: code })
+            })
+            .then(() => updateStatus('network-status', 'status-badge success', 'Успішно на Asus'))
+            .catch(() => updateStatus('network-status', 'status-badge error', 'Помилка мережі Wi-Fi'));
+        }
+
+        function stopScanning() {
+            if (state.controls) state.controls.stop();
+            document.getElementById('stop-btn').style.display = 'none';
+            document.getElementById('torch-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('video-overlay').classList.remove('scanning');
+            updateStatus('camera-status', 'status-badge camera', 'Камера: зупинена');
+        }
+
+        async function toggleTorch() {
+            try {
+                if (!state.controls) return;
+                const track = state.controls.stream.getVideoTracks()[0];
+                state.torchActive = !state.torchActive;
+                await track.applyConstraints({ advanced: [{ torch: state.torchActive }] });
+            } catch (e) { alert("Ліхтар не підтримується цим браузером"); }
+        }
+
+        function updateStatus(id, className, text) {
+            const el = document.getElementById(id);
+            el.className = className;
+            el.innerText = text;
+        }
     </script>
 </body>
 </html>
