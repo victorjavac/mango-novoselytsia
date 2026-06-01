@@ -9,8 +9,9 @@
         body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 15px; }
         #video { width: 100%; max-width: 450px; border-radius: 12px; background: #000; border: 2px solid #333; }
         .status { padding: 12px; margin: 10px 0; border-radius: 8px; font-weight: bold; font-size: 16px; background: #28a745; }
-        #last-barcode { font-size: 26px; color: #ffc107; margin: 15px 0; font-weight: bold; letter-spacing: 1px; }
+        #last-barcode { font-size: 28px; color: #ffc107; margin: 15px 0; font-weight: bold; letter-spacing: 1px; }
         .btn { padding: 18px 30px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; background: #007bff; color: white; cursor: pointer; width: 100%; max-width: 300px; }
+        .btn-next { background: #28a745; display: none; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -18,43 +19,58 @@
     <h2>📦 СКАНЕР МАНГО</h2>
     <div class="status">Зв'язок з Asus [192.168.0.103] готовий</div>
 
-    <div style="margin: 15px 0;">
+    <div style="margin: 15px 0; position: relative;">
         <video id="video"></video>
     </div>
 
-    <div>Останній код:</div>
+    <div>Зчитаний штрихкод:</div>
     <div id="last-barcode">---</div>
 
     <button class="btn" id="start-btn">УВІМКНУТИ КАМЕРУ</button>
+    <button class="btn btn-next" id="next-btn">👉 СЛЕДУЮЩИЙ ТОВАР</button>
 
     <script>
         const ASUS_IP = "192.168.0.103"; 
         const codeReader = new ZXing.BrowserMultiFormatReader();
-        let isScanning = false;
+        let controls = null;
 
-        document.getElementById('start-btn').addEventListener('click', () => {
-            if (isScanning) return;
-            isScanning = true;
+        // Запуск камеры
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            document.getElementById('start-btn').style.display = 'none';
+            startScanning();
+        });
+
+        async function startScanning() {
+            document.getElementById('next-btn').style.display = 'none';
             
-            codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+            controls = await codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
                 if (result) {
                     const barcodeValue = result.text;
                     document.getElementById('last-barcode').innerText = barcodeValue;
                     
                     if (navigator.vibrate) navigator.vibrate(150);
 
-                    // Надсилаємо штрихкод на Asus по локальній мережі
+                    // ОСТАНАВЛИВАЕМ СКАНЕР (Замораживаем процесс), чтобы избежать пулеметного спама
+                    if (controls) {
+                        controls.stop();
+                    }
+
+                    // Показываем кнопку "Следющий товар"
+                    document.getElementById('next-btn').style.display = 'inline-block';
+
+                    // Отправляем штрихкод на комп Asus
                     fetch(`http://${ASUS_IP}:5000/scan`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ barcode: barcodeValue })
-                    })
-                    .catch(error => {
-                        console.error('Помилка:', error);
-                    });
+                    }).catch(e => console.error('Ошибка сети:', e));
                 }
             });
-            document.getElementById('start-btn').style.display = 'none';
+        }
+
+        // Кнопка спуска для следующего сканирования
+        document.getElementById('next-btn').addEventListener('click', () => {
+            startScanning();
         });
     </script>
 </body>
