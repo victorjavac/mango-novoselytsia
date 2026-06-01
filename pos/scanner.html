@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Сканер МАНГО - PRO</title>
+    <title>Сканер МАНГО - ULTRA</title>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             text-align: center;
-            background: linear-gradient(135deg, #131313 0%, #242424 100%);
+            background: linear-gradient(135deg, #121212 0%, #222222 100%);
             color: white;
             padding: 15px;
             min-height: 100vh;
@@ -18,52 +18,50 @@
             flex-direction: column;
         }
         .container { max-width: 500px; margin: 0 auto; width: 100%; }
-        h2 { font-size: 22px; margin-bottom: 15px; letter-spacing: 0.5px; color: #ffc107; }
+        h2 { font-size: 22px; margin-bottom: 15px; color: #ffc107; letter-spacing: 0.5px; }
         
         .status-container { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
-        .status-badge { padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .status-badge { padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; }
         .status-badge.camera { background: #1e3a8a; color: #93c5fd; }
+        .status-badge.camera.active { background: #166534; color: #86efac; }
+        .status-badge.camera.freeze { background: #d97706; color: #fef3c7; }
         .status-badge.network { background: #2e2e2e; color: #ccc; }
-        .status-badge.success { background: #166534; color: #86efac; }
-        .status-badge.error { background: #7c2d12; color: #fed7aa; }
+        .status-badge.network.success { background: #166534; color: #86efac; }
+        .status-badge.network.error { background: #7c2d12; color: #fed7aa; }
         
         .video-container { position: relative; margin: 15px 0; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid #333; }
         #video { width: 100%; display: block; }
-        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 3px solid transparent; }
+        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 4px solid transparent; transition: all 0.3s; }
         .video-overlay.scanning { border-color: #10b981; box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.3); }
+        .video-overlay.freeze { border-color: #f59e0b; box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.4); background: rgba(0,0,0,0.4); }
         .scanning-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #10b981, transparent); top: 50%; animation: scan 2s infinite; }
+        .video-overlay.freeze .scanning-line { display: none; }
         @keyframes scan { 0% { top: 20%; } 50% { top: 50%; } 100% { top: 80%; } }
         
         .info-section { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; margin: 10px 0; border: 1px solid rgba(255, 255, 255, 0.1); }
-        #last-barcode { font-size: 28px; color: #10b981; margin: 5px 0; font-weight: bold; font-family: monospace; }
+        #last-barcode { font-size: 30px; color: #10b981; margin: 5px 0; font-weight: bold; font-family: monospace; }
+        #freeze-timer { font-size: 14px; color: #f59e0b; font-weight: bold; margin-top: 5px; display: none; }
         
-        .btn { padding: 16px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.2s ease; width: 100%; text-transform: uppercase; margin-top: 10px; }
+        .btn { padding: 16px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; color: white; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 5px; }
         .btn-start { background: #0ea5e9; }
-        .btn-next { background: #10b981; display: none; }
         .btn-torch { background: #6366f1; display: none; }
         .btn-stop { background: #ef4444; display: none; }
         
-        .config-section { background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 12px; margin-top: 20px; text-align: left; border: 1px solid #333; }
-        .config-section input { width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #444; border-radius: 6px; background: #222; color: white; }
+        .barcode-history { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 10px; margin-top: 10px; max-height: 110px; overflow-y: auto; text-align: left; font-size: 13px; }
+        .history-item { padding: 5px; border-bottom: 1px solid #333; color: #bbb; display: flex; justify-content: space-between; }
         
-        .barcode-history { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 10px; margin-top: 10px; max-height: 120px; overflow-y: auto; text-align: left; font-size: 13px; }
-        .history-item { padding: 5px; border-bottom: 1px solid #333; color: #bbb; }
-        .error-message, .success-message { padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; display: none; }
-        .error-message { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-        .success-message { background: rgba(16, 185, 129, 0.2); color: #86efac; }
+        .config-section { background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px; margin-top: 15px; text-align: left; border: 1px solid #333; }
+        .config-section input { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #444; border-radius: 6px; background: #222; color: white; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>📦 СКАНЕР МАНГО PRO</h2>
+        <h2>📦 СКАНЕР МАНГО ULTRA</h2>
         
         <div class="status-container">
-            <div class="status-badge camera" id="camera-status">Камера: готовність</div>
+            <div class="status-badge camera" id="camera-status">Камера: вимкнена</div>
             <div class="status-badge network" id="network-status">Asus: очікування</div>
         </div>
-
-        <div class="error-message" id="error-message"></div>
-        <div class="success-message" id="success-message"></div>
 
         <div class="video-container">
             <video id="video"></video>
@@ -73,25 +71,25 @@
         </div>
 
         <div class="info-section">
-            <div style="font-size: 12px; color: #aaa;">ЗЧИТАНИЙ ШТРИХКОД:</div>
+            <div style="font-size: 12px; color: #aaa; font-weight: bold;">ЗЧИТАНИЙ ШТРИХКОД:</div>
             <div id="last-barcode">---</div>
+            <div id="freeze-timer">Зачекайте, фіксація коду...</div>
         </div>
 
         <button class="btn btn-start" id="start-btn">▶ УВІМКНУТИ КАМЕРУ</button>
-        <button class="btn btn-next" id="next-btn">👉 НАСТУПНИЙ ТОВАР</button>
         <button class="btn btn-torch" id="torch-btn">💡 ЛІХТАР</button>
         <button class="btn btn-stop" id="stop-btn">⏹ ЗУПИНИТИ</button>
 
         <div class="barcode-history">
-            <div style="font-weight: bold; margin-bottom: 5px; color: #aaa;">Останні сканування:</div>
-            <div id="history-list"><div style="color:#666;">Список порожній</div></div>
+            <div style="font-weight: bold; margin-bottom: 5px; color: #888; font-size: 11px; text-transform: uppercase;">Останні 3 сканування:</div>
+            <div id="history-list"><div style="color:#555;">Історія порожня</div></div>
         </div>
 
         <div class="config-section">
-            <span style="font-size: 12px; color: #888; font-weight: bold;">🔧 НАЛАШТУВАННЯ ЗВ'ЯЗКУ:</span>
-            <label style="display:block; font-size:12px; margin-top:5px;">IP комп'ютера Asus:</label>
+            <span style="font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase;">🔧 НАЛАШТУВАННЯ АДРЕСИ (В мережі Wi-Fi):</span>
+            <label style="display:block; font-size:12px; margin-top:5px; color:#aaa;">IP-адреса комп'ютера Asus:</label>
             <input type="text" id="server-ip" value="192.168.0.103">
-            <label style="display:block; font-size:12px;">Порт локального сервера:</label>
+            <label style="display:block; font-size:12px; color:#aaa;">Порт локального сервера:</label>
             <input type="number" id="server-port" value="5000">
         </div>
     </div>
@@ -102,17 +100,13 @@
             serverPort: localStorage.getItem('serverPort') || '5000'
         };
 
-        let state = { isScanning: false, codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, torchActive: false, history: [] };
+        let state = { codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, torchActive: false, history: [], isReadyToScan: true };
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('server-ip').value = config.serverIp;
             document.getElementById('server-port').value = config.serverPort;
-            setupEvents();
-        });
-
-        function setupEvents() {
+            
             document.getElementById('start-btn').addEventListener('click', startScanning);
-            document.getElementById('next-btn').addEventListener('click', startScanning);
             document.getElementById('stop-btn').addEventListener('click', stopScanning);
             document.getElementById('torch-btn').addEventListener('click', toggleTorch);
             
@@ -124,60 +118,70 @@
                 config.serverPort = e.target.value;
                 localStorage.setItem('serverPort', config.serverPort);
             });
-        }
+        });
 
         async function startScanning() {
-            try {
-                document.getElementById('start-btn').style.display = 'none';
-                document.getElementById('next-btn').style.display = 'none';
-                document.getElementById('stop-btn').style.display = 'inline-block';
-                document.getElementById('torch-btn').style.display = 'inline-block';
-                document.getElementById('video-overlay').classList.add('scanning');
-                updateStatus('camera-status', 'status-badge camera success', 'Камера: активна');
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'inline-block';
+            document.getElementById('torch-btn').style.display = 'inline-block';
+            document.getElementById('video-overlay').className = 'video-overlay scanning';
+            updateStatus('camera-status', 'status-badge camera active', 'Камера: активна');
+            state.isReadyToScan = true;
 
-                state.controls = await state.codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-                    if (result) {
-                        handleCode(result.text);
-                    }
-                });
-            } catch (e) {
-                document.getElementById('error-message').innerText = "Помилка камери: " + e.message;
-                document.getElementById('error-message').style.display = 'block';
-            }
+            state.controls = await state.codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+                if (result && state.isReadyToScan) {
+                    handleCode(result.text);
+                }
+            });
         }
 
         function handleCode(code) {
+            state.isReadyToScan = false; // Блокуємо пулеметне зчитування
+            
             if (navigator.vibrate) navigator.vibrate(150);
             document.getElementById('last-barcode').innerText = code;
             
-            if(state.controls) state.controls.stop();
-            document.getElementById('video-overlay').classList.remove('scanning');
-            document.getElementById('next-btn').style.display = 'inline-block';
+            // Вмикаємо візуальну заморозку інтерфейсу
+            document.getElementById('video-overlay').className = 'video-overlay freeze';
+            document.getElementById('freeze-timer').style.display = 'block';
+            updateStatus('camera-status', 'status-badge camera freeze', 'Фіксація...');
             
-            // Додавання в історію
-            state.history.unshift(code);
-            if(state.history.length > 5) state.history.pop();
-            document.getElementById('history-list').innerHTML = state.history.map(c => `<div class="history-item">🔹 ${c}</div>`).join('');
+            // Запис в історію
+            let time = new Date().toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            state.history.unshift({code, time});
+            if(state.history.length > 3) state.history.pop();
+            document.getElementById('history-list').innerHTML = state.history.map(h => `<div class="history-item"><span>🔹 ${h.code}</span><span style="font-size:11px;color:#666;">${h.time}</span></div>`).join('');
 
-            // Відправка на Asus
-            updateStatus('network-status', 'status-badge network', 'Відправка...');
+            // Беззвучна відправка на ноутбук Asus
+            updateStatus('network-status', 'status-badge network', 'Передача...');
             fetch(`http://${config.serverIp}:${config.serverPort}/scan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ barcode: code })
             })
-            .then(() => updateStatus('network-status', 'status-badge success', 'Успішно на Asus'))
-            .catch(() => updateStatus('network-status', 'status-badge error', 'Помилка мережі Wi-Fi'));
+            .then(() => updateStatus('network-status', 'status-badge success', 'Додано на Asus'))
+            .catch(() => updateStatus('network-status', 'status-badge error', 'Помилка Wi-Fi'));
+
+            // АВТОМАТИЧНЕ РОЗМОРОЖЕННЯ ЧЕРЕЗ 2.5 СЕКУНДИ
+            setTimeout(() => {
+                if (state.controls) {
+                    state.isReadyToScan = true;
+                    document.getElementById('video-overlay').className = 'video-overlay scanning';
+                    document.getElementById('freeze-timer').style.display = 'none';
+                    updateStatus('camera-status', 'status-badge camera active', 'Камера: активна');
+                }
+            }, 2500);
         }
 
         function stopScanning() {
             if (state.controls) state.controls.stop();
+            state.controls = null;
             document.getElementById('stop-btn').style.display = 'none';
             document.getElementById('torch-btn').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
             document.getElementById('start-btn').style.display = 'inline-block';
-            document.getElementById('video-overlay').classList.remove('scanning');
-            updateStatus('camera-status', 'status-badge camera', 'Камера: зупинена');
+            document.getElementById('freeze-timer').style.display = 'none';
+            document.getElementById('video-overlay').className = 'video-overlay';
+            updateStatus('camera-status', 'status-badge camera', 'Камера: вимкнена');
         }
 
         async function toggleTorch() {
@@ -186,7 +190,7 @@
                 const track = state.controls.stream.getVideoTracks()[0];
                 state.torchActive = !state.torchActive;
                 await track.applyConstraints({ advanced: [{ torch: state.torchActive }] });
-            } catch (e) { alert("Ліхтар не підтримується цим браузером"); }
+            } catch (e) { alert("Ліхтар не підтримується на цьому пристрої"); }
         }
 
         function updateStatus(id, className, text) {
