@@ -126,23 +126,18 @@
         ip: localStorage.getItem('mango_pro_ip') || '192.168.0.103', port: '5000', audioCtx: null
     };
 
-    // Авторизація
-    document.getElementById('auth-btn').addEventListener('click', () => {
-        const email = document.getElementById('auth-email').value.trim();
-        const pass = document.getElementById('auth-pass').value.trim();
-        auth.signInWithEmailAndPassword(email, pass).catch(err => {
-            document.getElementById('auth-error').innerText = "Помилка входу";
-            document.getElementById('auth-error').style.display = 'block';
-        });
-    });
-
-    auth.onAuthStateChanged(user => {
-        if(user) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-content').style.display = 'flex';
-            fetchWarehouse();
-        }
-    });
+   // ==========================================
+    // АВТОМАТИЧНИЙ ВХІД БЕЗ ПАРОЛІВ (МАНГО-PRO)
+    // ==========================================
+    
+    // Одразу приховуємо екран авторизації та відкриваємо сканер
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'flex';
+    
+    // Спроба завантажити склад з Asus при старті
+    setTimeout(() => {
+        fetchWarehouse();
+    }, 500);
 
     // Звуковий чіп каси
     function beep(freq, dur) {
