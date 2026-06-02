@@ -2,202 +2,287 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Сканер МАНГО - ULTRA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>МАНГО ТЕРМІНАЛ — Professional</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #121212 0%, #222222 100%);
-            color: white;
-            padding: 15px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --primary: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --bg-dark: #090d16; --bg-card: rgba(30, 41, 59, 0.7); --text: #f8fafc;
         }
-        .container { max-width: 500px; margin: 0 auto; width: 100%; }
-        h2 { font-size: 22px; margin-bottom: 15px; color: #ffc107; letter-spacing: 0.5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        .wrapper { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
         
-        .status-container { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
-        .status-badge { padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; }
-        .status-badge.camera { background: #1e3a8a; color: #93c5fd; }
-        .status-badge.camera.active { background: #166534; color: #86efac; }
-        .status-badge.camera.freeze { background: #d97706; color: #fef3c7; }
-        .status-badge.network { background: #2e2e2e; color: #ccc; }
-        .status-badge.network.success { background: #166534; color: #86efac; }
-        .status-badge.network.error { background: #7c2d12; color: #fed7aa; }
+        h2 { background: linear-gradient(135deg, #ffd966, #ffa500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; text-align: center; font-weight: 800; }
+        .badge-row { display: flex; gap: 10px; }
+        .badge { flex: 1; background: #1e293b; padding: 10px; border-radius: 30px; font-size: 12px; font-weight: bold; text-align: center; border-left: 4px solid #334155; }
+        .badge.active { border-left-color: var(--primary); color: #86efac; background: #064e3b; }
+        .badge.freeze { border-left-color: var(--warning); color: #fde047; background: #78350f; }
         
-        .video-container { position: relative; margin: 15px 0; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid #333; }
-        #video { width: 100%; display: block; }
-        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 4px solid transparent; transition: all 0.3s; }
-        .video-overlay.scanning { border-color: #10b981; box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.3); }
-        .video-overlay.freeze { border-color: #f59e0b; box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.4); background: rgba(0,0,0,0.4); }
-        .scanning-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #10b981, transparent); top: 50%; animation: scan 2s infinite; }
-        .video-overlay.freeze .scanning-line { display: none; }
-        @keyframes scan { 0% { top: 20%; } 50% { top: 50%; } 100% { top: 80%; } }
+        .cam-box { position: relative; border-radius: 24px; overflow: hidden; border: 2px solid #334155; background: #000; aspect-ratio: 4/3; }
+        #video { width: 100%; height: 100%; object-fit: cover; }
+        .laser-line { position: absolute; width: 90%; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), #fff, var(--primary), transparent); left: 5%; top: 50%; animation: laser 2s infinite ease-in-out; }
+        @keyframes laser { 0%, 100% { top: 20%; } 50% { top: 80%; } }
         
-        .info-section { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; margin: 10px 0; border: 1px solid rgba(255, 255, 255, 0.1); }
-        #last-barcode { font-size: 30px; color: #10b981; margin: 5px 0; font-weight: bold; font-family: monospace; }
-        #freeze-timer { font-size: 14px; color: #f59e0b; font-weight: bold; margin-top: 5px; display: none; }
+        .freeze-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--warning); font-weight: bold; }
+        .progress-container { width: 70%; height: 4px; background: #334155; border-radius: 2px; margin-top: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: var(--warning); transition: width 0.05s linear; }
+
+        .card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 14px; }
+        .input-row { display: flex; gap: 8px; margin-top: 5px; }
+        input { flex: 1; background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 12px; color: white; font-size: 16px; font-family: monospace; }
+        input:focus { outline: 1px solid var(--primary); }
         
-        .btn { padding: 16px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; color: white; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 5px; }
-        .btn-start { background: #0ea5e9; }
-        .btn-torch { background: #6366f1; display: none; }
-        .btn-stop { background: #ef4444; display: none; }
+        .btn { padding: 14px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 14px; }
+        .btn-main { background: #2563eb; color: white; width: 100%; }
+        .btn-action { flex: 1; font-size: 12px; padding: 10px; }
+        .btn-torch { background: #5b21b6; color: white; }
+        .btn-stop { background: var(--danger); color: white; }
+        .btn-find { background: var(--primary); color: white; border-radius: 12px; padding: 0 20px; }
+
+        .wh-table { max-height: 180px; overflow-y: auto; margin-top: 8px; }
+        .wh-item { display: flex; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid #334155; font-size: 14px; }
         
-        .barcode-history { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 10px; margin-top: 10px; max-height: 110px; overflow-y: auto; text-align: left; font-size: 13px; }
-        .history-item { padding: 5px; border-bottom: 1px solid #333; color: #bbb; display: flex; justify-content: space-between; }
-        
-        .config-section { background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px; margin-top: 15px; text-align: left; border: 1px solid #333; }
-        .config-section input { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #444; border-radius: 6px; background: #222; color: white; font-size: 14px; }
+        /* Екран авторизації */
+        #auth-screen { position: fixed; inset: 0; background: #090d16; display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .auth-box { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>📦 СКАНЕР МАНГО ULTRA</h2>
-        
-        <div class="status-container">
-            <div class="status-badge camera" id="camera-status">Камера: вимкнена</div>
-            <div class="status-badge network" id="network-status">Asus: очікування</div>
-        </div>
 
-        <div class="video-container">
-            <video id="video"></video>
-            <div class="video-overlay" id="video-overlay">
-                <div class="scanning-line"></div>
-            </div>
-        </div>
+<div id="auth-screen">
+    <div class="auth-box">
+        <h2 style="margin-bottom: 15px;">🥭 ТЕРМІНАЛ МАНГО</h2>
+        <input type="email" id="auth-email" placeholder="Логін (Email)" style="width:100%; margin-bottom:10px;">
+        <input type="password" id="auth-pass" placeholder="Пароль" style="width:100%; margin-bottom:15px;">
+        <button class="btn btn-main" id="auth-btn">УВІЙТИ В СИСТЕМУ</button>
+        <div id="auth-error" style="color:var(--danger); font-size:13px; margin-top:10px; display:none;"></div>
+    </div>
+</div>
 
-        <div class="info-section">
-            <div style="font-size: 12px; color: #aaa; font-weight: bold;">ЗЧИТАНИЙ ШТРИХКОД:</div>
-            <div id="last-barcode">---</div>
-            <div id="freeze-timer">Зачекайте, фіксація коду...</div>
-        </div>
+<div class="wrapper" id="main-content" style="display: none;">
+    <h2>📡 МАНГО · ULTRA TERMINAL</h2>
+    
+    <div class="badge-row">
+        <div class="badge" id="badge-cam">📷 Камера: вимкнена</div>
+        <div class="badge" id="badge-server">🖥️ Asus: очікування</div>
+    </div>
 
-        <button class="btn btn-start" id="start-btn">▶ УВІМКНУТИ КАМЕРУ</button>
-        <button class="btn btn-torch" id="torch-btn">💡 ЛІХТАР</button>
-        <button class="btn btn-stop" id="stop-btn">⏹ ЗУПИНИТИ</button>
-
-        <div class="barcode-history">
-            <div style="font-weight: bold; margin-bottom: 5px; color: #888; font-size: 11px; text-transform: uppercase;">Останні 3 сканування:</div>
-            <div id="history-list"><div style="color:#555;">Історія порожня</div></div>
-        </div>
-
-        <div class="config-section">
-            <span style="font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase;">🔧 НАЛАШТУВАННЯ АДРЕСИ (В мережі Wi-Fi):</span>
-            <label style="display:block; font-size:12px; margin-top:5px; color:#aaa;">IP-адреса комп'ютера Asus:</label>
-            <input type="text" id="server-ip" value="192.168.0.103">
-            <label style="display:block; font-size:12px; color:#aaa;">Порт локального сервера:</label>
-            <input type="number" id="server-port" value="5000">
+    <div class="cam-box">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="laser-line" id="laser"></div>
+        <div class="freeze-overlay" id="freeze-ui">
+            <span>⏳ ФІКСАЦІЯ КОДУ...</span>
+            <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
         </div>
     </div>
 
-    <script>
-        let config = {
-            serverIp: localStorage.getItem('serverIp') || '192.168.0.103',
-            serverPort: localStorage.getItem('serverPort') || '5000'
-        };
+    <div class="btn-row" style="display:flex; gap:10px;">
+        <button class="btn btn-main" id="btn-start">▶ ЗАПУСТИТИ СКАНЕР</button>
+        <button class="btn btn-action btn-torch" id="btn-torch" style="display:none;">🔦 ЛІХТАР</button>
+        <button class="btn btn-action btn-stop" id="btn-stop" style="display:none;">⏹️ СТОП</button>
+    </div>
 
-        let state = { codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, torchActive: false, history: [], isReadyToScan: true };
+    <div class="card">
+        <div style="font-size:11px; color:#94a3b8; font-weight:bold; text-transform:uppercase;">📝 РУЧНЕ ВВЕДЕННЯ (якщо штрихкод стертий)</div>
+        <div class="input-row">
+            <input type="text" id="manual-input" placeholder="Введіть код вручну..." inputmode="numeric">
+            <button class="btn btn-find" id="btn-manual-send">ВЕНЕСТИ</button>
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('server-ip').value = config.serverIp;
-            document.getElementById('server-port').value = config.serverPort;
-            
-            document.getElementById('start-btn').addEventListener('click', startScanning);
-            document.getElementById('stop-btn').addEventListener('click', stopScanning);
-            document.getElementById('torch-btn').addEventListener('click', toggleTorch);
-            
-            document.getElementById('server-ip').addEventListener('change', (e) => {
-                config.serverIp = e.target.value;
-                localStorage.setItem('serverIp', config.serverIp);
-            });
-            document.getElementById('server-port').addEventListener('change', (e) => {
-                config.serverPort = e.target.value;
-                localStorage.setItem('serverPort', config.serverPort);
-            });
+    <div class="card">
+        <div style="font-weight:bold; font-size:13px; display:flex; justify-content:space-between;">
+            <span>🏪 СТАТУС СКЛАДУ НА ASUS</span>
+            <span id="btn-refresh" style="cursor:pointer; color:rgba(255,215,0,0.8)">⟳ ОНОВИТИ</span>
+        </div>
+        <div class="wh-table" id="wh-list">
+            <div style="text-align:center; padding:15px; color:#475569;">Склад очікує перевірки зв'язку...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Конфігурація бази Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
+        authDomain: "mangopos-393c4.firebaseapp.com",
+        projectId: "mangopos-393c4",
+        storageBucket: "mangopos-393c4.firebasestorage.app",
+        messagingSenderId: "742965231195",
+        appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    let state = {
+        codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, isReady: true, activeTrack: null, torch: false,
+        ip: localStorage.getItem('mango_pro_ip') || '192.168.0.103', port: '5000', audioCtx: null
+    };
+
+    // Авторизація
+    document.getElementById('auth-btn').addEventListener('click', () => {
+        const email = document.getElementById('auth-email').value.trim();
+        const pass = document.getElementById('auth-pass').value.trim();
+        auth.signInWithEmailAndPassword(email, pass).catch(err => {
+            document.getElementById('auth-error').innerText = "Помилка входу";
+            document.getElementById('auth-error').style.display = 'block';
         });
+    });
 
-        async function startScanning() {
-            document.getElementById('start-btn').style.display = 'none';
-            document.getElementById('stop-btn').style.display = 'inline-block';
-            document.getElementById('torch-btn').style.display = 'inline-block';
-            document.getElementById('video-overlay').className = 'video-overlay scanning';
-            updateStatus('camera-status', 'status-badge camera active', 'Камера: активна');
-            state.isReadyToScan = true;
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            fetchWarehouse();
+        }
+    });
 
+    // Звуковий чіп каси
+    function beep(freq, dur) {
+        try {
+            if(!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = state.audioCtx.createOscillator();
+            let gain = state.audioCtx.createGain();
+            osc.connect(gain); gain.connect(state.audioCtx.destination);
+            osc.frequency.value = freq; gain.gain.setValueAtTime(0.2, state.audioCtx.currentTime);
+            osc.start(); osc.stop(state.audioCtx.currentTime + (dur/1000));
+        } catch(e){}
+    }
+
+    async def startScanning() {
+        document.getElementById('btn-start').style.display = 'none';
+        document.getElementById('btn-stop').style.display = 'inline-block';
+        document.getElementById('btn-torch').style.display = 'inline-block';
+        document.getElementById('badge-cam').className = 'badge active';
+        document.getElementById('badge-cam').innerText = '✅ Камера: активна';
+        document.getElementById('laser').style.display = 'block';
+
+        try {
             state.controls = await state.codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-                if (result && state.isReadyToScan) {
-                    handleCode(result.text);
+                if(result && state.isReady) {
+                    processBarcode(result.text);
                 }
             });
-        }
+            if(state.controls && state.controls.stream) {
+                state.activeTrack = state.controls.stream.getVideoTracks()[0];
+            }
+        } catch(e) { alert("Камера недоступна"); stopScanning(); }
+    }
 
-        function handleCode(code) {
-            state.isReadyToScan = false; // Блокуємо пулеметне зчитування
-            
-            if (navigator.vibrate) navigator.vibrate(150);
-            document.getElementById('last-barcode').innerText = code;
-            
-            // Вмикаємо візуальну заморозку інтерфейсу
-            document.getElementById('video-overlay').className = 'video-overlay freeze';
-            document.getElementById('freeze-timer').style.display = 'block';
-            updateStatus('camera-status', 'status-badge camera freeze', 'Фіксація...');
-            
-            // Запис в історію
-            let time = new Date().toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-            state.history.unshift({code, time});
-            if(state.history.length > 3) state.history.pop();
-            document.getElementById('history-list').innerHTML = state.history.map(h => `<div class="history-item"><span>🔹 ${h.code}</span><span style="font-size:11px;color:#666;">${h.time}</span></div>`).join('');
+    function stopScanning() {
+        if(state.controls) state.controls.stop();
+        state.controls = null; state.activeTrack = null; state.torch = false;
+        document.getElementById('btn-start').style.display = 'block';
+        document.getElementById('btn-stop').style.display = 'none';
+        document.getElementById('btn-torch').style.display = 'none';
+        document.getElementById('badge-cam').className = 'badge';
+        document.getElementById('badge-cam').innerText = '📷 Камера: вимкнена';
+        document.getElementById('laser').style.display = 'none';
+    }
 
-            // Беззвучна відправка на ноутбук Asus
-            updateStatus('network-status', 'status-badge network', 'Передача...');
-            fetch(`http://${config.serverIp}:${config.serverPort}/scan`, {
+    async function processBarcode(code) {
+        state.isReady = false;
+        if(navigator.vibrate) navigator.vibrate([80, 40, 80]);
+        beep(1500, 70); setTimeout(() => beep(1900, 90), 80); // Фірмовий подвійний пік МАНГО
+
+        document.getElementById('freeze-ui').style.display = 'flex';
+        document.getElementById('badge-cam').className = 'badge freeze';
+        document.getElementById('badge-cam').innerText = '⏳ Фіксація...';
+
+        // Анімація прогрес-бару заморожування
+        let start = Date.now();
+        let interval = setInterval(() => {
+            let passed = Date.now() - start;
+            let percent = Math.min((passed / 2500) * 100, 100);
+            document.getElementById('p-bar').style.width = percent + '%';
+            if(passed >= 2500) clearInterval(interval);
+        }, 50);
+
+        // Беззвучна відправка на Asus
+        await sendData(code);
+
+        setTimeout(() => {
+            document.getElementById('freeze-ui').style.display = 'none';
+            document.getElementById('p-bar').style.width = '0%';
+            state.isReady = true;
+            if(state.controls) {
+                document.getElementById('badge-cam').className = 'badge active';
+                document.getElementById('badge-cam').innerText = '✅ Камера: активна';
+            }
+        }, 2500);
+    }
+
+    async function sendData(barcode) {
+        document.getElementById('badge-server').className = 'badge';
+        document.getElementById('badge-server').innerText = '📡 Передача...';
+        try {
+            let res = await fetch(`http://${state.ip}:5000/scan`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barcode: code })
-            })
-            .then(() => updateStatus('network-status', 'status-badge success', 'Додано на Asus'))
-            .catch(() => updateStatus('network-status', 'status-badge error', 'Помилка Wi-Fi'));
-
-            // АВТОМАТИЧНЕ РОЗМОРОЖЕННЯ ЧЕРЕЗ 2.5 СЕКУНДИ
-            setTimeout(() => {
-                if (state.controls) {
-                    state.isReadyToScan = true;
-                    document.getElementById('video-overlay').className = 'video-overlay scanning';
-                    document.getElementById('freeze-timer').style.display = 'none';
-                    updateStatus('camera-status', 'status-badge camera active', 'Камера: активна');
-                }
-            }, 2500);
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ barcode: barcode })
+            });
+            if(res.ok) {
+                document.getElementById('badge-server').className = 'badge active';
+                document.getElementById('badge-server').innerText = '✅ Доставлено';
+                let data = await res.json();
+                renderWarehouse(data.items);
+            } else { throw new Error(); }
+        } catch(e) {
+            document.getElementById('badge-server').className = 'badge freeze';
+            document.getElementById('badge-server').innerText = '❌ Помилка Wi-Fi';
+            beep(300, 200); // Низький звук помилки мережі
         }
+    }
 
-        function stopScanning() {
-            if (state.controls) state.controls.stop();
-            state.controls = null;
-            document.getElementById('stop-btn').style.display = 'none';
-            document.getElementById('torch-btn').style.display = 'none';
-            document.getElementById('start-btn').style.display = 'inline-block';
-            document.getElementById('freeze-timer').style.display = 'none';
-            document.getElementById('video-overlay').className = 'video-overlay';
-            updateStatus('camera-status', 'status-badge camera', 'Камера: вимкнена');
-        }
+    async function fetchWarehouse() {
+        try {
+            let res = await fetch(`http://${state.ip}:5000/warehouse`);
+            if(res.ok) {
+                let data = await res.json();
+                renderWarehouse(data.items);
+            }
+        } catch(e){}
+    }
 
-        async function toggleTorch() {
-            try {
-                if (!state.controls) return;
-                const track = state.controls.stream.getVideoTracks()[0];
-                state.torchActive = !state.torchActive;
-                await track.applyConstraints({ advanced: [{ torch: state.torchActive }] });
-            } catch (e) { alert("Ліхтар не підтримується на цьому пристрої"); }
+    function renderWarehouse(items) {
+        if(!items || items.length === 0) {
+            document.getElementById('wh-list').innerHTML = '<div style="text-align:center;padding:15px;color:#555;">Склад порожній</div>';
+            return;
         }
+        document.getElementById('wh-list').innerHTML = items.reverse().slice(0, 10).map(i => `
+            <div class="wh-item">
+                <span style="font-family:monospace; color:#facc15;">📦 ${i.barcode}</span>
+                <span style="background:#1e293b; padding:2px 10px; border-radius:10px; font-weight:bold;">${i.quantity} шт</span>
+            </div>
+        `).join('');
+    }
 
-        function updateStatus(id, className, text) {
-            const el = document.getElementById(id);
-            el.className = className;
-            el.innerText = text;
+    // Слухачі подій
+    document.getElementById('btn-start').addEventListener('click', startScanning);
+    document.getElementById('btn-stop').addEventListener('click', stopScanning);
+    document.getElementById('btn-refresh').addEventListener('click', fetchWarehouse);
+    
+    document.getElementById('btn-torch').addEventListener('click', async () => {
+        if(!state.activeTrack) return;
+        state.torch = !state.torch;
+        await state.activeTrack.applyConstraints({advanced: [{torch: state.torch}]});
+    });
+
+    document.getElementById('btn-manual-send').addEventListener('click', () => {
+        let code = document.getElementById('manual-input').value.trim();
+        if(code) {
+            sendData(code);
+            document.getElementById('manual-input').value = '';
         }
-    </script>
+    });
+</script>
+
 </body>
 </html>
