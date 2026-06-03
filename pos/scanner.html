@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>МАНГО ТЕРМІНАЛ — Professional</title>
+    <title>МАНГО ТЕРМІНАЛ — ULTRA</title>
     
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <style>
@@ -19,7 +16,7 @@
         body { background: var(--bg-dark); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         .wrapper { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
         
-        h2 { background: linear-gradient(135deg, #ffd966, #ffa500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; text-align: center; font-weight: 800; }
+        h2 { background: linear-gradient(135deg, #ffd966, #ffa500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; text-align: center; font-weight: 800; margin-top: 10px; }
         .badge-row { display: flex; gap: 10px; }
         .badge { flex: 1; background: #1e293b; padding: 10px; border-radius: 30px; font-size: 12px; font-weight: bold; text-align: center; border-left: 4px solid #334155; }
         .badge.active { border-left-color: var(--primary); color: #86efac; background: #064e3b; }
@@ -37,7 +34,6 @@
         .card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 14px; }
         .input-row { display: flex; gap: 8px; margin-top: 5px; }
         input { flex: 1; background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 12px; color: white; font-size: 16px; font-family: monospace; }
-        input:focus { outline: 1px solid var(--primary); }
         
         .btn { padding: 14px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 14px; }
         .btn-main { background: #2563eb; color: white; width: 100%; }
@@ -45,28 +41,11 @@
         .btn-torch { background: #5b21b6; color: white; }
         .btn-stop { background: var(--danger); color: white; }
         .btn-find { background: var(--primary); color: white; border-radius: 12px; padding: 0 20px; }
-
-        .wh-table { max-height: 180px; overflow-y: auto; margin-top: 8px; }
-        .wh-item { display: flex; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid #334155; font-size: 14px; }
-        
-        /* Екран авторизації */
-        #auth-screen { position: fixed; inset: 0; background: #090d16; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .auth-box { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<div id="auth-screen">
-    <div class="auth-box">
-        <h2 style="margin-bottom: 15px;">🥭 ТЕРМІНАЛ МАНГО</h2>
-        <input type="email" id="auth-email" placeholder="Логін (Email)" style="width:100%; margin-bottom:10px;">
-        <input type="password" id="auth-pass" placeholder="Пароль" style="width:100%; margin-bottom:15px;">
-        <button class="btn btn-main" id="auth-btn">УВІЙТИ В СИСТЕМУ</button>
-        <div id="auth-error" style="color:var(--danger); font-size:13px; margin-top:10px; display:none;"></div>
-    </div>
-</div>
-
-<div class="wrapper" id="main-content" style="display: none;">
+<div class="wrapper" id="main-content">
     <h2>📡 МАНГО · ULTRA TERMINAL</h2>
     
     <div class="badge-row">
@@ -76,14 +55,14 @@
 
     <div class="cam-box">
         <video id="video" autoplay playsinline muted></video>
-        <div class="laser-line" id="laser"></div>
+        <div class="laser-line" id="laser" style="display:none;"></div>
         <div class="freeze-overlay" id="freeze-ui">
             <span>⏳ ФІКСАЦІЯ КОДУ...</span>
             <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
         </div>
     </div>
 
-    <div class="btn-row" style="display:flex; gap:10px;">
+    <div class="btn-row" style="display:flex; gap:10px; margin-top: 5px;">
         <button class="btn btn-main" id="btn-start">▶ ЗАПУСТИТИ СКАНЕР</button>
         <button class="btn btn-action btn-torch" id="btn-torch" style="display:none;">🔦 ЛІХТАР</button>
         <button class="btn btn-action btn-stop" id="btn-stop" style="display:none;">⏹️ СТОП</button>
@@ -93,51 +72,32 @@
         <div style="font-size:11px; color:#94a3b8; font-weight:bold; text-transform:uppercase;">📝 РУЧНЕ ВВЕДЕННЯ (якщо штрихкод стертий)</div>
         <div class="input-row">
             <input type="text" id="manual-input" placeholder="Введіть код вручну..." inputmode="numeric">
-            <button class="btn btn-find" id="btn-manual-send">ВЕНЕСТИ</button>
+            <button class="btn btn-find" id="btn-manual-send">ВНЕСТИ</button>
         </div>
     </div>
-
+    
     <div class="card">
-        <div style="font-weight:bold; font-size:13px; display:flex; justify-content:space-between;">
-            <span>🏪 СТАТУС СКЛАДУ НА ASUS</span>
-            <span id="btn-refresh" style="cursor:pointer; color:rgba(255,215,0,0.8)">⟳ ОНОВИТИ</span>
-        </div>
-        <div class="wh-table" id="wh-list">
-            <div style="text-align:center; padding:15px; color:#475569;">Склад очікує перевірки зв'язку...</div>
-        </div>
+        <div style="font-size:11px; color:#94a3b8; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">🔧 НАЛАШТУВАННЯ АДРЕСИ (IP)</div>
+        <input type="text" id="server-ip-field" value="192.168.0.103" style="font-size:14px; padding:8px;">
     </div>
 </div>
 
 <script>
-    // Конфігурація бази Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-        authDomain: "mangopos-393c4.firebaseapp.com",
-        projectId: "mangopos-393c4",
-        storageBucket: "mangopos-393c4.firebasestorage.app",
-        messagingSenderId: "742965231195",
-        appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
     let state = {
         codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, isReady: true, activeTrack: null, torch: false,
-        ip: localStorage.getItem('mango_pro_ip') || '192.168.0.103', port: '5000', audioCtx: null
+        ip: localStorage.getItem('mango_pro_ip') || '192.168.0.103', audioCtx: null
     };
 
-   // ==========================================
-    // АВТОМАТИЧНИЙ ВХІД БЕЗ ПАРОЛІВ (МАНГО-PRO)
-    // ==========================================
-    
-    // Одразу приховуємо екран авторизації та відкриваємо сканер
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-content').style.display = 'flex';
-    
-    // Спроба завантажити склад з Asus при старті
-    setTimeout(() => {
-        fetchWarehouse();
-    }, 500);
+    // Ініціалізація сторінки
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('server-ip-field').value = state.ip;
+        
+        document.getElementById('server-ip-field').addEventListener('change', (e) => {
+            state.ip = e.target.value.trim();
+            localStorage.setItem('mango_pro_ip', state.ip);
+            document.getElementById('badge-server').innerText = '🖥️ IP оновлено';
+        });
+    });
 
     // Звуковий чіп каси
     function beep(freq, dur) {
@@ -151,7 +111,7 @@
         } catch(e){}
     }
 
-    async def startScanning() {
+    async function startScanning() {
         document.getElementById('btn-start').style.display = 'none';
         document.getElementById('btn-stop').style.display = 'inline-block';
         document.getElementById('btn-torch').style.display = 'inline-block';
@@ -185,13 +145,12 @@
     async function processBarcode(code) {
         state.isReady = false;
         if(navigator.vibrate) navigator.vibrate([80, 40, 80]);
-        beep(1500, 70); setTimeout(() => beep(1900, 90), 80); // Фірмовий подвійний пік МАНГО
+        beep(1500, 70); setTimeout(() => beep(1900, 90), 80); // Подвійний пік каси МАНГО
 
         document.getElementById('freeze-ui').style.display = 'flex';
         document.getElementById('badge-cam').className = 'badge freeze';
         document.getElementById('badge-cam').innerText = '⏳ Фіксація...';
 
-        // Анімація прогрес-бару заморожування
         let start = Date.now();
         let interval = setInterval(() => {
             let passed = Date.now() - start;
@@ -200,7 +159,6 @@
             if(passed >= 2500) clearInterval(interval);
         }, 50);
 
-        // Беззвучна відправка на Asus
         await sendData(code);
 
         setTimeout(() => {
@@ -209,7 +167,7 @@
             state.isReady = true;
             if(state.controls) {
                 document.getElementById('badge-cam').className = 'badge active';
-                document.getElementById('badge-cam').innerText = '✅ Камера: активна';
+                document.getElementById('badge-cam').innerText = '✅ Камера: active';
             }
         }, 2500);
     }
@@ -225,44 +183,18 @@
             });
             if(res.ok) {
                 document.getElementById('badge-server').className = 'badge active';
-                document.getElementById('badge-server').innerText = '✅ Доставлено';
-                let data = await res.json();
-                renderWarehouse(data.items);
+                document.getElementById('badge-server').innerText = '✅ На комп\'ютері';
             } else { throw new Error(); }
         } catch(e) {
             document.getElementById('badge-server').className = 'badge freeze';
             document.getElementById('badge-server').innerText = '❌ Помилка Wi-Fi';
-            beep(300, 200); // Низький звук помилки мережі
+            beep(300, 200); // Звук помилки мережі
         }
-    }
-
-    async function fetchWarehouse() {
-        try {
-            let res = await fetch(`http://${state.ip}:5000/warehouse`);
-            if(res.ok) {
-                let data = await res.json();
-                renderWarehouse(data.items);
-            }
-        } catch(e){}
-    }
-
-    function renderWarehouse(items) {
-        if(!items || items.length === 0) {
-            document.getElementById('wh-list').innerHTML = '<div style="text-align:center;padding:15px;color:#555;">Склад порожній</div>';
-            return;
-        }
-        document.getElementById('wh-list').innerHTML = items.reverse().slice(0, 10).map(i => `
-            <div class="wh-item">
-                <span style="font-family:monospace; color:#facc15;">📦 ${i.barcode}</span>
-                <span style="background:#1e293b; padding:2px 10px; border-radius:10px; font-weight:bold;">${i.quantity} шт</span>
-            </div>
-        `).join('');
     }
 
     // Слухачі подій
     document.getElementById('btn-start').addEventListener('click', startScanning);
     document.getElementById('btn-stop').addEventListener('click', stopScanning);
-    document.getElementById('btn-refresh').addEventListener('click', fetchWarehouse);
     
     document.getElementById('btn-torch').addEventListener('click', async () => {
         if(!state.activeTrack) return;
@@ -278,6 +210,5 @@
         }
     });
 </script>
-
 </body>
 </html>
