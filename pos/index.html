@@ -74,5 +74,84 @@
     <div id="print-section"></div>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="js/app.js"></script>
+    <script>
+    // =========================================================
+    // МАНГО-PRO: ТРИСТУПЕНЕВИЙ ЗАХИЩЕНИЙ АЛГОРИТМ ВИДАЛЕННЯ
+    // =========================================================
+    
+    // Функція, яка перехоплює натискання на кнопку видалення в таблиці складу
+    async function deleteProductWorkflow(productId, currentStatus) {
+        // КРОК 1: Товар активний на складі -> Переносимо в Архів (ховаємо з очей продавця)
+        if (!currentStatus || currentStatus === 'active') {
+            await db.collection('продукти').doc(productId).update({
+                archived: true,
+                status: 'archive'
+            });
+            alert('📦 Товар успішно переміщено в Архів!');
+            if (typeof loadWarehouse === 'function') loadWarehouse(); // Перезавантажуємо склад
+            return;
+        }
+
+        // КРОК 2: Товар уже в Архіві -> Переносимо далі в Кошик
+        if (currentStatus === 'archive') {
+            await db.collection('продукти').doc(productId).update({
+                status: 'trash'
+            });
+            alert('🗑️ Товар переміщено в Кошик сміття!');
+            if (typeof loadWarehouse === 'function') loadWarehouse();
+            return;
+        }
+
+        // КРОК 3: Товар у Кошику -> Запитуємо суворе фінальне твердження
+        if (currentStatus === 'trash') {
+            // Екран блокується, вискакує вікно-запит
+            const confirmDelete = window.confirm(
+                `⚠️ УВАГА! Ви намагаєтесь видалити товар (Код: ${productId}) НАЗАВЖДИ.\n\n` +
+                `Цей товар зникне з бази даних магазину МАНГО безповоротно! Його залишки та історія будуть стерті.\n\n` +
+                `Ви впевнені у своїй дії? Натисніть "ОК" для видалення або "Скасувати".`
+            );
+            
+            if (confirmDelete) {
+                // Пряме примусове видалення документа з хмари Google Firebase
+                await db.collection('продукти').doc(productId).delete();
+                alert('🔥 Товар повністю та безповоротно випалено з бази даних!');
+                if (typeof loadWarehouse === 'function') loadWarehouse();
+            } else {
+                console.log('Видалення скасовано користувачем. Дані в безпеці.');
+            }
+        }
+    }
+
+    // Автоматичне підключення нашого воркфлоу до кнопок таблиці складу
+    document.getElementById('open-warehouse-btn').addEventListener('click', () => {
+        setTimeout(() => {
+            const tableBody = document.getElementById('warehouse-table-body');
+            if (!tableBody) return;
+
+            // Слідкуємо за оновленням таблиці складу
+            const observer = new MutationObserver(() => {
+                const rows = tableBody.getElementsByTagName('tr');
+                for (let row of rows) {
+                    const actionBtn = row.querySelector('button, a.delete-btn');
+                    if (actionBtn && !actionBtn.dataset.secureBound) {
+                        actionBtn.dataset.secureBound = "true";
+                        
+                        // Забираємо старі функції та ставимо наш безпечний триступеневий захист
+                        const productId = row.cells[0].innerText.trim();
+                        // Визначаємо поточний статус товару з дата-атрибутів або за замовчуванням
+                        const currentStatus = actionBtn.dataset.status || 'active'; 
+                        
+                        actionBtn.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteProductWorkflow(productId, currentStatus);
+                        };
+                    }
+                }
+            });
+            observer.observe(tableBody, { childList: true });
+        }, 500);
+    });
+    </script>
 </body>
 </html>
