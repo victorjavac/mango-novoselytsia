@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- ВІКНО ВХОДУ -->
     <div id="auth-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f6f8;">
         <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 320px;">
             <img src="../favicon.jpg" alt="МАНГО" style="width: 80px; border-radius: 50%; margin-bottom: 20px;">
@@ -22,7 +21,6 @@
         </div>
     </div>
 
-    <!-- ОСНОВНИЙ ІНТЕРФЕЙС КАСИ (ПРИХОВАНИЙ ДО ВХОДУ) -->
     <div id="app-container" style="display: none;">
         <div id="cart-section">
             <h2>Поточний чек <span id="user-display" style="font-size: 14px; color: #666; font-weight: normal;"></span></h2>
@@ -57,8 +55,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА СКЛАДУ -->
-   <div id="warehouse-modal" class="modal">
+    <div id="warehouse-modal" class="modal">
         <div class="modal-content" style="background: #fff; max-width: 650px; width: 100%;">
             <span class="close-btn">&times;</span>
             
@@ -84,48 +81,38 @@
             </table>
         </div>
     </div>
-                <thead>
-                    <tr><th>Код</th><th>Назва</th><th>Ціна</th><th>К-сть</th><th>Дія</th></tr>
-                </thead>
-                <tbody id="warehouse-table-body"></tbody>
-            </table>
-        </div>
-    </div>
 
     <div id="print-section"></div>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="js/app.js"></script>
+    
     <script>
     // =========================================================
     // МАНГО-PRO: ТРИСТУПЕНЕВИЙ ЗАХИЩЕНИЙ АЛГОРИТМ ВИДАЛЕННЯ
     // =========================================================
-    
-    // Функція, яка перехоплює натискання на кнопку видалення в таблиці складу
+    let currentViewStatus = 'active'; 
+
     async function deleteProductWorkflow(productId, currentStatus) {
-        // КРОК 1: Товар активний на складі -> Переносимо в Архів (ховаємо з очей продавця)
         if (!currentStatus || currentStatus === 'active') {
             await db.collection('продукти').doc(productId).update({
                 archived: true,
                 status: 'archive'
             });
             alert('📦 Товар успішно переміщено в Архів!');
-            if (typeof loadWarehouse === 'function') loadWarehouse(); // Перезавантажуємо склад
+            loadWarehouseTableSecure(currentViewStatus); 
             return;
         }
 
-        // КРОК 2: Товар уже в Архіві -> Переносимо далі в Кошик
         if (currentStatus === 'archive') {
             await db.collection('продукти').doc(productId).update({
                 status: 'trash'
             });
             alert('🗑️ Товар переміщено в Кошик сміття!');
-            if (typeof loadWarehouse === 'function') loadWarehouse();
+            loadWarehouseTableSecure(currentViewStatus);
             return;
         }
 
-        // КРОК 3: Товар у Кошику -> Запитуємо суворе фінальне твердження
         if (currentStatus === 'trash') {
-            // Екран блокується, вискакує вікно-запит
             const confirmDelete = window.confirm(
                 `⚠️ УВАГА! Ви намагаєтесь видалити товар (Код: ${productId}) НАЗАВЖДИ.\n\n` +
                 `Цей товар зникне з бази даних магазину МАНГО безповоротно! Його залишки та історія будуть стерті.\n\n` +
@@ -133,51 +120,13 @@
             );
             
             if (confirmDelete) {
-                // Пряме примусове видалення документа з хмари Google Firebase
                 await db.collection('продукти').doc(productId).delete();
                 alert('🔥 Товар повністю та безповоротно випалено з бази даних!');
-                if (typeof loadWarehouse === 'function') loadWarehouse();
-            } else {
-                console.log('Видалення скасовано користувачем. Дані в безпеці.');
+                loadWarehouseTableSecure(currentViewStatus);
             }
         }
     }
 
-    // Автоматичне підключення нашого воркфлоу до кнопок таблиці складу
-    document.getElementById('open-warehouse-btn').addEventListener('click', () => {
-        setTimeout(() => {
-            const tableBody = document.getElementById('warehouse-table-body');
-            if (!tableBody) return;
-
-            // Слідкуємо за оновленням таблиці складу
-            const observer = new MutationObserver(() => {
-                const rows = tableBody.getElementsByTagName('tr');
-                for (let row of rows) {
-                    const actionBtn = row.querySelector('button, a.delete-btn');
-                    if (actionBtn && !actionBtn.dataset.secureBound) {
-                        actionBtn.dataset.secureBound = "true";
-                        
-                        // Забираємо старі функції та ставимо наш безпечний триступеневий захист
-                        const productId = row.cells[0].innerText.trim();
-                        // Визначаємо поточний статус товару з дата-атрибутів або за замовчуванням
-                        const currentStatus = actionBtn.dataset.status || 'active'; 
-                        
-                        actionBtn.onclick = (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            deleteProductWorkflow(productId, currentStatus);
-                        };
-                    }
-                }
-            });
-            observer.observe(tableBody, { childList: true });
-        }, 500);
-    });
-    </script>
-    // Логіка перемикання вкладок у модальному вікні складу
-    let currentViewStatus = 'active'; // За замовчуванням показуємо активні
-
-    // Функція фільтрації та відображення товарів залежно від обраної вкладки
     async function loadWarehouseTableSecure(status = 'active') {
         currentViewStatus = status;
         const tableBody = document.getElementById('warehouse-table-body');
@@ -188,9 +137,7 @@
         try {
             let query = db.collection('продукти');
             
-            // Налаштовуємо прецизійні фільтри під кожну вкладку
             if (status === 'active') {
-                // Показуємо тільки ті, що не в архіві й не в кошику
                 query = query.where('archived', '==', false);
             } else if (status === 'archive') {
                 query = query.where('status', '==', 'archive');
@@ -204,12 +151,10 @@
                 return;
             }
             
-            // Рендеримо рядки таблиці
             tableBody.innerHTML = snapshot.docs.map(doc => {
                 const p = doc.data();
                 const id = doc.id;
                 
-                // Налаштовуємо текст на червоній кнопці залежно від вкладки
                 let btnText = '🗑️ Архів';
                 if (status === 'archive') btnText = '🗑️ В Кошик';
                 if (status === 'trash') btnText = '🔥 ВИДАЛИТИ';
@@ -232,16 +177,17 @@
         }
     }
 
-    // Прив'язуємо кліки до кнопок-вкладок
+    // Прив'язуємо події до кнопок-вкладок
     document.getElementById('tab-active').addEventListener('click', () => loadWarehouseTableSecure('active'));
     document.getElementById('tab-archive').addEventListener('click', () => loadWarehouseTableSecure('archive'));
     document.getElementById('tab-trash').addEventListener('click', () => loadWarehouseTableSecure('trash'));
 
-    // Модифікуємо стандартну кнопку відкриття складу, щоб вона одразу завантажувала активні товари
+    // Перехоплюємо кнопку відкриття складу
     document.getElementById('open-warehouse-btn').addEventListener('click', () => {
         setTimeout(() => {
             loadWarehouseTableSecure('active');
         }, 200);
     });
+    </script>
 </body>
 </html>
