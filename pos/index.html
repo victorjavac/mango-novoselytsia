@@ -86,12 +86,13 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="js/app.js"></script>
     
-    <script>
+   <script>
     // =========================================================
-    // МАНГО-PRO: ТРИСТУПЕНЕВИЙ ЗАХИЩЕНИЙ АЛГОРИТМ ВИДАЛЕННЯ
+    // МАНГО-PRO: ПОЛНЫЙ ЦИКЛ УПРАВЛЕНИЯ (УДАЛЕНИЕ И ВОССТАНОВЛЕНИЕ)
     // =========================================================
     let currentViewStatus = 'active'; 
 
+    // 1. ФУНКЦИЯ УДАЛЕНИЯ (Вперед по цепочке)
     async function deleteProductWorkflow(productId, currentStatus) {
         if (!currentStatus || currentStatus === 'active') {
             await db.collection('продукти').doc(productId).update({
@@ -127,6 +128,21 @@
         }
     }
 
+    // 2. НОВАЯ ФУНКЦИЯ ВОССТАНОВЛЕНИЯ (Назад в активные)
+    async function restoreProductWorkflow(productId) {
+        try {
+            await db.collection('продукти').doc(productId).update({
+                archived: false, // Возвращаем в общую кассу
+                status: 'active' // Сбрасываем статус архива/корзины
+            });
+            alert('🟢 Товар успішно повернуто в Активні залишки!');
+            loadWarehouseTableSecure(currentViewStatus); // Перезагружаем текущую вкладку
+        } catch (err) {
+            alert('Помилка відновлення: ' + err.message);
+        }
+    }
+
+    // 3. ОТРИСОВКА ТАБЛИЦЫ С УМНЫМИ КНОПКАМИ
     async function loadWarehouseTableSecure(status = 'active') {
         currentViewStatus = status;
         const tableBody = document.getElementById('warehouse-table-body');
@@ -156,8 +172,17 @@
                 const id = doc.id;
                 
                 let btnText = '🗑️ Архів';
-                if (status === 'archive') btnText = '🗑️ В Кошик';
-                if (status === 'trash') btnText = '🔥 ВИДАЛИТИ';
+                let restoreBtn = ''; // По умолчанию для активных кнопки возврата нет
+                
+                // Если мы в Архиве или Корзине — добавляем зеленую кнопку «Вернуть»
+                if (status === 'archive') {
+                    btnText = '🗑️ В Кошик';
+                    restoreBtn = `<button onclick="restoreProductWorkflow('${id}')" style="padding: 4px 10px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; margin-right:5px;">🔄 Вернути</button>`;
+                }
+                if (status === 'trash') {
+                    btnText = '🔥 ВИДАЛИТИ';
+                    restoreBtn = `<button onclick="restoreProductWorkflow('${id}')" style="padding: 4px 10px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; margin-right:5px;">🔄 Вернути</button>`;
+                }
                 
                 return `
                     <tr style="border-bottom: 1px solid #eee;">
@@ -165,7 +190,8 @@
                         <td style="padding: 10px;">${p.name || 'Без назви'}</td>
                         <td style="padding: 10px;">${p.price} грн</td>
                         <td style="padding: 10px;">${p.quantity} шт</td>
-                        <td style="padding: 10px; text-align: center;">
+                        <td style="padding: 10px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 4px;">
+                            ${restoreBtn}
                             <button onclick="deleteProductWorkflow('${id}', '${status}')" style="padding: 4px 10px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">${btnText}</button>
                         </td>
                     </tr>
@@ -177,12 +203,12 @@
         }
     }
 
-    // Прив'язуємо події до кнопок-вкладок
+    // Привязываем события к кнопкам-вкладкам
     document.getElementById('tab-active').addEventListener('click', () => loadWarehouseTableSecure('active'));
     document.getElementById('tab-archive').addEventListener('click', () => loadWarehouseTableSecure('archive'));
     document.getElementById('tab-trash').addEventListener('click', () => loadWarehouseTableSecure('trash'));
 
-    // Перехоплюємо кнопку відкриття складу
+    // Перехватываем кнопку открытия склада
     document.getElementById('open-warehouse-btn').addEventListener('click', () => {
         setTimeout(() => {
             loadWarehouseTableSecure('active');
