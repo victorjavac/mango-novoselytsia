@@ -58,11 +58,32 @@
     </div>
 
     <!-- МОДАЛКА СКЛАДУ -->
-    <div id="warehouse-modal" class="modal">
-        <div class="modal-content">
+   <div id="warehouse-modal" class="modal">
+        <div class="modal-content" style="background: #fff; max-width: 650px; width: 100%;">
             <span class="close-btn">&times;</span>
-            <h2 style="border: none;">📦 Залишки на складі</h2>
-            <table id="warehouse-table">
+            
+            <h2 style="border: none; margin-bottom: 15px;">📦 Управління складом МАНГО</h2>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <button id="tab-active" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">🟢 Активні</button>
+                <button id="tab-archive" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">📦 Архів</button>
+                <button id="tab-trash" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">🗑️ Кошик</button>
+            </div>
+
+            <table id="warehouse-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f4f6f8;">
+                        <th style="padding: 10px; text-align: left;">Код</th>
+                        <th style="padding: 10px; text-align: left;">Назва</th>
+                        <th style="padding: 10px; text-align: left;">Ціна</th>
+                        <th style="padding: 10px; text-align: left;">К-сть</th>
+                        <th style="padding: 10px; text-align: center;">Дія</th>
+                    </tr>
+                </thead>
+                <tbody id="warehouse-table-body"></tbody>
+            </table>
+        </div>
+    </div>
                 <thead>
                     <tr><th>Код</th><th>Назва</th><th>Ціна</th><th>К-сть</th><th>Дія</th></tr>
                 </thead>
@@ -153,5 +174,74 @@
         }, 500);
     });
     </script>
+    // Логіка перемикання вкладок у модальному вікні складу
+    let currentViewStatus = 'active'; // За замовчуванням показуємо активні
+
+    // Функція фільтрації та відображення товарів залежно від обраної вкладки
+    async function loadWarehouseTableSecure(status = 'active') {
+        currentViewStatus = status;
+        const tableBody = document.getElementById('warehouse-table-body');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">⏳ Завантаження даних...</td></tr>`;
+        
+        try {
+            let query = db.collection('продукти');
+            
+            // Налаштовуємо прецизійні фільтри під кожну вкладку
+            if (status === 'active') {
+                // Показуємо тільки ті, що не в архіві й не в кошику
+                query = query.where('archived', '==', false);
+            } else if (status === 'archive') {
+                query = query.where('status', '==', 'archive');
+            } else if (status === 'trash') {
+                query = query.where('status', '==', 'trash');
+            }
+            
+            const snapshot = await query.get();
+            if (snapshot.empty) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">📭 У цьому розділі немає товарів</td></tr>`;
+                return;
+            }
+            
+            // Рендеримо рядки таблиці
+            tableBody.innerHTML = snapshot.docs.map(doc => {
+                const p = doc.data();
+                const id = doc.id;
+                
+                // Налаштовуємо текст на червоній кнопці залежно від вкладки
+                let btnText = '🗑️ Архів';
+                if (status === 'archive') btnText = '🗑️ В Кошик';
+                if (status === 'trash') btnText = '🔥 ВИДАЛИТИ';
+                
+                return `
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px; font-family: monospace;">${id}</td>
+                        <td style="padding: 10px;">${p.name || 'Без назви'}</td>
+                        <td style="padding: 10px;">${p.price} грн</td>
+                        <td style="padding: 10px;">${p.quantity} шт</td>
+                        <td style="padding: 10px; text-align: center;">
+                            <button onclick="deleteProductWorkflow('${id}', '${status}')" style="padding: 4px 10px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">${btnText}</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Помилка: ${err.message}</td></tr>`;
+        }
+    }
+
+    // Прив'язуємо кліки до кнопок-вкладок
+    document.getElementById('tab-active').addEventListener('click', () => loadWarehouseTableSecure('active'));
+    document.getElementById('tab-archive').addEventListener('click', () => loadWarehouseTableSecure('archive'));
+    document.getElementById('tab-trash').addEventListener('click', () => loadWarehouseTableSecure('trash'));
+
+    // Модифікуємо стандартну кнопку відкриття складу, щоб вона одразу завантажувала активні товари
+    document.getElementById('open-warehouse-btn').addEventListener('click', () => {
+        setTimeout(() => {
+            loadWarehouseTableSecure('active');
+        }, 200);
+    });
 </body>
 </html>
