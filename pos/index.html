@@ -86,134 +86,39 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="js/app.js"></script>
     
-   <script>
-    // =========================================================
-    // МАНГО-PRO: ПОЛНЫЙ ЦИКЛ УПРАВЛЕНИЯ (УДАЛЕНИЕ И ВОССТАНОВЛЕНИЕ)
-    // =========================================================
-    let currentViewStatus = 'active'; 
-
-    // 1. ФУНКЦИЯ УДАЛЕНИЯ (Вперед по цепочке)
-    async function deleteProductWorkflow(productId, currentStatus) {
-        if (!currentStatus || currentStatus === 'active') {
-            await db.collection('продукти').doc(productId).update({
-                archived: true,
-                status: 'archive'
-            });
-            alert('📦 Товар успішно переміщено в Архів!');
-            loadWarehouseTableSecure(currentViewStatus); 
-            return;
-        }
-
-        if (currentStatus === 'archive') {
-            await db.collection('продукти').doc(productId).update({
-                status: 'trash'
-            });
-            alert('🗑️ Товар переміщено в Кошик сміття!');
-            loadWarehouseTableSecure(currentViewStatus);
-            return;
-        }
-
-        if (currentStatus === 'trash') {
-            const confirmDelete = window.confirm(
-                `⚠️ УВАГА! Ви намагаєтесь видалити товар (Код: ${productId}) НАЗАВЖДИ.\n\n` +
-                `Цей товар зникне з бази даних магазину МАНГО безповоротно! Його залишки та історія будуть стерті.\n\n` +
-                `Ви впевнені у своїй дії? Натисніть "ОК" для видалення або "Скасувати".`
-            );
-            
-            if (confirmDelete) {
-                await db.collection('продукти').doc(productId).delete();
-                alert('🔥 Товар повністю та безповоротно випалено з бази даних!');
-                loadWarehouseTableSecure(currentViewStatus);
-            }
-        }
-    }
-
-    // 2. НОВАЯ ФУНКЦИЯ ВОССТАНОВЛЕНИЯ (Назад в активные)
+  // 1. ОНОВЛЕНА ФУНКЦІЯ ВІДНОВЛЕННЯ (Тепер залізобетонно робить товар видимим для каси)
     async function restoreProductWorkflow(productId) {
         try {
             await db.collection('продукти').doc(productId).update({
-                archived: false, // Возвращаем в общую кассу
-                status: 'active' // Сбрасываем статус архива/корзины
+                archived: false,  // Суворе логічне значення для старого коду каси!
+                status: 'active'  // Переводимо в активний режим
             });
-            alert('🟢 Товар успішно повернуто в Активні залишки!');
-            loadWarehouseTableSecure(currentViewStatus); // Перезагружаем текущую вкладку
+            alert('🟢 Товар успішно повернуто в Активні залишки каси!');
+            loadWarehouseTableSecure(currentViewStatus);
         } catch (err) {
             alert('Помилка відновлення: ' + err.message);
         }
     }
 
-    // 3. ОТРИСОВКА ТАБЛИЦЫ С УМНЫМИ КНОПКАМИ
-    async function loadWarehouseTableSecure(status = 'active') {
-        currentViewStatus = status;
-        const tableBody = document.getElementById('warehouse-table-body');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">⏳ Завантаження даних...</td></tr>`;
-        
-        try {
-            let query = db.collection('продукти');
-            
-            if (status === 'active') {
-                query = query.where('archived', '==', false);
-            } else if (status === 'archive') {
-                query = query.where('status', '==', 'archive');
-            } else if (status === 'trash') {
-                query = query.where('status', '==', 'trash');
-            }
-            
-            const snapshot = await query.get();
-            if (snapshot.empty) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">📭 У цьому розділі немає товарів</td></tr>`;
-                return;
-            }
-            
-            tableBody.innerHTML = snapshot.docs.map(doc => {
-                const p = doc.data();
-                const id = doc.id;
-                
-                let btnText = '🗑️ Архів';
-                let restoreBtn = ''; // По умолчанию для активных кнопки возврата нет
-                
-                // Если мы в Архиве или Корзине — добавляем зеленую кнопку «Вернуть»
-                if (status === 'archive') {
-                    btnText = '🗑️ В Кошик';
-                    restoreBtn = `<button onclick="restoreProductWorkflow('${id}')" style="padding: 4px 10px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; margin-right:5px;">🔄 Вернути</button>`;
+    // 2. АВТОМАТИЧНЕ ВИПРАВЛЕННЯ ПРИЙОМУ НОВОГО ТОВАРУ
+    // Перехоплюємо кнопку "ДОДАТИ НА СКЛАД" у правій панелі, щоб вона теж правильно ставила мітки
+    const originalAddBtn = document.getElementById('add-product-btn');
+    if (originalAddBtn) {
+        originalAddBtn.addEventListener('click', async (e) => {
+            // Даємо старому коду з app.js секунду внести товар, а потім примусово лікуємо його мітки
+            setTimeout(async () => {
+                const barcode = document.getElementById('new-barcode').value.trim();
+                if (barcode) {
+                    try {
+                        await db.collection('продукти').doc(barcode).update({
+                            archived: false,
+                            status: 'active'
+                        });
+                        console.log('Синхронізація міток нового товару успішна!');
+                    } catch(e) {}
                 }
-                if (status === 'trash') {
-                    btnText = '🔥 ВИДАЛИТИ';
-                    restoreBtn = `<button onclick="restoreProductWorkflow('${id}')" style="padding: 4px 10px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; margin-right:5px;">🔄 Вернути</button>`;
-                }
-                
-                return `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px; font-family: monospace;">${id}</td>
-                        <td style="padding: 10px;">${p.name || 'Без назви'}</td>
-                        <td style="padding: 10px;">${p.price} грн</td>
-                        <td style="padding: 10px;">${p.quantity} шт</td>
-                        <td style="padding: 10px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 4px;">
-                            ${restoreBtn}
-                            <button onclick="deleteProductWorkflow('${id}', '${status}')" style="padding: 4px 10px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">${btnText}</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-        } catch (err) {
-            tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Помилка: ${err.message}</td></tr>`;
-        }
+            }, 800);
+        });
     }
-
-    // Привязываем события к кнопкам-вкладкам
-    document.getElementById('tab-active').addEventListener('click', () => loadWarehouseTableSecure('active'));
-    document.getElementById('tab-archive').addEventListener('click', () => loadWarehouseTableSecure('archive'));
-    document.getElementById('tab-trash').addEventListener('click', () => loadWarehouseTableSecure('trash'));
-
-    // Перехватываем кнопку открытия склада
-    document.getElementById('open-warehouse-btn').addEventListener('click', () => {
-        setTimeout(() => {
-            loadWarehouseTableSecure('active');
-        }, 200);
-    });
-    </script>
 </body>
 </html>
