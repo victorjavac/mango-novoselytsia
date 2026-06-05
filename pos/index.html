@@ -2,123 +2,534 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Каса МАНГО — Авторизація</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>МАНГО СКЛАД | Сканер + Сервер</title>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #0a0f1a 0%, #0f172a 100%);
+            color: #eef2ff;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container { max-width: 550px; margin: 0 auto; }
+        .card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            padding: 16px 18px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        h2 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD966, #FFA500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+        .sub {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+        .status-grid {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .badge {
+            background: #1e293b;
+            padding: 8px 12px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            border-left: 3px solid #facc15;
+        }
+        .badge.active { background: #064e3b; color: #a7f3d0; border-left-color: #10b981; }
+        .badge.freeze { background: #7c2d12; color: #fed7aa; border-left-color: #f97316; }
+        .badge.success { background: #14532d; color: #86efac; border-left-color: #4ade80; }
+        .badge.error { background: #7f1a1a; color: #fecaca; border-left-color: #ef4444; }
+
+        .video-card {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background: #000;
+            border: 2px solid #334155;
+            margin-bottom: 12px;
+        }
+        #video { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; }
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            transition: all 0.2s;
+            border-radius: 28px;
+        }
+        .overlay.scan {
+            box-shadow: inset 0 0 0 3px #10b981, inset 0 0 30px rgba(16,185,129,0.5);
+        }
+        .overlay.freeze {
+            background: rgba(0,0,0,0.65);
+            box-shadow: inset 0 0 0 3px #f59e0b;
+        }
+        .scan-line {
+            position: absolute;
+            width: 90%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, #facc15, #10b981, transparent);
+            left: 5%;
+            top: 40%;
+            animation: moveLine 1.8s infinite ease-in-out;
+            border-radius: 4px;
+        }
+        .overlay.freeze .scan-line { display: none; }
+        @keyframes moveLine {
+            0% { top: 20%; opacity: 0.6; }
+            50% { top: 70%; opacity: 1; }
+            100% { top: 20%; opacity: 0.6; }
+        }
+
+        .code-panel {
+            text-align: center;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 28px;
+            margin: 12px 0;
+        }
+        #last-barcode {
+            font-family: monospace;
+            font-size: 28px;
+            font-weight: bold;
+            color: #facc15;
+            background: #0a0f1a;
+            padding: 8px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+        .freeze-timer {
+            font-size: 13px;
+            color: #fb923c;
+            font-weight: 600;
+            background: #2d1a0c;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            margin-top: 6px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin: 14px 0;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px 0;
+            font-weight: 700;
+            border: none;
+            border-radius: 44px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-primary { background: #2563eb; color: white; box-shadow: 0 4px 12px #1e3a8a; }
+        .btn-warning { background: #eab308; color: #0f172a; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #334155; color: #e2e8f0; }
+        .btn-sm { padding: 8px; font-size: 13px; }
+
+        .warehouse-table {
+            background: #0f172a;
+            border-radius: 24px;
+            padding: 12px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .wh-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding: 10px 6px;
+            font-size: 14px;
+        }
+        .wh-barcode { font-family: monospace; font-weight: bold; color: #facc15; }
+        .wh-qty { background: #1e293b; padding: 4px 10px; border-radius: 40px; font-weight: 700; }
+        .wh-date { font-size: 10px; color: #6c86a3; }
+        .refresh-icon { cursor: pointer; font-size: 18px; margin-left: 8px; }
+        h4 { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #cbd5e1; }
+        .config-row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+        .config-row input { background: #1e293b; border: 1px solid #475569; padding: 10px; border-radius: 24px; color: white; flex: 1; }
+        label { font-size: 11px; color: #94a3b8; margin-left: 6px; }
+        small { color: #a0aec0; }
+    </style>
 </head>
 <body>
-    <div id="auth-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f6f8;">
-        <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 320px;">
-            <img src="../favicon.jpg" alt="МАНГО" style="width: 80px; border-radius: 50%; margin-bottom: 20px;">
-            <h2 style="margin-bottom: 20px; font-family: sans-serif;">Вхід у Касу</h2>
-            <input type="email" id="auth-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
-            <input type="password" id="auth-password" placeholder="Пароль" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px;">
-            <button id="login-btn" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">УВІЙТИ</button>
-            <p id="auth-error" style="color: red; font-size: 13px; margin-top: 15px; display: none;"></p>
+<div class="container">
+    <h2>📡 МАНГО · СКЛАД</h2>
+    <div class="sub">Штрихкод → Сервер Asus → Склад</div>
+
+    <div class="status-grid">
+        <div class="badge" id="camStatus">📷 Камера: вимк.</div>
+        <div class="badge" id="serverStatus">🖥️ Сервер: ?</div>
+    </div>
+
+    <div class="video-card">
+        <video id="video" autoplay playsinline></video>
+        <div class="overlay" id="scanOverlay">
+            <div class="scan-line"></div>
         </div>
     </div>
 
-    <div id="app-container" style="display: none;">
-        <div id="cart-section">
-            <h2>Поточний чек <span id="user-display" style="font-size: 14px; color: #666; font-weight: normal;"></span></h2>
-            <ul id="cart-items"></ul>
-            <div id="discount-section">
-                <input type="number" id="discount-input" placeholder="Знижка (грн)">
-                <button id="apply-discount-btn">Застосувати</button>
-            </div>
-            <div id="total-price">Разом до сплати: <span>0</span> грн</div>
-        </div>
-
-        <div id="control-section">
-            <input type="text" id="barcode-input" placeholder="Скануйте товар..." autocomplete="off">
-            <button id="pay-button">ОПЛАТИТИ ТА ДРУКУВАТИ ЧЕК</button>
-            
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button id="z-report-btn" style="background: #6c757d; color: white; flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📊 Z-Звіт</button>
-                <button id="open-warehouse-btn" style="background: #17a2b8; color: white; flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📦 СКЛАД</button>
-                <button id="logout-btn" style="background: #dc3545; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Вихід</button>
-            </div>
-
-            <div id="admin-section" style="margin-top: 20px;">
-                <h3>Прийом товару</h3>
-                <div class="admin-inputs">
-                    <input type="text" id="new-barcode" placeholder="Штрихкод">
-                    <input type="text" id="new-name" placeholder="Назва товару">
-                    <input type="number" id="new-price" placeholder="Ціна">
-                    <input type="number" id="new-quantity" placeholder="Кількість">
-                    <button id="add-product-btn">ДОДАТИ НА СКЛАД</button>
-                </div>
-            </div>
-        </div>
+    <div class="code-panel">
+        <div style="font-size:12px; color:#9ca3af;">✅ ОСТАННІЙ ШТРИХКОД</div>
+        <div id="last-barcode">—</div>
+        <div id="freezeMsg" class="freeze-timer" style="display: none;">⏳ ФІКСАЦІЯ (2.5с)</div>
     </div>
 
-    <div id="warehouse-modal" class="modal">
-        <div class="modal-content" style="background: #fff; max-width: 650px; width: 100%;">
-            <span class="close-btn">&times;</span>
-            
-            <h2 style="border: none; margin-bottom: 15px;">📦 Управління складом МАНГО</h2>
-            
-            <div style="display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-                <button id="tab-active" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">🟢 Активні</button>
-                <button id="tab-archive" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">📦 Архів</button>
-                <button id="tab-trash" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer;">🗑️ Кошик</button>
-            </div>
-
-            <table id="warehouse-table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #f4f6f8;">
-                        <th style="padding: 10px; text-align: left;">Код</th>
-                        <th style="padding: 10px; text-align: left;">Назва</th>
-                        <th style="padding: 10px; text-align: left;">Ціна</th>
-                        <th style="padding: 10px; text-align: left;">К-сть</th>
-                        <th style="padding: 10px; text-align: center;">Дія</th>
-                    </tr>
-                </thead>
-                <tbody id="warehouse-table-body"></tbody>
-            </table>
-        </div>
+    <div class="btn-group">
+        <button class="btn btn-primary" id="startCamBtn">▶ УВІМКНУТИ</button>
+        <button class="btn btn-warning" id="torchBtn" style="display:none;">🔦 ЛІХТАР</button>
+        <button class="btn btn-danger" id="stopCamBtn" style="display:none;">⏹️ СТОП</button>
     </div>
 
-    <div id="print-section"></div>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="js/app.js"></script>
-    
-  // 1. ОНОВЛЕНА ФУНКЦІЯ ВІДНОВЛЕННЯ (Тепер залізобетонно робить товар видимим для каси)
-    async function restoreProductWorkflow(productId) {
+    <!-- СКЛАД (інтеграція з комп'ютером) -->
+    <div class="card">
+        <h4>🏪 СКЛАД НА КОМП'ЮТЕРІ (ASUS)
+            <span id="warehouseRefreshBtn" style="cursor:pointer; background:#334155; padding:4px 12px; border-radius:40px; font-size:12px;">⟳ ОНОВИТИ</span>
+        </h4>
+        <div id="warehouseList" class="warehouse-table">
+            <div style="text-align:center; padding:20px; color:#6b7280;">⏳ Завантаження складу...</div>
+        </div>
+        <small style="display:block; margin-top:6px;">💡 Після сканування код автоматично додається в склад (збільшує кількість).</small>
+    </div>
+
+    <div class="card">
+        <div style="font-weight:600; margin-bottom:8px;">📋 ІСТОРІЯ СКАНУВАНЬ (останні 3)</div>
+        <div id="historyLog" style="font-size:13px; color:#b9c3db;">—</div>
+    </div>
+
+    <div class="card">
+        <div style="font-weight:600; margin-bottom:6px;">🔧 З'ЄДНАННЯ З СЕРВЕРОМ (комп'ютер Asus)</div>
+        <div class="config-row">
+            <input type="text" id="serverIpInput" placeholder="IP комп'ютера" value="192.168.0.103">
+            <input type="number" id="serverPortInput" placeholder="Порт" value="5000">
+        </div>
+        <label>📌 Вкажіть IP та PORT локального сервера (на ноутбуці Asus). Після зміни натисніть «Перевірити»</label>
+        <button id="checkServerBtn" class="btn btn-secondary btn-sm" style="margin-top:8px;">🔍 ПЕРЕВІРИТИ СЕРВЕР / СКЛАД</button>
+    </div>
+</div>
+
+<script>
+    // ---------- ГЛОБАЛЬНИЙ СТАН ----------
+    let scanner = null;
+    let torchEnabled = false;
+    let videoTrack = null;
+    let isScanFrozen = false;          // блокування повторного сканування
+    let currentStream = null;
+
+    // Конфігурація сервера
+    let serverConfig = {
+        ip: localStorage.getItem('mango_server_ip') || '192.168.0.103',
+        port: localStorage.getItem('mango_server_port') || '5000'
+    };
+
+    // DOM елементи
+    const videoElem = document.getElementById('video');
+    const camStatusDiv = document.getElementById('camStatus');
+    const serverStatusSpan = document.getElementById('serverStatus');
+    const lastBarcodeSpan = document.getElementById('last-barcode');
+    const freezeMsgDiv = document.getElementById('freezeMsg');
+    const scanOverlay = document.getElementById('scanOverlay');
+    const startBtn = document.getElementById('startCamBtn');
+    const stopBtn = document.getElementById('stopCamBtn');
+    const torchBtn = document.getElementById('torchBtn');
+    const warehouseContainer = document.getElementById('warehouseList');
+    const historyLogDiv = document.getElementById('historyLog');
+    const serverIpInput = document.getElementById('serverIpInput');
+    const serverPortInput = document.getElementById('serverPortInput');
+    const refreshWarehouseBtn = document.getElementById('warehouseRefreshBtn');
+    const checkServerBtn = document.getElementById('checkServerBtn');
+
+    let scanHistory = []; // зберігає до 3
+
+    // ----- ФУНКЦІЇ РОБОТИ ЗІ СКЛАДОМ (HTTP запити до сервера Asus) -----
+    function getServerUrl() {
+        return `http://${serverConfig.ip}:${serverConfig.port}`;
+    }
+
+    // Отримати склад з комп'ютера та відобразити
+    async function fetchWarehouseFromComputer() {
         try {
-            await db.collection('продукти').doc(productId).update({
-                archived: false,  // Суворе логічне значення для старого коду каси!
-                status: 'active'  // Переводимо в активний режим
+            const response = await fetch(`${getServerUrl()}/warehouse`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
             });
-            alert('🟢 Товар успішно повернуто в Активні залишки каси!');
-            loadWarehouseTableSecure(currentViewStatus);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            renderWarehouse(data.items || []);
+            updateServerStatus(true);
+            return true;
         } catch (err) {
-            alert('Помилка відновлення: ' + err.message);
+            console.warn("Не вдалося отримати склад:", err);
+            warehouseContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#f87171;">❌ Не вдалося підключитись до сервера Asus.<br>Перевірте IP/порт та чи запущений сервер.</div>`;
+            updateServerStatus(false);
+            return false;
         }
     }
 
-    // 2. АВТОМАТИЧНЕ ВИПРАВЛЕННЯ ПРИЙОМУ НОВОГО ТОВАРУ
-    // Перехоплюємо кнопку "ДОДАТИ НА СКЛАД" у правій панелі, щоб вона теж правильно ставила мітки
-    const originalAddBtn = document.getElementById('add-product-btn');
-    if (originalAddBtn) {
-        originalAddBtn.addEventListener('click', async (e) => {
-            // Даємо старому коду з app.js секунду внести товар, а потім примусово лікуємо його мітки
-            setTimeout(async () => {
-                const barcode = document.getElementById('new-barcode').value.trim();
-                if (barcode) {
-                    try {
-                        await db.collection('продукти').doc(barcode).update({
-                            archived: false,
-                            status: 'active'
-                        });
-                        console.log('Синхронізація міток нового товару успішна!');
-                    } catch(e) {}
+    // Відображення складу (масив об'єктів {barcode, quantity, lastUpdated, productName?})
+    function renderWarehouse(items) {
+        if (!items || items.length === 0) {
+            warehouseContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#9ca3af;">📭 Склад порожній. Відскануйте перший товар.</div>`;
+            return;
+        }
+        const sorted = [...items].sort((a,b) => (b.quantity - a.quantity));
+        warehouseContainer.innerHTML = sorted.map(item => `
+            <div class="wh-item">
+                <div>
+                    <span class="wh-barcode">📦 ${escapeHtml(item.barcode)}</span>
+                    <div class="wh-date">${item.lastUpdated ? 'оновлено: ' + new Date(item.lastUpdated).toLocaleTimeString('uk-UA') : ''}</div>
+                </div>
+                <div class="wh-qty">${item.quantity} шт</div>
+            </div>
+        `).join('');
+    }
+
+    // Відправити штрихкод на комп'ютер (додати на склад)
+    async function sendBarcodeToWarehouse(barcode) {
+        updateServerStatus('pending');
+        try {
+            const response = await fetch(`${getServerUrl()}/scan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ barcode: barcode })
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || 'server error');
+            }
+            const result = await response.json();
+            console.log('Сервер відповів:', result);
+            updateServerStatus(true);
+            // після успішного додавання оновлюємо відображення складу
+            await fetchWarehouseFromComputer();
+            return true;
+        } catch (err) {
+            console.error("Помилка відправки на склад:", err);
+            updateServerStatus(false);
+            serverStatusSpan.innerText = '❌ Помилка Wi-Fi';
+            return false;
+        }
+    }
+
+    function updateServerStatus(isOk) {
+        if (isOk === true) {
+            serverStatusSpan.innerHTML = '✅ Сервер: активний';
+            serverStatusSpan.className = 'badge success';
+        } else if (isOk === false) {
+            serverStatusSpan.innerHTML = '⚠️ Сервер: недоступний';
+            serverStatusSpan.className = 'badge error';
+        } else if (isOk === 'pending') {
+            serverStatusSpan.innerHTML = '📡 Відправка...';
+            serverStatusSpan.className = 'badge';
+        } else {
+            serverStatusSpan.innerHTML = '🖥️ Сервер: ?';
+            serverStatusSpan.className = 'badge';
+        }
+    }
+
+    // додати в історію локально
+    function addToHistory(barcode) {
+        const time = new Date().toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        scanHistory.unshift({ code: barcode, time });
+        if (scanHistory.length > 3) scanHistory.pop();
+        historyLogDiv.innerHTML = scanHistory.map(h => `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155;"><span>🔹 ${h.code}</span><span style="color:#a0aec3;">${h.time}</span></div>`).join('');
+        if(scanHistory.length === 0) historyLogDiv.innerHTML = '<div style="color:#6b7280;">—</div>';
+    }
+
+    // головна обробка сканованого коду
+    async function onBarcodeDetected(barcodeText) {
+        if (isScanFrozen) return;    // імунітет під час заморозки
+
+        isScanFrozen = true;
+        // вібрація
+        if (navigator.vibrate) navigator.vibrate(120);
+        
+        // відображаємо код
+        lastBarcodeSpan.innerText = barcodeText;
+        addToHistory(barcodeText);
+        
+        // вмикаємо freeze візуал
+        scanOverlay.classList.remove('scan');
+        scanOverlay.classList.add('freeze');
+        freezeMsgDiv.style.display = 'inline-block';
+        camStatusDiv.innerHTML = '⏸️ Фіксація коду...';
+        camStatusDiv.className = 'badge freeze';
+        
+        // ВІДПРАВЛЯЄМО НА СЕРВЕР (склад на комп'ютері)
+        await sendBarcodeToWarehouse(barcodeText);
+        
+        // розморожуємо через 2.5 секунди
+        setTimeout(() => {
+            if (scanner) {
+                isScanFrozen = false;
+                scanOverlay.classList.remove('freeze');
+                scanOverlay.classList.add('scan');
+                freezeMsgDiv.style.display = 'none';
+                camStatusDiv.innerHTML = '✅ Камера: активна';
+                camStatusDiv.className = 'badge active';
+            } else {
+                // якщо камера вимкнена - не міняємо оверлей агресивно
+                scanOverlay.classList.remove('freeze');
+                scanOverlay.classList.remove('scan');
+            }
+        }, 2500);
+    }
+
+    // Запуск камери + сканера
+    async function startScanner() {
+        if (scanner) {
+            await stopScanner(); // зупиняємо попередній
+        }
+        try {
+            // @zxing library
+            const codeReader = new ZXing.BrowserMultiFormatReader();
+            // Запит доступу до камери і запуск
+            const controls = await codeReader.decodeFromVideoDevice(null, videoElem, (result, err) => {
+                if (result && !isScanFrozen) {
+                    onBarcodeDetected(result.text);
                 }
-            }, 800);
+                // ігноруємо err (це нормально, поки немає коду)
+            });
+            scanner = codeReader;
+            // зберігаємо stream для ліхтарика
+            if (controls && controls.stream) {
+                currentStream = controls.stream;
+                const tracks = currentStream.getVideoTracks();
+                if (tracks.length > 0) videoTrack = tracks[0];
+            }
+            // оновлення UI
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            torchBtn.style.display = 'inline-block';
+            scanOverlay.classList.add('scan');
+            scanOverlay.classList.remove('freeze');
+            camStatusDiv.innerHTML = '✅ Камера: активна';
+            camStatusDiv.className = 'badge active';
+            isScanFrozen = false;
+            freezeMsgDiv.style.display = 'none';
+        } catch (err) {
+            console.error("Помилка запуску камери:", err);
+            camStatusDiv.innerHTML = '❌ Помилка камери';
+            camStatusDiv.className = 'badge error';
+            alert("Не вдалося отримати доступ до камери. Перевірте дозволи.");
+        }
+    }
+
+    // Зупинити сканер
+    async function stopScanner() {
+        if (scanner) {
+            try {
+                await scanner.reset();
+                scanner = null;
+            } catch(e) { console.warn(e); }
+        }
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+        }
+        videoTrack = null;
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        torchBtn.style.display = 'none';
+        scanOverlay.classList.remove('scan');
+        scanOverlay.classList.remove('freeze');
+        camStatusDiv.innerHTML = '📷 Камера: вимкнена';
+        camStatusDiv.className = 'badge';
+        isScanFrozen = false;
+        freezeMsgDiv.style.display = 'none';
+    }
+
+    // Ліхтарик
+    async function toggleTorch() {
+        if (!videoTrack) {
+            alert("Камера не активна");
+            return;
+        }
+        try {
+            torchEnabled = !torchEnabled;
+            await videoTrack.applyConstraints({ advanced: [{ torch: torchEnabled }] });
+        } catch (err) {
+            console.warn("Ліхтар не підтримується", err);
+            alert("Ваша камера не підтримує ліхтарик під час сканування");
+            torchEnabled = false;
+        }
+    }
+
+    // Оновити конфігурацію сервера з UI
+    function updateServerConfig() {
+        let newIp = serverIpInput.value.trim();
+        let newPort = serverPortInput.value.trim();
+        if (newIp) serverConfig.ip = newIp;
+        if (newPort) serverConfig.port = newPort;
+        localStorage.setItem('mango_server_ip', serverConfig.ip);
+        localStorage.setItem('mango_server_port', serverConfig.port);
+        // перевіряємо з'єднання
+        fetchWarehouseFromComputer();
+    }
+
+    // Події
+    startBtn.addEventListener('click', startScanner);
+    stopBtn.addEventListener('click', stopScanner);
+    torchBtn.addEventListener('click', toggleTorch);
+    refreshWarehouseBtn.addEventListener('click', () => fetchWarehouseFromComputer());
+    checkServerBtn.addEventListener('click', () => {
+        updateServerConfig();
+        fetchWarehouseFromComputer();
+    });
+    
+    // збереження при зміні полів
+    serverIpInput.addEventListener('change', () => {
+        serverConfig.ip = serverIpInput.value;
+        localStorage.setItem('mango_server_ip', serverConfig.ip);
+    });
+    serverPortInput.addEventListener('change', () => {
+        serverConfig.port = serverPortInput.value;
+        localStorage.setItem('mango_server_port', serverConfig.port);
+    });
+
+    // Ініціалізація UI
+    serverIpInput.value = serverConfig.ip;
+    serverPortInput.value = serverConfig.port;
+    
+    // спроба завантажити склад при старті (якщо сервер живий)
+    fetchWarehouseFromComputer();
+
+    // простий escape для безпеки
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
     }
+</script>
 </body>
 </html>
