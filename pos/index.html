@@ -2,534 +2,151 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>МАНГО СКЛАД | Сканер + Сервер</title>
-    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МАНГО | Головна Каса</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            background: linear-gradient(145deg, #0a0f1a 0%, #0f172a 100%);
-            color: #eef2ff;
-            padding: 16px;
-            min-height: 100vh;
-        }
-        .container { max-width: 550px; margin: 0 auto; }
-        .card {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(2px);
-            border-radius: 32px;
-            padding: 16px 18px;
-            margin-bottom: 18px;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        h2 {
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #FFD966, #FFA500);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-align: center;
-            letter-spacing: -0.3px;
-            margin-bottom: 6px;
-        }
-        .sub {
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 12px;
-        }
-        .status-grid {
-            display: flex;
-            gap: 10px;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        .badge {
-            background: #1e293b;
-            padding: 8px 12px;
-            border-radius: 60px;
-            font-size: 12px;
-            font-weight: 600;
-            flex: 1;
-            text-align: center;
-            border-left: 3px solid #facc15;
-        }
-        .badge.active { background: #064e3b; color: #a7f3d0; border-left-color: #10b981; }
-        .badge.freeze { background: #7c2d12; color: #fed7aa; border-left-color: #f97316; }
-        .badge.success { background: #14532d; color: #86efac; border-left-color: #4ade80; }
-        .badge.error { background: #7f1a1a; color: #fecaca; border-left-color: #ef4444; }
-
-        .video-card {
-            position: relative;
-            border-radius: 28px;
-            overflow: hidden;
-            background: #000;
-            border: 2px solid #334155;
-            margin-bottom: 12px;
-        }
-        #video { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; }
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            transition: all 0.2s;
-            border-radius: 28px;
-        }
-        .overlay.scan {
-            box-shadow: inset 0 0 0 3px #10b981, inset 0 0 30px rgba(16,185,129,0.5);
-        }
-        .overlay.freeze {
-            background: rgba(0,0,0,0.65);
-            box-shadow: inset 0 0 0 3px #f59e0b;
-        }
-        .scan-line {
-            position: absolute;
-            width: 90%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #10b981, #facc15, #10b981, transparent);
-            left: 5%;
-            top: 40%;
-            animation: moveLine 1.8s infinite ease-in-out;
-            border-radius: 4px;
-        }
-        .overlay.freeze .scan-line { display: none; }
-        @keyframes moveLine {
-            0% { top: 20%; opacity: 0.6; }
-            50% { top: 70%; opacity: 1; }
-            100% { top: 20%; opacity: 0.6; }
-        }
-
-        .code-panel {
-            text-align: center;
-            background: #0f172a;
-            padding: 12px;
-            border-radius: 28px;
-            margin: 12px 0;
-        }
-        #last-barcode {
-            font-family: monospace;
-            font-size: 28px;
-            font-weight: bold;
-            color: #facc15;
-            background: #0a0f1a;
-            padding: 8px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            word-break: break-all;
-        }
-        .freeze-timer {
-            font-size: 13px;
-            color: #fb923c;
-            font-weight: 600;
-            background: #2d1a0c;
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 50px;
-            margin-top: 6px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin: 14px 0;
-        }
-        .btn {
-            flex: 1;
-            padding: 14px 0;
-            font-weight: 700;
-            border: none;
-            border-radius: 44px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-            text-transform: uppercase;
-        }
-        .btn-primary { background: #2563eb; color: white; box-shadow: 0 4px 12px #1e3a8a; }
-        .btn-warning { background: #eab308; color: #0f172a; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-secondary { background: #334155; color: #e2e8f0; }
-        .btn-sm { padding: 8px; font-size: 13px; }
-
-        .warehouse-table {
-            background: #0f172a;
-            border-radius: 24px;
-            padding: 12px;
-            max-height: 260px;
-            overflow-y: auto;
-        }
-        .wh-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #334155;
-            padding: 10px 6px;
-            font-size: 14px;
-        }
-        .wh-barcode { font-family: monospace; font-weight: bold; color: #facc15; }
-        .wh-qty { background: #1e293b; padding: 4px 10px; border-radius: 40px; font-weight: 700; }
-        .wh-date { font-size: 10px; color: #6c86a3; }
-        .refresh-icon { cursor: pointer; font-size: 18px; margin-left: 8px; }
-        h4 { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #cbd5e1; }
-        .config-row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-        .config-row input { background: #1e293b; border: 1px solid #475569; padding: 10px; border-radius: 24px; color: white; flex: 1; }
-        label { font-size: 11px; color: #94a3b8; margin-left: 6px; }
-        small { color: #a0aec0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #facc15; text-align: center; margin-bottom: 20px; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; text-align: center; background: #334155; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .tab.active { background: #3b82f6; color: white; }
+        
+        .product-list { display: flex; flex-direction: column; gap: 10px; }
+        .item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+        .item.archive { border-left-color: #f59e0b; opacity: 0.8; }
+        .item.trash { border-left-color: #ef4444; opacity: 0.6; }
+        
+        .item-info { display: flex; flex-direction: column; gap: 4px; }
+        .barcode { font-family: monospace; color: #facc15; font-size: 16px; font-weight: bold; }
+        .name { color: #94a3b8; font-size: 13px; }
+        
+        .item-actions { display: flex; gap: 8px; align-items: center; }
+        .qty { background: #334155; padding: 6px 12px; border-radius: 20px; font-weight: bold; margin-right: 10px; }
+        
+        button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-archive { background: #d97706; }
+        .btn-trash { background: #b91c1c; }
+        .btn-restore { background: #059669; }
+        .btn-delete { background: #7f1d1d; border: 1px solid #ef4444; }
+        
+        #loading { text-align: center; color: #94a3b8; margin: 20px 0; font-style: italic; }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h2>📡 МАНГО · СКЛАД</h2>
-    <div class="sub">Штрихкод → Сервер Asus → Склад</div>
-
-    <div class="status-grid">
-        <div class="badge" id="camStatus">📷 Камера: вимк.</div>
-        <div class="badge" id="serverStatus">🖥️ Сервер: ?</div>
+    <h1>🛍️ МАНГО | КАСА (Google Cloud)</h1>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('active')">🟢 Активні</div>
+        <div class="tab" onclick="switchTab('archive')">🟡 Архів</div>
+        <div class="tab" onclick="switchTab('trash')">🔴 Кошик</div>
     </div>
 
-    <div class="video-card">
-        <video id="video" autoplay playsinline></video>
-        <div class="overlay" id="scanOverlay">
-            <div class="scan-line"></div>
-        </div>
-    </div>
-
-    <div class="code-panel">
-        <div style="font-size:12px; color:#9ca3af;">✅ ОСТАННІЙ ШТРИХКОД</div>
-        <div id="last-barcode">—</div>
-        <div id="freezeMsg" class="freeze-timer" style="display: none;">⏳ ФІКСАЦІЯ (2.5с)</div>
-    </div>
-
-    <div class="btn-group">
-        <button class="btn btn-primary" id="startCamBtn">▶ УВІМКНУТИ</button>
-        <button class="btn btn-warning" id="torchBtn" style="display:none;">🔦 ЛІХТАР</button>
-        <button class="btn btn-danger" id="stopCamBtn" style="display:none;">⏹️ СТОП</button>
-    </div>
-
-    <!-- СКЛАД (інтеграція з комп'ютером) -->
-    <div class="card">
-        <h4>🏪 СКЛАД НА КОМП'ЮТЕРІ (ASUS)
-            <span id="warehouseRefreshBtn" style="cursor:pointer; background:#334155; padding:4px 12px; border-radius:40px; font-size:12px;">⟳ ОНОВИТИ</span>
-        </h4>
-        <div id="warehouseList" class="warehouse-table">
-            <div style="text-align:center; padding:20px; color:#6b7280;">⏳ Завантаження складу...</div>
-        </div>
-        <small style="display:block; margin-top:6px;">💡 Після сканування код автоматично додається в склад (збільшує кількість).</small>
-    </div>
-
-    <div class="card">
-        <div style="font-weight:600; margin-bottom:8px;">📋 ІСТОРІЯ СКАНУВАНЬ (останні 3)</div>
-        <div id="historyLog" style="font-size:13px; color:#b9c3db;">—</div>
-    </div>
-
-    <div class="card">
-        <div style="font-weight:600; margin-bottom:6px;">🔧 З'ЄДНАННЯ З СЕРВЕРОМ (комп'ютер Asus)</div>
-        <div class="config-row">
-            <input type="text" id="serverIpInput" placeholder="IP комп'ютера" value="192.168.0.103">
-            <input type="number" id="serverPortInput" placeholder="Порт" value="5000">
-        </div>
-        <label>📌 Вкажіть IP та PORT локального сервера (на ноутбуці Asus). Після зміни натисніть «Перевірити»</label>
-        <button id="checkServerBtn" class="btn btn-secondary btn-sm" style="margin-top:8px;">🔍 ПЕРЕВІРИТИ СЕРВЕР / СКЛАД</button>
-    </div>
+    <div id="loading">📡 Синхронізація з таблицею...</div>
+    <div class="product-list" id="inventory-list"></div>
 </div>
 
 <script>
-    // ---------- ГЛОБАЛЬНИЙ СТАН ----------
-    let scanner = null;
-    let torchEnabled = false;
-    let videoTrack = null;
-    let isScanFrozen = false;          // блокування повторного сканування
-    let currentStream = null;
+    // Посилання правильно взяте в лапки!
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxos6i8tMy4xwHgLc7M72ngnBCdZiSAyZlMgCbMcgSx7-hfBsxur2cti_t_M79MLWxC/exec";
+    
+    let allItems = [];
+    let currentTab = 'active';
 
-    // Конфігурація сервера
-    let serverConfig = {
-        ip: localStorage.getItem('mango_server_ip') || '192.168.0.103',
-        port: localStorage.getItem('mango_server_port') || '5000'
-    };
-
-    // DOM елементи
-    const videoElem = document.getElementById('video');
-    const camStatusDiv = document.getElementById('camStatus');
-    const serverStatusSpan = document.getElementById('serverStatus');
-    const lastBarcodeSpan = document.getElementById('last-barcode');
-    const freezeMsgDiv = document.getElementById('freezeMsg');
-    const scanOverlay = document.getElementById('scanOverlay');
-    const startBtn = document.getElementById('startCamBtn');
-    const stopBtn = document.getElementById('stopCamBtn');
-    const torchBtn = document.getElementById('torchBtn');
-    const warehouseContainer = document.getElementById('warehouseList');
-    const historyLogDiv = document.getElementById('historyLog');
-    const serverIpInput = document.getElementById('serverIpInput');
-    const serverPortInput = document.getElementById('serverPortInput');
-    const refreshWarehouseBtn = document.getElementById('warehouseRefreshBtn');
-    const checkServerBtn = document.getElementById('checkServerBtn');
-
-    let scanHistory = []; // зберігає до 3
-
-    // ----- ФУНКЦІЇ РОБОТИ ЗІ СКЛАДОМ (HTTP запити до сервера Asus) -----
-    function getServerUrl() {
-        return `http://${serverConfig.ip}:${serverConfig.port}`;
-    }
-
-    // Отримати склад з комп'ютера та відобразити
-    async function fetchWarehouseFromComputer() {
+    async function loadData() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('inventory-list').innerHTML = '';
         try {
-            const response = await fetch(`${getServerUrl()}/warehouse`, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            renderWarehouse(data.items || []);
-            updateServerStatus(true);
-            return true;
-        } catch (err) {
-            console.warn("Не вдалося отримати склад:", err);
-            warehouseContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#f87171;">❌ Не вдалося підключитись до сервера Asus.<br>Перевірте IP/порт та чи запущений сервер.</div>`;
-            updateServerStatus(false);
-            return false;
+            // Тепер тут використовується правильна змінна
+            let res = await fetch(googleScriptUrl);
+            let data = await res.json();
+            allItems = data.items || [];
+            renderList();
+        } catch(e) {
+            alert("Помилка підключення до бази!");
         }
+        document.getElementById('loading').style.display = 'none';
     }
 
-    // Відображення складу (масив об'єктів {barcode, quantity, lastUpdated, productName?})
-    function renderWarehouse(items) {
-        if (!items || items.length === 0) {
-            warehouseContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#9ca3af;">📭 Склад порожній. Відскануйте перший товар.</div>`;
-            return;
-        }
-        const sorted = [...items].sort((a,b) => (b.quantity - a.quantity));
-        warehouseContainer.innerHTML = sorted.map(item => `
-            <div class="wh-item">
-                <div>
-                    <span class="wh-barcode">📦 ${escapeHtml(item.barcode)}</span>
-                    <div class="wh-date">${item.lastUpdated ? 'оновлено: ' + new Date(item.lastUpdated).toLocaleTimeString('uk-UA') : ''}</div>
-                </div>
-                <div class="wh-qty">${item.quantity} шт</div>
-            </div>
-        `).join('');
-    }
-
-    // Відправити штрихкод на комп'ютер (додати на склад)
-    async function sendBarcodeToWarehouse(barcode) {
-        updateServerStatus('pending');
+    async function sendAction(action, barcode, newStatus = null) {
+        document.getElementById('loading').style.display = 'block';
         try {
-            const response = await fetch(`${getServerUrl()}/scan`, {
+            await fetch(googleScriptUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barcode: barcode })
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: action, barcode: barcode, newStatus: newStatus })
             });
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(errText || 'server error');
-            }
-            const result = await response.json();
-            console.log('Сервер відповів:', result);
-            updateServerStatus(true);
-            // після успішного додавання оновлюємо відображення складу
-            await fetchWarehouseFromComputer();
-            return true;
-        } catch (err) {
-            console.error("Помилка відправки на склад:", err);
-            updateServerStatus(false);
-            serverStatusSpan.innerText = '❌ Помилка Wi-Fi';
-            return false;
+            setTimeout(loadData, 1500);
+        } catch(e) {
+            alert("Помилка відправки команди!");
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    function updateServerStatus(isOk) {
-        if (isOk === true) {
-            serverStatusSpan.innerHTML = '✅ Сервер: активний';
-            serverStatusSpan.className = 'badge success';
-        } else if (isOk === false) {
-            serverStatusSpan.innerHTML = '⚠️ Сервер: недоступний';
-            serverStatusSpan.className = 'badge error';
-        } else if (isOk === 'pending') {
-            serverStatusSpan.innerHTML = '📡 Відправка...';
-            serverStatusSpan.className = 'badge';
-        } else {
-            serverStatusSpan.innerHTML = '🖥️ Сервер: ?';
-            serverStatusSpan.className = 'badge';
-        }
+    function switchTab(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        renderList();
     }
 
-    // додати в історію локально
-    function addToHistory(barcode) {
-        const time = new Date().toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        scanHistory.unshift({ code: barcode, time });
-        if (scanHistory.length > 3) scanHistory.pop();
-        historyLogDiv.innerHTML = scanHistory.map(h => `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155;"><span>🔹 ${h.code}</span><span style="color:#a0aec3;">${h.time}</span></div>`).join('');
-        if(scanHistory.length === 0) historyLogDiv.innerHTML = '<div style="color:#6b7280;">—</div>';
-    }
-
-    // головна обробка сканованого коду
-    async function onBarcodeDetected(barcodeText) {
-        if (isScanFrozen) return;    // імунітет під час заморозки
-
-        isScanFrozen = true;
-        // вібрація
-        if (navigator.vibrate) navigator.vibrate(120);
+    function renderList() {
+        const list = document.getElementById('inventory-list');
+        list.innerHTML = '';
         
-        // відображаємо код
-        lastBarcodeSpan.innerText = barcodeText;
-        addToHistory(barcodeText);
+        let filtered = allItems.filter(item => item.status === currentTab);
         
-        // вмикаємо freeze візуал
-        scanOverlay.classList.remove('scan');
-        scanOverlay.classList.add('freeze');
-        freezeMsgDiv.style.display = 'inline-block';
-        camStatusDiv.innerHTML = '⏸️ Фіксація коду...';
-        camStatusDiv.className = 'badge freeze';
-        
-        // ВІДПРАВЛЯЄМО НА СЕРВЕР (склад на комп'ютері)
-        await sendBarcodeToWarehouse(barcodeText);
-        
-        // розморожуємо через 2.5 секунди
-        setTimeout(() => {
-            if (scanner) {
-                isScanFrozen = false;
-                scanOverlay.classList.remove('freeze');
-                scanOverlay.classList.add('scan');
-                freezeMsgDiv.style.display = 'none';
-                camStatusDiv.innerHTML = '✅ Камера: активна';
-                camStatusDiv.className = 'badge active';
-            } else {
-                // якщо камера вимкнена - не міняємо оверлей агресивно
-                scanOverlay.classList.remove('freeze');
-                scanOverlay.classList.remove('scan');
-            }
-        }, 2500);
-    }
-
-    // Запуск камери + сканера
-    async function startScanner() {
-        if (scanner) {
-            await stopScanner(); // зупиняємо попередній
-        }
-        try {
-            // @zxing library
-            const codeReader = new ZXing.BrowserMultiFormatReader();
-            // Запит доступу до камери і запуск
-            const controls = await codeReader.decodeFromVideoDevice(null, videoElem, (result, err) => {
-                if (result && !isScanFrozen) {
-                    onBarcodeDetected(result.text);
-                }
-                // ігноруємо err (це нормально, поки немає коду)
-            });
-            scanner = codeReader;
-            // зберігаємо stream для ліхтарика
-            if (controls && controls.stream) {
-                currentStream = controls.stream;
-                const tracks = currentStream.getVideoTracks();
-                if (tracks.length > 0) videoTrack = tracks[0];
-            }
-            // оновлення UI
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'inline-block';
-            torchBtn.style.display = 'inline-block';
-            scanOverlay.classList.add('scan');
-            scanOverlay.classList.remove('freeze');
-            camStatusDiv.innerHTML = '✅ Камера: активна';
-            camStatusDiv.className = 'badge active';
-            isScanFrozen = false;
-            freezeMsgDiv.style.display = 'none';
-        } catch (err) {
-            console.error("Помилка запуску камери:", err);
-            camStatusDiv.innerHTML = '❌ Помилка камери';
-            camStatusDiv.className = 'badge error';
-            alert("Не вдалося отримати доступ до камери. Перевірте дозволи.");
-        }
-    }
-
-    // Зупинити сканер
-    async function stopScanner() {
-        if (scanner) {
-            try {
-                await scanner.reset();
-                scanner = null;
-            } catch(e) { console.warn(e); }
-        }
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-            currentStream = null;
-        }
-        videoTrack = null;
-        startBtn.style.display = 'inline-block';
-        stopBtn.style.display = 'none';
-        torchBtn.style.display = 'none';
-        scanOverlay.classList.remove('scan');
-        scanOverlay.classList.remove('freeze');
-        camStatusDiv.innerHTML = '📷 Камера: вимкнена';
-        camStatusDiv.className = 'badge';
-        isScanFrozen = false;
-        freezeMsgDiv.style.display = 'none';
-    }
-
-    // Ліхтарик
-    async function toggleTorch() {
-        if (!videoTrack) {
-            alert("Камера не активна");
+        if (filtered.length === 0) {
+            list.innerHTML = `<div style="text-align:center; color:#64748b; padding:20px;">Список порожній</div>`;
             return;
         }
-        try {
-            torchEnabled = !torchEnabled;
-            await videoTrack.applyConstraints({ advanced: [{ torch: torchEnabled }] });
-        } catch (err) {
-            console.warn("Ліхтар не підтримується", err);
-            alert("Ваша камера не підтримує ліхтарик під час сканування");
-            torchEnabled = false;
-        }
-    }
 
-    // Оновити конфігурацію сервера з UI
-    function updateServerConfig() {
-        let newIp = serverIpInput.value.trim();
-        let newPort = serverPortInput.value.trim();
-        if (newIp) serverConfig.ip = newIp;
-        if (newPort) serverConfig.port = newPort;
-        localStorage.setItem('mango_server_ip', serverConfig.ip);
-        localStorage.setItem('mango_server_port', serverConfig.port);
-        // перевіряємо з'єднання
-        fetchWarehouseFromComputer();
-    }
+        filtered.forEach(item => {
+            let actionsHtml = '';
+            let itemClass = `item ${item.status}`;
+            
+            if (item.status === 'active') {
+                actionsHtml = `
+                    <button class="btn-archive" onclick="sendAction('status', '${item.id}', 'archive')">В архів</button>
+                    <button class="btn-trash" onclick="sendAction('status', '${item.id}', 'trash')">В кошик</button>
+                `;
+            } else if (item.status === 'archive') {
+                actionsHtml = `
+                    <button class="btn-restore" onclick="sendAction('status', '${item.id}', 'active')">Відновити</button>
+                    <button class="btn-trash" onclick="sendAction('status', '${item.id}', 'trash')">В кошик</button>
+                `;
+            } else if (item.status === 'trash') {
+                actionsHtml = `
+                    <button class="btn-restore" onclick="sendAction('status', '${item.id}', 'active')">Відновити</button>
+                    <button class="btn-delete" onclick="if(confirm('Видалити назавжди?')) sendAction('delete', '${item.id}')">Знищити</button>
+                `;
+            }
 
-    // Події
-    startBtn.addEventListener('click', startScanner);
-    stopBtn.addEventListener('click', stopScanner);
-    torchBtn.addEventListener('click', toggleTorch);
-    refreshWarehouseBtn.addEventListener('click', () => fetchWarehouseFromComputer());
-    checkServerBtn.addEventListener('click', () => {
-        updateServerConfig();
-        fetchWarehouseFromComputer();
-    });
-    
-    // збереження при зміні полів
-    serverIpInput.addEventListener('change', () => {
-        serverConfig.ip = serverIpInput.value;
-        localStorage.setItem('mango_server_ip', serverConfig.ip);
-    });
-    serverPortInput.addEventListener('change', () => {
-        serverConfig.port = serverPortInput.value;
-        localStorage.setItem('mango_server_port', serverConfig.port);
-    });
-
-    // Ініціалізація UI
-    serverIpInput.value = serverConfig.ip;
-    serverPortInput.value = serverConfig.port;
-    
-    // спроба завантажити склад при старті (якщо сервер живий)
-    fetchWarehouseFromComputer();
-
-    // простий escape для безпеки
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+            list.innerHTML += `
+                <div class="${itemClass}">
+                    <div class="item-info">
+                        <span class="barcode">📦 ${escapeHtml(item.id)}</span>
+                        <span class="name">${escapeHtml(item.name)}</span>
+                    </div>
+                    <div class="item-actions">
+                        <span class="qty">${item.quantity} шт</span>
+                        ${actionsHtml}
+                    </div>
+                </div>
+            `;
         });
     }
+
+    function escapeHtml(str) {
+        return str ? str.toString().replace(/[&<>'"]/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[x])) : '';
+    }
+
+    loadData();
 </script>
 </body>
 </html>

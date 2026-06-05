@@ -16,7 +16,7 @@
         body { background: var(--bg-dark); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         .wrapper { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
         
-        h2 { background: linear-gradient(135deg, #ffd966, #ffa500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; text-align: center; font-weight: 800; margin-top: 10px; }
+        h2 { background: linear-gradient(135deg, #ffd966, #ffa500); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; text-align: center; font-weight: 800; margin-top: 10px; }
         .badge-row { display: flex; gap: 10px; }
         .badge { flex: 1; background: #1e293b; padding: 10px; border-radius: 30px; font-size: 12px; font-weight: bold; text-align: center; border-left: 4px solid #334155; }
         .badge.active { border-left-color: var(--primary); color: #86efac; background: #064e3b; }
@@ -79,8 +79,7 @@
 
 <script>
     // ⚠️ ВСТАВ СЮДИ СВОЄ ДОВГЕ ПОСИЛАННЯ ВЕБ-ДОДАТКА GOOGLE APPS SCRIPT
-    const googleScriptUrl = "ВСТАВ_СЮДИ_СВОЄ_ПОСИЛАННЯ_ВЕБ_ДОДАТКА_GOOGLE";
-
+const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxos6i8tMy4xwHgLc7M72ngnBCdZiSAyZlMgCbMcgSx7-hfBsxur2cti_t_M79MLWxC/exec";
     let state = {
         codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, isReady: true, activeTrack: null, torch: false,
         audioCtx: null
