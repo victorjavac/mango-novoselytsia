@@ -22,11 +22,14 @@
         .item-info { display: flex; flex-direction: column; gap: 4px; }
         .barcode { font-family: monospace; color: #facc15; font-size: 16px; font-weight: bold; }
         .name { color: #94a3b8; font-size: 13px; }
+        .details { font-size: 11px; color: #cbd5e1; margin-top: 2px; }
         
         .item-actions { display: flex; gap: 8px; align-items: center; }
         .qty { background: #334155; padding: 6px 12px; border-radius: 20px; font-weight: bold; margin-right: 10px; }
         
         button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-sell { background: #2563eb; font-size: 14px; padding: 8px 16px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+        .btn-sell:hover { background: #1d4ed8; }
         .btn-archive { background: #d97706; }
         .btn-trash { background: #b91c1c; }
         .btn-restore { background: #059669; }
@@ -38,7 +41,7 @@
 <body>
 
 <div class="container">
-    <h1>🛍️ МАНГО | КАСА (Google Cloud)</h1>
+    <h1>🛍️ МАНГО | КАСА</h1>
     
     <div class="tabs">
         <div class="tab active" onclick="switchTab('active')">🟢 Активні</div>
@@ -51,24 +54,21 @@
 </div>
 
 <script>
-    // Посилання правильно взяте в лапки!
-    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxos6i8tMy4xwHgLc7M72ngnBCdZiSAyZlMgCbMcgSx7-hfBsxur2cti_t_M79MLWxC/exec";
+    // ⚠️ ВСТАВ СВОЄ ПОСИЛАННЯ В ЛАПКИ:
+    const googleScriptUrl = "ВСТАВ_СЮДИ_СВОЄ_ПОСИЛАННЯ_ВЕБ_ДОДАТКА_GOOGLE";
     
     let allItems = [];
     let currentTab = 'active';
-
+AKfycbxos6i8tMy4xwHgLc7M72ngnBCdZiSAyZlMgCbMcgSx7-hfBsxur2cti_t_M79MLWxC
     async function loadData() {
         document.getElementById('loading').style.display = 'block';
         document.getElementById('inventory-list').innerHTML = '';
         try {
-            // Тепер тут використовується правильна змінна
             let res = await fetch(googleScriptUrl);
             let data = await res.json();
             allItems = data.items || [];
             renderList();
-        } catch(e) {
-            alert("Помилка підключення до бази!");
-        }
+        } catch(e) { alert("Помилка підключення до бази!"); }
         document.getElementById('loading').style.display = 'none';
     }
 
@@ -100,18 +100,21 @@
         list.innerHTML = '';
         
         let filtered = allItems.filter(item => item.status === currentTab);
-        
-        if (filtered.length === 0) {
-            list.innerHTML = `<div style="text-align:center; color:#64748b; padding:20px;">Список порожній</div>`;
-            return;
-        }
+        if (filtered.length === 0) { list.innerHTML = `<div style="text-align:center; color:#64748b; padding:20px;">Список порожній</div>`; return; }
 
         filtered.forEach(item => {
             let actionsHtml = '';
-            let itemClass = `item ${item.status}`;
             
+            // Збираємо додаткові характеристики до купи
+            let details = [];
+            if (item.size) details.push(`📏 ${escapeHtml(item.size)}`);
+            if (item.color) details.push(`🎨 ${escapeHtml(item.color)}`);
+            if (item.brand) details.push(`🏷️ ${escapeHtml(item.brand)}`);
+            let detailsHtml = details.length > 0 ? `<div class="details">${details.join(' | ')}</div>` : '';
+
             if (item.status === 'active') {
                 actionsHtml = `
+                    <button class="btn-sell" onclick="sendAction('sell', '${item.id}')">🛒 ПРОДАТИ</button>
                     <button class="btn-archive" onclick="sendAction('status', '${item.id}', 'archive')">В архів</button>
                     <button class="btn-trash" onclick="sendAction('status', '${item.id}', 'trash')">В кошик</button>
                 `;
@@ -128,10 +131,11 @@
             }
 
             list.innerHTML += `
-                <div class="${itemClass}">
+                <div class="item ${item.status}">
                     <div class="item-info">
                         <span class="barcode">📦 ${escapeHtml(item.id)}</span>
                         <span class="name">${escapeHtml(item.name)}</span>
+                        ${detailsHtml}
                     </div>
                     <div class="item-actions">
                         <span class="qty">${item.quantity} шт</span>
@@ -142,10 +146,7 @@
         });
     }
 
-    function escapeHtml(str) {
-        return str ? str.toString().replace(/[&<>'"]/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[x])) : '';
-    }
-
+    function escapeHtml(str) { return str ? str.toString().replace(/[&<>'"]/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[x])) : ''; }
     loadData();
 </script>
 </body>
