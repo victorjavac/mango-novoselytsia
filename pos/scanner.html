@@ -50,7 +50,7 @@
     
     <div class="badge-row">
         <div class="badge" id="badge-cam">📷 Камера: вимкнена</div>
-        <div class="badge" id="badge-server">🖥️ Asus: очікування</div>
+        <div class="badge" id="badge-server">☁️ Google: очікування</div>
     </div>
 
     <div class="cam-box">
@@ -75,29 +75,16 @@
             <button class="btn btn-find" id="btn-manual-send">ВНЕСТИ</button>
         </div>
     </div>
-    
-    <div class="card">
-        <div style="font-size:11px; color:#94a3b8; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">🔧 НАЛАШТУВАННЯ АДРЕСИ (IP)</div>
-        <input type="text" id="server-ip-field" value="192.168.0.103" style="font-size:14px; padding:8px;">
-    </div>
 </div>
 
 <script>
+    // ⚠️ ВСТАВ СЮДИ СВОЄ ДОВГЕ ПОСИЛАННЯ ВЕБ-ДОДАТКА GOOGLE APPS SCRIPT
+    const googleScriptUrl = "ВСТАВ_СЮДИ_СВОЄ_ПОСИЛАННЯ_ВЕБ_ДОДАТКА_GOOGLE";
+
     let state = {
         codeReader: new ZXing.BrowserMultiFormatReader(), controls: null, isReady: true, activeTrack: null, torch: false,
-        ip: localStorage.getItem('mango_pro_ip') || '192.168.0.103', audioCtx: null
+        audioCtx: null
     };
-
-    // Ініціалізація сторінки
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('server-ip-field').value = state.ip;
-        
-        document.getElementById('server-ip-field').addEventListener('change', (e) => {
-            state.ip = e.target.value.trim();
-            localStorage.setItem('mango_pro_ip', state.ip);
-            document.getElementById('badge-server').innerText = '🖥️ IP оновлено';
-        });
-    });
 
     // Звуковий чіп каси
     function beep(freq, dur) {
@@ -176,18 +163,18 @@
         document.getElementById('badge-server').className = 'badge';
         document.getElementById('badge-server').innerText = '📡 Передача...';
         try {
-            let res = await fetch(`http://${state.ip}:5000/scan`, {
+            // ЗВЕРНЕННЯ ДО ХМАРИ GOOGLE ЗАМІСТЬ ЛОКАЛЬНОГО СЕРВЕРА
+            await fetch(googleScriptUrl, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ barcode: barcode })
             });
-            if(res.ok) {
-                document.getElementById('badge-server').className = 'badge active';
-                document.getElementById('badge-server').innerText = '✅ На комп\'ютері';
-            } else { throw new Error(); }
+            document.getElementById('badge-server').className = 'badge active';
+            document.getElementById('badge-server').innerText = '✅ В таблиці Google';
         } catch(e) {
             document.getElementById('badge-server').className = 'badge freeze';
-            document.getElementById('badge-server').innerText = '❌ Помилка Wi-Fi';
+            document.getElementById('badge-server').innerText = '❌ Помилка Хмари';
             beep(300, 200); // Звук помилки мережі
         }
     }
