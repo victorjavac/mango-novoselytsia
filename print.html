@@ -38,9 +38,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 10px; /* Зменшено вертикальний відступ між елементами */
             text-align: center;
-            margin-top: 10mm;
+            margin-top: 5mm; /* Піднято вище для компенсації великого логотипа */
         }
 
         .logo-image {
@@ -50,22 +50,24 @@
         }
 
         .logo-image img {
-            max-width: 130mm; /* ЗБІЛЬШЕНО З 95mm */
+            max-width: 130mm;
             width: 100%;
             height: auto;
+            max-height: 75mm; /* Запобіжник, щоб логотип не розтягувався занадто сильно у висоту */
+            object-fit: contain;
         }
 
         .headline {
-            font-size: 10mm;
+            font-size: 9mm; /* Трохи зменшено для балансу */
             color: #301830;
-            letter-spacing: 0.2em;
-            margin-top: 6mm;
+            letter-spacing: 0.15em;
+            margin-top: 2mm;
         }
 
         .subheadline {
-            font-size: 5.5mm;
+            font-size: 5mm;
             color: #52435b;
-            line-height: 1.45;
+            line-height: 1.4;
             max-width: 140mm;
         }
 
@@ -73,17 +75,17 @@
             font-size: 14mm;
             color: #f6c844;
             letter-spacing: 2mm;
-            margin: 2mm 0;
+            margin: 1mm 0;
             line-height: 1;
             text-shadow: 0 2px 4px rgba(246, 200, 68, 0.3);
         }
 
         .qr-card {
             width: 100%;
-            max-width: 110mm;
-            padding: 14px;
+            max-width: 95mm; /* Оптимізовано розмір QR-коду, щоб точно вліз на А4 */
+            padding: 12px;
             background: #fff;
-            border-radius: 24px;
+            border-radius: 20px;
             border: 1px solid rgba(146, 105, 183, 0.14);
             box-shadow: 0 20px 35px rgba(121, 76, 145, 0.09);
         }
@@ -95,10 +97,10 @@
         }
 
         .note {
-            font-size: 4.2mm;
+            font-size: 4mm;
             color: #6a566d;
             max-width: 145mm;
-            line-height: 1.6;
+            line-height: 1.5;
             margin-top: 4px;
         }
 
@@ -109,12 +111,14 @@
             text-transform: uppercase;
             text-align: center;
             margin-top: auto;
+            padding-top: 5mm;
         }
 
+        /* ПРАВИЛА ДЛЯ ДРУКУ */
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 0; /* Вимикаємо дефолтні відступи принтера */
             }
 
             body {
@@ -128,8 +132,10 @@
                 border-radius: 0;
                 margin: 0;
                 width: 210mm;
-                min-height: 297mm;
-                padding: 20mm;
+                height: 296mm; /* Жорстка фіксація висоти в межах одного аркуша */
+                max-height: 296mm;
+                padding: 15mm; /* Трохи менші поля при друку для більшого простору */
+                page-break-inside: avoid; /* Заборона розриву сторінки */
             }
 
             body, .a4-page, .qr-card, .stars {
