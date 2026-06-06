@@ -38,9 +38,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px; /* Зменшено вертикальний відступ між елементами */
+            gap: 8px;
             text-align: center;
-            margin-top: 5mm; /* Піднято вище для компенсації великого логотипа */
+            margin-top: 3mm;
         }
 
         .logo-image {
@@ -50,25 +50,25 @@
         }
 
         .logo-image img {
-            max-width: 130mm;
+            max-width: 100mm;
             width: 100%;
             height: auto;
-            max-height: 75mm; /* Запобіжник, щоб логотип не розтягувався занадто сильно у висоту */
+            max-height: 60mm;
             object-fit: contain;
         }
 
         .headline {
-            font-size: 9mm; /* Трохи зменшено для балансу */
+            font-size: 8.5mm;
             color: #301830;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.14em;
             margin-top: 2mm;
         }
 
         .subheadline {
-            font-size: 5mm;
+            font-size: 4.7mm;
             color: #52435b;
             line-height: 1.4;
-            max-width: 140mm;
+            max-width: 130mm;
         }
 
         .stars {
@@ -97,21 +97,21 @@
         }
 
         .note {
-            font-size: 4mm;
+            font-size: 3.8mm;
             color: #6a566d;
-            max-width: 145mm;
-            line-height: 1.5;
+            max-width: 135mm;
+            line-height: 1.45;
             margin-top: 4px;
         }
 
         .footer-text {
-            font-size: 4mm;
+            font-size: 3.8mm;
             color: #83638a;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             text-align: center;
             margin-top: auto;
-            padding-top: 5mm;
+            padding-top: 4mm;
         }
 
         /* ПРАВИЛА ДЛЯ ДРУКУ */
@@ -142,8 +142,9 @@
                 width: 100%;
                 max-width: 210mm;
                 height: auto;
-                max-height: 280mm;
-                padding: 14mm;
+                max-height: 285mm;
+                padding: 10mm;
+                box-sizing: border-box;
                 page-break-inside: avoid;
                 break-inside: avoid;
                 page-break-after: avoid;
