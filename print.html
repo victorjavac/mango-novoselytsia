@@ -32,15 +32,16 @@
             padding: 20mm;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            /* Видалено justify-content: space-between для ручного контролю висоти */
         }
 
         .page-inner {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 16px; /* Трохи збільшено відступ між елементами */
             text-align: center;
+            margin-top: 10mm; /* Регулює, наскільки високо починається контент */
         }
 
         .logo-image {
@@ -69,6 +70,16 @@
             max-width: 140mm;
         }
 
+        /* Новий клас для зірочок */
+        .stars {
+            font-size: 14mm;
+            color: #f6c844; /* Золотий колір зірок */
+            letter-spacing: 2mm;
+            margin: 2mm 0;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(246, 200, 68, 0.3);
+        }
+
         .qr-card {
             width: 100%;
             max-width: 110mm;
@@ -90,6 +101,7 @@
             color: #6a566d;
             max-width: 145mm;
             line-height: 1.6;
+            margin-top: 4px;
         }
 
         .footer-text {
@@ -97,7 +109,8 @@
             color: #83638a;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            padding-top: 10mm;
+            text-align: center;
+            margin-top: auto; /* Ця властивість штовхає футер в самий низ сторінки */
         }
 
         @media print {
@@ -121,7 +134,7 @@
                 padding: 20mm;
             }
 
-            body, .a4-page, .qr-card {
+            body, .a4-page, .qr-card, .stars {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -137,6 +150,9 @@
 
             <div class="headline">Ваш відгук важливий</div>
             <div class="subheadline">Покажіть, що ви задоволені покупкою та допоможіть іншим знайти найкращий вибір нижньої білизни.</div>
+
+            <!-- Блок із зірочками -->
+            <div class="stars">★★★★★</div>
 
             <div class="qr-card">
                 <img src="qr.png" alt="QR код для відгуків" class="qr-code">
