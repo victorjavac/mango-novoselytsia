@@ -118,12 +118,20 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0; /* Вимикаємо дефолтні відступи принтера */
+                margin: 0;
+            }
+
+            html, body {
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
             }
 
             body {
                 background: #fff;
                 padding: 0;
+                display: block;
             }
 
             .a4-page {
@@ -131,11 +139,15 @@
                 border: none;
                 border-radius: 0;
                 margin: 0;
-                width: 210mm;
-                height: 296mm; /* Жорстка фіксація висоти в межах одного аркуша */
-                max-height: 296mm;
-                padding: 15mm; /* Трохи менші поля при друку для більшого простору */
-                page-break-inside: avoid; /* Заборона розриву сторінки */
+                width: 100%;
+                max-width: 210mm;
+                height: auto;
+                max-height: 280mm;
+                padding: 14mm;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                page-break-after: avoid;
+                display: block;
             }
 
             body, .a4-page, .qr-card, .stars {
