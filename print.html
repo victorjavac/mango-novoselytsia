@@ -32,16 +32,15 @@
             padding: 20mm;
             display: flex;
             flex-direction: column;
-            /* Видалено justify-content: space-between для ручного контролю висоти */
         }
 
         .page-inner {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px; /* Трохи збільшено відступ між елементами */
+            gap: 16px;
             text-align: center;
-            margin-top: 10mm; /* Регулює, наскільки високо починається контент */
+            margin-top: 10mm;
         }
 
         .logo-image {
@@ -51,7 +50,7 @@
         }
 
         .logo-image img {
-            max-width: 95mm;
+            max-width: 130mm; /* ЗБІЛЬШЕНО З 95mm */
             width: 100%;
             height: auto;
         }
@@ -70,10 +69,9 @@
             max-width: 140mm;
         }
 
-        /* Новий клас для зірочок */
         .stars {
             font-size: 14mm;
-            color: #f6c844; /* Золотий колір зірок */
+            color: #f6c844;
             letter-spacing: 2mm;
             margin: 2mm 0;
             line-height: 1;
@@ -110,7 +108,7 @@
             letter-spacing: 0.15em;
             text-transform: uppercase;
             text-align: center;
-            margin-top: auto; /* Ця властивість штовхає футер в самий низ сторінки */
+            margin-top: auto;
         }
 
         @media print {
@@ -151,7 +149,6 @@
             <div class="headline">Ваш відгук важливий</div>
             <div class="subheadline">Покажіть, що ви задоволені покупкою та допоможіть іншим знайти найкращий вибір нижньої білизни.</div>
 
-            <!-- Блок із зірочками -->
             <div class="stars">★★★★★</div>
 
             <div class="qr-card">
