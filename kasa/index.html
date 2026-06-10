@@ -14,6 +14,7 @@
     <title>Каса МАНГО</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 </head>
 <body>
 
@@ -59,6 +60,7 @@
                 <button id="lock-now-btn" title="Заблокувати касу">🔒</button>
             </div>
             <input type="text" id="barcode-input" placeholder="Пікніть сканером або введіть код..." autofocus autocomplete="off">
+            <button id="scan-sell-btn" class="scan-btn">📷 Сканувати товар камерою</button>
             <button id="pay-button">ОПЛАТИТИ ТА ДРУКУВАТИ ЧЕК</button>
             
             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -69,8 +71,14 @@
             <div id="admin-section" style="margin-top: 30px;">
                 <h2>Прийом товару / Друк етикеток</h2>
                 <div class="admin-inputs">
-                    <input type="text" id="new-barcode" placeholder="Штрихкод (або ваш код)">
-                    <input type="text" id="new-name" placeholder="Назва (наприклад: Топ чорний M)">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="new-barcode" placeholder="Штрихкод (зчитайте камерою або введіть)" style="flex: 1;">
+                        <button id="scan-receive-btn" class="scan-btn" title="Сканувати камерою">📷</button>
+                    </div>
+                    <input type="text" id="new-name" placeholder="Назва (наприклад: Бюстгальтер мереживний)">
+                    <input type="text" id="new-brand" placeholder="Фірма / бренд (наприклад: Milavitsa)">
+                    <input type="text" id="new-size" placeholder="Розмір (наприклад: 75B, M, 42)">
+                    <input type="text" id="new-article" placeholder="Артикул виробника (необов'язково)">
                     <input type="number" id="new-price" placeholder="Ціна (грн)">
                     <input type="number" id="new-quantity" placeholder="Кількість (шт)">
                     
@@ -100,11 +108,15 @@
                 <input type="text" id="warehouse-search" placeholder="🔍 Пошук за назвою або кодом..." autocomplete="off">
                 <button id="add-row-btn" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px;">➕ Додати новий рядок</button>
             </div>
+            <div class="table-scroll">
             <table id="warehouse-table">
                 <thead>
                     <tr>
                         <th>Штрихкод</th>
+                        <th>Фірма</th>
                         <th>Назва товару</th>
+                        <th>Розмір</th>
+                        <th>Артикул</th>
                         <th>Ціна (грн)</th>
                         <th>Залишок (шт)</th>
                         <th>Дія</th>
@@ -113,6 +125,22 @@
                 <tbody id="warehouse-table-body">
                     </tbody>
             </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вікно сканування камерою -->
+    <div id="scan-modal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <span class="close-btn" id="scan-close">&times;</span>
+            <h2 style="margin: 0 0 10px;">📷 Сканування штрихкоду</h2>
+            <p id="scan-status" style="color: #555; margin: 0 0 10px;">Наведіть камеру на штрихкод товару.</p>
+            <video id="scan-video" muted playsinline></video>
+            <div style="margin-top: 12px; text-align: center;">
+                <label class="scan-photo-label">🖼️ Або зчитати з фото
+                    <input type="file" id="scan-file" accept="image/*" style="display:none;">
+                </label>
+            </div>
         </div>
     </div>
 

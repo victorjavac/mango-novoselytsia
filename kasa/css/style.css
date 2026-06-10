@@ -186,6 +186,45 @@ h2 {
     box-sizing: border-box;
 }
 
+/* Кнопки сканування камерою */
+.scan-btn {
+    background-color: #6f42c1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+    transition: background-color 0.2s;
+}
+.scan-btn:hover { background-color: #59359a; }
+#scan-receive-btn { width: auto; padding: 12px 16px; margin: 0; font-size: 18px; flex: none; }
+
+/* Вікно сканера */
+#scan-video {
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 8px;
+    background: #000;
+}
+.scan-photo-label {
+    display: inline-block;
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+.scan-photo-label:hover { background: #e2e6ea; }
+
+/* Горизонтальний скрол широкої таблиці складу на телефоні */
+.table-scroll { width: 100%; overflow-x: auto; }
+
 /* Кнопка Оплати */
 #pay-button {
     background-color: #28a745;

@@ -40,6 +40,9 @@ const cartCountEl = document.getElementById('cart-count');
 
 const newBarcodeInp = document.getElementById('new-barcode');
 const newNameInp = document.getElementById('new-name');
+const newBrandInp = document.getElementById('new-brand');
+const newSizeInp = document.getElementById('new-size');
+const newArticleInp = document.getElementById('new-article');
 const newPriceInp = document.getElementById('new-price');
 const newQuantityInp = document.getElementById('new-quantity');
 const addProductBtn = document.getElementById('add-product-btn');
@@ -195,7 +198,7 @@ function renderWarehouse() {
     for (let code of codes) {
         let item = productDatabase[code];
         if (warehouseFilter) {
-            const hay = (code + ' ' + (item.name || '')).toLowerCase();
+            const hay = (code + ' ' + (item.name || '') + ' ' + (item.brand || '') + ' ' + (item.size || '') + ' ' + (item.article || '')).toLowerCase();
             if (!hay.includes(warehouseFilter)) continue;
         }
         shown++;
@@ -204,7 +207,10 @@ function renderWarehouse() {
 
         tr.innerHTML = `
             <td><strong>${code}</strong></td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'name', this.innerText)">${item.name}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'brand', this.innerText)">${item.brand || ''}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'name', this.innerText)">${item.name || ''}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'size', this.innerText)">${item.size || ''}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'article', this.innerText)">${item.article || ''}</td>
             <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'price', this.innerText)">${item.price}</td>
             <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${code}', 'quantity', this.innerText)">${item.quantity}</td>
             <td style="display: flex; gap: 5px;">
@@ -216,7 +222,7 @@ function renderWarehouse() {
     }
     if (shown === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="5" style="text-align:center; color:#888; padding:20px;">${warehouseFilter ? 'Нічого не знайдено' : 'Склад порожній'}</td>`;
+        tr.innerHTML = `<td colspan="8" style="text-align:center; color:#888; padding:20px;">${warehouseFilter ? 'Нічого не знайдено' : 'Склад порожній'}</td>`;
         warehouseTableBody.appendChild(tr);
     }
 }
@@ -260,7 +266,8 @@ addRowBtn.addEventListener('click', function() {
 window.printSingleLabel = function(code) {
     const item = productDatabase[code];
     if(!item) return;
-    printSection.innerHTML = `<div class="label-print"><div class="label-name">${item.name}</div><svg id="barcode-svg-temp"></svg><div class="label-price">${item.price} грн</div></div>`;
+    const labelName = item.size ? `${item.name} • ${item.size}` : item.name;
+    printSection.innerHTML = `<div class="label-print"><div class="label-name">${labelName}</div><svg id="barcode-svg-temp"></svg><div class="label-price">${item.price} грн</div></div>`;
     JsBarcode("#barcode-svg-temp", code, { format: "CODE128", displayValue: false, margin: 0 });
     window.print();
 };
@@ -270,22 +277,28 @@ window.printSingleLabel = function(code) {
 // ==========================================
 addProductBtn.addEventListener('click', function() {
     const code = newBarcodeInp.value.trim(); const name = newNameInp.value.trim();
+    const brand = newBrandInp.value.trim(); const size = newSizeInp.value.trim(); const article = newArticleInp.value.trim();
     const price = parseFloat(newPriceInp.value); const quantity = parseInt(newQuantityInp.value);
 
     if (code === "" || name === "" || isNaN(price) || price <= 0 || isNaN(quantity) || quantity <= 0) {
-        alert("Помилка: Заповніть всі поля!"); return;
+        alert("Помилка: Заповніть обов'язкові поля (штрихкод, назва, ціна, кількість)!"); return;
     }
 
     if (productDatabase[code]) {
         let newQty = productDatabase[code].quantity + quantity;
-        db.collection("products").doc(code).update({ quantity: newQty, price: price, name: name });
+        const payload = { quantity: newQty, price: price, name: name };
+        if (brand) payload.brand = brand;
+        if (size) payload.size = size;
+        if (article) payload.article = article;
+        db.collection("products").doc(code).update(payload);
         alert(`Товар оновлено в хмарі! Залишок: ${newQty} шт.`);
     } else {
-        db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity });
+        db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
         alert(`Товар додано в хмару!`);
     }
 
-    newBarcodeInp.value = ''; newNameInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
+    newBarcodeInp.value = ''; newNameInp.value = ''; newBrandInp.value = ''; newSizeInp.value = ''; newArticleInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
+    newBarcodeInp.focus();
 });
 
 printLabelBtn.addEventListener('click', function() {
@@ -443,7 +456,10 @@ if (importBtn && importFile) {
                     batch.set(db.collection('products').doc(code), {
                         name: it.name || 'Без назви',
                         price: parseFloat(it.price) || 0,
-                        quantity: parseInt(it.quantity) || 0
+                        quantity: parseInt(it.quantity) || 0,
+                        brand: it.brand || '',
+                        size: it.size || '',
+                        article: it.article || ''
                     });
                 });
                 batch.commit().then(() => alert('Відновлено успішно!')).catch(err => alert('Помилка відновлення: ' + err.message));
@@ -451,5 +467,95 @@ if (importBtn && importFile) {
         };
         reader.readAsText(file);
         importFile.value = '';
+    });
+}
+
+// ==========================================
+// 7. СКАНУВАННЯ ШТРИХКОДУ КАМЕРОЮ ТЕЛЕФОНА (ZXing)
+// ==========================================
+// Дозволяє заносити/продавати товар без фізичного сканера:
+//  - «sell»    — зчитаний код одразу додається в чек;
+//  - «receive» — код підставляється у форму прийому товару
+//                (якщо такий товар уже є — підтягуються його дані).
+const scanModal = document.getElementById('scan-modal');
+const scanVideo = document.getElementById('scan-video');
+const scanStatus = document.getElementById('scan-status');
+const scanFileInp = document.getElementById('scan-file');
+const scanCloseBtn = document.getElementById('scan-close');
+const scanSellBtn = document.getElementById('scan-sell-btn');
+const scanReceiveBtn = document.getElementById('scan-receive-btn');
+
+let codeReader = null;
+let scanMode = 'sell';
+
+function getReader() {
+    if (!codeReader && window.ZXing) codeReader = new ZXing.BrowserMultiFormatReader();
+    return codeReader;
+}
+
+function openScanner(mode) {
+    scanMode = mode;
+    if (!window.ZXing) { alert('Сканер не завантажився. Перевірте інтернет і оновіть сторінку.'); return; }
+    scanModal.style.display = 'block';
+    scanStatus.innerText = 'Вмикаю камеру…';
+    const reader = getReader();
+    reader.decodeFromConstraints({ video: { facingMode: 'environment' } }, scanVideo, (result) => {
+        if (result) onCodeScanned(result.getText());
+    }).then(() => {
+        scanStatus.innerText = 'Наведіть камеру на штрихкод товару.';
+    }).catch(() => {
+        scanStatus.innerHTML = 'Камеру недоступно. Дозвольте доступ до камери або скористайтесь «🖼️ зчитати з фото».';
+    });
+}
+
+function closeScanner() {
+    try { if (codeReader) codeReader.reset(); } catch (e) {}
+    scanModal.style.display = 'none';
+}
+
+function onCodeScanned(code) {
+    const clean = String(code).trim();
+    if (!clean) return;
+    closeScanner();
+    if (scanMode === 'sell') {
+        addToCart(clean);
+    } else {
+        newBarcodeInp.value = clean;
+        const existing = productDatabase[clean];
+        if (existing) {
+            newNameInp.value = existing.name || '';
+            newBrandInp.value = existing.brand || '';
+            newSizeInp.value = existing.size || '';
+            newArticleInp.value = existing.article || '';
+            if (existing.price) newPriceInp.value = existing.price;
+            alert('Цей товар уже є в базі — дані підставлено. Вкажіть кількість, яку додаєте.');
+            newQuantityInp.focus();
+        } else {
+            newNameInp.focus();
+        }
+    }
+}
+
+if (scanSellBtn) scanSellBtn.addEventListener('click', () => openScanner('sell'));
+if (scanReceiveBtn) scanReceiveBtn.addEventListener('click', () => openScanner('receive'));
+if (scanCloseBtn) scanCloseBtn.addEventListener('click', closeScanner);
+window.addEventListener('click', (e) => { if (e.target === scanModal) closeScanner(); });
+
+if (scanFileInp) {
+    scanFileInp.addEventListener('change', function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        if (!window.ZXing) { alert('Сканер не завантажився.'); return; }
+        scanStatus.innerText = 'Розпізнаю фото…';
+        const reader = getReader();
+        try { reader.reset(); } catch (err) {}
+        const url = URL.createObjectURL(file);
+        reader.decodeFromImageUrl(url).then(result => {
+            URL.revokeObjectURL(url);
+            onCodeScanned(result.getText());
+        }).catch(() => {
+            URL.revokeObjectURL(url);
+            scanStatus.innerText = 'Не вдалося розпізнати штрихкод на фото. Сфотографуйте ближче і рівніше.';
+        });
+        scanFileInp.value = '';
     });
 }
