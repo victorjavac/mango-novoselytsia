@@ -36,13 +36,55 @@
         .btn-delete { background: #7f1d1d; border: 1px solid #ef4444; }
         
         #loading { text-align: center; color: #94a3b8; margin: 20px 0; font-style: italic; }
+
+        .price { color: #34d399; font-weight: bold; }
+
+        /* ===== Блок продажу (чек) ===== */
+        .checkout { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+        .checkout-title { font-size: 18px; font-weight: bold; color: #34d399; margin-bottom: 12px; }
+        .scan-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .scan-row input { flex: 1; background: #1e293b; border: 2px solid #10b981; color: #f8fafc; padding: 14px; border-radius: 8px; font-size: 18px; font-family: monospace; outline: none; }
+        .scan-row input:focus { box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+        .btn-add { background: #10b981; padding: 0 20px; font-size: 15px; }
+        .btn-add:hover { background: #059669; }
+
+        .sale-cart { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .sale-cart:empty::after { content: "Чек порожній — відскануйте товар"; color: #64748b; font-size: 13px; font-style: italic; }
+        .sale-line { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 10px 14px; border-radius: 8px; }
+        .sale-line .ln-info { display: flex; flex-direction: column; gap: 2px; }
+        .sale-line .ln-name { font-weight: bold; }
+        .sale-line .ln-code { font-family: monospace; color: #94a3b8; font-size: 12px; }
+        .sale-line .ln-right { display: flex; align-items: center; gap: 12px; }
+        .btn-remove { background: #b91c1c; padding: 6px 10px; }
+
+        .sale-total { font-size: 22px; font-weight: bold; text-align: right; color: #facc15; padding: 10px 0; border-top: 1px solid #334155; }
+        .sale-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-checkout { flex: 1; background: #16a34a; font-size: 16px; padding: 14px; }
+        .btn-checkout:hover { background: #15803d; }
+        .btn-checkout:disabled { background: #475569; cursor: not-allowed; }
+        .btn-clear { background: #475569; padding: 14px 18px; }
+        .btn-clear:hover { background: #334155; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🛍️ МАНГО | КАСА</h1>
-    
+
+    <div class="checkout">
+        <div class="checkout-title">🛒 Продаж</div>
+        <div class="scan-row">
+            <input type="text" id="sale-input" placeholder="Скануйте або введіть штрихкод..." inputmode="numeric" autocomplete="off">
+            <button class="btn-add" onclick="addFromInput()">Додати</button>
+        </div>
+        <ul class="sale-cart" id="sale-cart"></ul>
+        <div class="sale-total">РАЗОМ: <span id="sale-total">0</span> грн</div>
+        <div class="sale-actions">
+            <button class="btn-checkout" id="checkout-btn" onclick="checkout()">✅ ОФОРМИТИ ПРОДАЖ</button>
+            <button class="btn-clear" onclick="clearSale()">Очистити</button>
+        </div>
+    </div>
+
     <div class="tabs">
         <div class="tab active" onclick="switchTab('active')">🟢 Активні</div>
         <div class="tab" onclick="switchTab('archive')">🟡 Архів</div>
@@ -59,6 +101,7 @@
     
     let allItems = [];
     let currentTab = 'active';
+    let saleCart = [];
 
     async function loadData() {
         document.getElementById('loading').style.display = 'block';
@@ -87,6 +130,94 @@
             document.getElementById('loading').style.display = 'none';
         }
     }
+
+    // ===== Продаж (чек) =====
+    function addFromInput() {
+        const input = document.getElementById('sale-input');
+        const code = input.value.trim();
+        if (code !== '') addToSale(code);
+        input.value = '';
+        input.focus();
+    }
+
+    function addToSale(code) {
+        const product = allItems.find(item => item.id === code && item.status === 'active');
+        if (!product) { alert("Товар не знайдено серед активних!"); return; }
+
+        const inCart = saleCart.filter(i => i.id === code).length;
+        if (inCart >= Number(product.quantity)) { alert(`На складі більше немає цієї позиції (${product.quantity} шт)!`); return; }
+
+        saleCart.push({ id: product.id, name: product.name, price: Number(product.price) || 0 });
+        renderSale();
+    }
+
+    function removeFromSale(index) {
+        saleCart.splice(index, 1);
+        renderSale();
+    }
+
+    function clearSale() {
+        saleCart = [];
+        renderSale();
+    }
+
+    function renderSale() {
+        const cart = document.getElementById('sale-cart');
+        cart.innerHTML = '';
+        let total = 0;
+        saleCart.forEach((item, index) => {
+            total += item.price;
+            const li = document.createElement('li');
+            li.className = 'sale-line';
+            li.innerHTML = `
+                <div class="ln-info">
+                    <span class="ln-name">${escapeHtml(item.name)}</span>
+                    <span class="ln-code">📦 ${escapeHtml(item.id)}</span>
+                </div>
+                <div class="ln-right">
+                    <span class="price">${item.price} грн</span>
+                    <button class="btn-remove" onclick="removeFromSale(${index})">❌</button>
+                </div>`;
+            cart.appendChild(li);
+        });
+        document.getElementById('sale-total').innerText = total;
+    }
+
+    async function checkout() {
+        if (saleCart.length === 0) { alert("Чек порожній!"); return; }
+        const total = saleCart.reduce((s, i) => s + i.price, 0);
+        if (!confirm(`Оформити продаж на ${total} грн?`)) return;
+
+        const btn = document.getElementById('checkout-btn');
+        btn.disabled = true;
+        btn.innerText = "ОБРОБКА...";
+        document.getElementById('loading').style.display = 'block';
+
+        try {
+            for (const item of saleCart) {
+                await fetch(googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'sell', barcode: item.id })
+                });
+                await new Promise(r => setTimeout(r, 400));
+            }
+            alert(`Продаж оформлено: ${total} грн`);
+            saleCart = [];
+            renderSale();
+            setTimeout(loadData, 1500);
+        } catch(e) {
+            alert("Помилка оформлення продажу!");
+        }
+        btn.disabled = false;
+        btn.innerText = "✅ ОФОРМИТИ ПРОДАЖ";
+        document.getElementById('sale-input').focus();
+    }
+
+    document.getElementById('sale-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') addFromInput();
+    });
 
     function switchTab(tabName) {
         currentTab = tabName;
@@ -134,7 +265,7 @@
                 <div class="item ${item.status}">
                     <div class="item-info">
                         <span class="barcode">📦 ${escapeHtml(item.id)}</span>
-                        <span class="name">${escapeHtml(item.name)}</span>
+                        <span class="name">${escapeHtml(item.name)} · <span class="price">${item.price || 0} грн</span></span>
                         ${detailsHtml}
                     </div>
                     <div class="item-actions">
