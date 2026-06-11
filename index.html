@@ -111,11 +111,17 @@
         /* --- ФОН ОЛІЙНИЦІ ВГОРІ --- */
         .main-header {
             position: relative;
+            box-sizing: border-box;
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), url('physical-banner.png') no-repeat center center/cover;
+            background-color: #f4e8e1;
+            background-image: url('physical-banner.png');
+            background-repeat: no-repeat;
+            background-origin: border-box;
+            background-position: right center;
+            background-size: auto 92%;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             text-align: center;
             padding: 20px;
             padding-top: 70px;
@@ -124,17 +130,31 @@
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 750px;
+            max-width: 480px;
             width: 100%;
+            margin-left: 5vw;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.92);
             padding: 50px 40px;
             backdrop-filter: blur(12px);
             border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* На вузьких екранах (планшет/телефон) — фото на весь фон, картка по центру */
+        @media (max-width: 1000px) {
+            .main-header {
+                background-size: cover;
+                background-position: center center;
+                justify-content: center;
+            }
+            .hero-content {
+                margin-left: 0;
+                max-width: 600px;
+            }
         }
 
         h1, p, .btn-cta, .category-cover-title, .btn-back, .social-title {
@@ -655,6 +675,11 @@
         
         <div class="main-categories-grid" id="categories-cover-menu">
             
+            <div class="category-cover-item" onclick="openCategory('shop')">
+                <img src="shop/1.jpg" loading="lazy" alt="Вітрина та інтер'єр магазину білизни МАНГО Новоселиця">
+                <div class="cover-overlay"><div class="category-cover-title">✨ Наш магазин</div></div>
+            </div>
+
             <div class="category-cover-item" onclick="openCategory('bust')">
                 <img src="bust/1.jpg" loading="lazy" alt="Купити жіночий бюстгальтер в магазині білизни МАНГО Новоселиця">
                 <div class="cover-overlay"><div class="category-cover-title">Бюстгальтери</div></div>
@@ -695,10 +720,6 @@
                 <div class="cover-overlay"><div class="category-cover-title">Підліткова білизна</div></div>
             </div>
 
-            <div class="category-cover-item" onclick="openCategory('shop')">
-                <img src="shop/1.jpg" loading="lazy" alt="Вітрина та інтер'єр магазину білизни МАНГО Новоселиця">
-                <div class="cover-overlay"><div class="category-cover-title">✨ Наш магазин</div></div>
-            </div>
 
         </div>
 
