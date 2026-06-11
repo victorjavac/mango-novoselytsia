@@ -187,6 +187,20 @@ if (warehouseSearch) {
     });
 }
 
+// Захист від HTML-ін'єкції: екрануємо все, що показуємо через innerHTML
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+// Екранування коду, який підставляється всередину onclick="...('CODE')"
+function escapeJsInAttr(value) {
+    return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+}
+
 function renderWarehouse() {
     warehouseTableBody.innerHTML = '';
     const codes = Object.keys(productDatabase).sort((a, b) => {
@@ -205,17 +219,18 @@ function renderWarehouse() {
         let tr = document.createElement('tr');
         let qtyStyle = item.quantity <= 0 ? 'color: red; font-weight: bold;' : '';
 
+        const c = escapeJsInAttr(code);
         tr.innerHTML = `
-            <td><strong>${code}</strong></td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'brand', this.innerText)">${item.brand || ''}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'name', this.innerText)">${item.name || ''}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'size', this.innerText)">${item.size || ''}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'article', this.innerText)">${item.article || ''}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'price', this.innerText)">${item.price}</td>
-            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${code}', 'quantity', this.innerText)">${item.quantity}</td>
+            <td><strong>${escapeHtml(code)}</strong></td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'brand', this.innerText)">${escapeHtml(item.brand || '')}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'name', this.innerText)">${escapeHtml(item.name || '')}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'size', this.innerText)">${escapeHtml(item.size || '')}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'article', this.innerText)">${escapeHtml(item.article || '')}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'price', this.innerText)">${escapeHtml(item.price)}</td>
+            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${c}', 'quantity', this.innerText)">${escapeHtml(item.quantity)}</td>
             <td style="display: flex; gap: 5px;">
-                <button class="print-row-btn" onclick="printSingleLabel('${code}')">🖨️ Друк</button>
-                <button class="delete-row-btn" onclick="deleteProduct('${code}')">🗑️ Видалити</button>
+                <button class="print-row-btn" onclick="printSingleLabel('${c}')">🖨️ Друк</button>
+                <button class="delete-row-btn" onclick="deleteProduct('${c}')">🗑️ Видалити</button>
             </td>
         `;
         warehouseTableBody.appendChild(tr);
@@ -267,7 +282,7 @@ window.printSingleLabel = function(code) {
     const item = productDatabase[code];
     if(!item) return;
     const labelName = item.size ? `${item.name} • ${item.size}` : item.name;
-    printSection.innerHTML = `<div class="label-print"><div class="label-name">${labelName}</div><svg id="barcode-svg-temp"></svg><div class="label-price">${item.price} грн</div></div>`;
+    printSection.innerHTML = `<div class="label-print"><div class="label-name">${escapeHtml(labelName)}</div><svg id="barcode-svg-temp"></svg><div class="label-price">${escapeHtml(item.price)} грн</div></div>`;
     JsBarcode("#barcode-svg-temp", code, { format: "CODE128", displayValue: false, margin: 0 });
     window.print();
 };
@@ -285,13 +300,14 @@ addProductBtn.addEventListener('click', function() {
     }
 
     if (productDatabase[code]) {
-        let newQty = productDatabase[code].quantity + quantity;
-        const payload = { quantity: newQty, price: price, name: name };
+        // Атомарне додавання залишку на сервері (без втрати паралельних оновлень)
+        const estimatedQty = (productDatabase[code].quantity || 0) + quantity;
+        const payload = { quantity: firebase.firestore.FieldValue.increment(quantity), price: price, name: name };
         if (brand) payload.brand = brand;
         if (size) payload.size = size;
         if (article) payload.article = article;
         db.collection("products").doc(code).update(payload);
-        alert(`Товар оновлено в хмарі! Залишок: ${newQty} шт.`);
+        alert(`Товар оновлено в хмарі! Залишок: ~${estimatedQty} шт.`);
     } else {
         db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
         alert(`Товар додано в хмару!`);
@@ -365,11 +381,11 @@ function updateCartUI() {
         const li = document.createElement('li');
         li.style.padding = "10px"; li.style.borderBottom = "1px solid #eee"; li.style.display = "flex"; li.style.justifyContent = "space-between"; li.style.alignItems = "center"; li.style.fontSize = "18px";
         li.innerHTML = `
-            <span style="flex:1;">${item.name}<br><small style="color:#888;">${item.price} грн/шт</small></span>
+            <span style="flex:1;">${escapeHtml(item.name)}<br><small style="color:#888;">${escapeHtml(item.price)} грн/шт</small></span>
             <span class="cart-qty">
-                <button onclick="changeQty('${item.code}', -1)">−</button>
+                <button onclick="changeQty('${escapeJsInAttr(item.code)}', -1)">−</button>
                 <span class="qty-num">${item.qty}</span>
-                <button onclick="changeQty('${item.code}', 1)">+</button>
+                <button onclick="changeQty('${escapeJsInAttr(item.code)}', 1)">+</button>
             </span>
             <strong style="min-width:80px; text-align:right;">${lineTotal} грн</strong>
         `;
@@ -393,7 +409,7 @@ payButton.addEventListener('click', function() {
     cart.forEach(item => {
         const lineTotal = item.price * item.qty;
         const qtyLabel = item.qty > 1 ? ` <span style="color:#555;">${item.qty}×${item.price}</span>` : '';
-        itemsHtml += `<div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>${item.name}${qtyLabel}</span><span>${lineTotal}</span></div>`;
+        itemsHtml += `<div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>${escapeHtml(item.name)}${qtyLabel}</span><span>${lineTotal}</span></div>`;
     });
     let discountHtml = currentDiscount > 0 ? `<div style="text-align: right; margin-top: 5px;">Знижка: -${currentDiscount} грн</div>` : '';
     printSection.innerHTML = `<div class="receipt-print"><img src="img/logo_print.jpg" alt="МАНГО"><div style="text-align: center; font-weight: bold; margin-top: 5px;">ФОП ТАРАСОВА О.М.</div><div style="text-align: center; font-size: 10px; font-weight: bold;">МАГАЗИН "МАНГО"</div><div style="text-align: center; font-size: 10px;">м. Новоселиця, вул. Хотинська 9А</div><div class="line"></div><div style="font-size: 10px; margin-bottom: 5px;">${dateStr}</div>${itemsHtml}<div class="line"></div>${discountHtml}<div style="font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px;">ДО СПЛАТИ: ${total} грн</div><div class="line"></div><div style="text-align: center; font-size: 10px; margin-top: 10px;">Дякуємо за покупку!</div></div>`;
@@ -404,9 +420,10 @@ payButton.addEventListener('click', function() {
     // СПИСУЄМО ТОВАРИ З ХМАРИ (за кількістю в чеку)
     cart.forEach(item => {
         if (productDatabase[item.code]) {
-            let newQty = productDatabase[item.code].quantity - item.qty;
-            if (newQty < 0) newQty = 0;
-            db.collection("products").doc(item.code).update({ quantity: newQty });
+            // Атомарне списання на сервері (без втрати паралельних продажів)
+            db.collection("products").doc(item.code).update({
+                quantity: firebase.firestore.FieldValue.increment(-item.qty)
+            });
         }
     });
 
@@ -450,19 +467,28 @@ if (importBtn && importFile) {
                 const obj = JSON.parse(ev.target.result);
                 const codes = Object.keys(obj);
                 if (!confirm(`Відновити ${codes.length} товар(ів) у хмару? Існуючі коди буде перезаписано.`)) return;
-                const batch = db.batch();
-                codes.forEach(code => {
-                    const it = obj[code];
-                    batch.set(db.collection('products').doc(code), {
-                        name: it.name || 'Без назви',
-                        price: parseFloat(it.price) || 0,
-                        quantity: parseInt(it.quantity) || 0,
-                        brand: it.brand || '',
-                        size: it.size || '',
-                        article: it.article || ''
+                // Firestore дозволяє максимум 500 операцій на batch — ділимо на частини
+                const BATCH_LIMIT = 499;
+                let chain = Promise.resolve();
+                for (let i = 0; i < codes.length; i += BATCH_LIMIT) {
+                    const chunk = codes.slice(i, i + BATCH_LIMIT);
+                    chain = chain.then(() => {
+                        const batch = db.batch();
+                        chunk.forEach(code => {
+                            const it = obj[code];
+                            batch.set(db.collection('products').doc(code), {
+                                name: it.name || 'Без назви',
+                                price: parseFloat(it.price) || 0,
+                                quantity: parseInt(it.quantity) || 0,
+                                brand: it.brand || '',
+                                size: it.size || '',
+                                article: it.article || ''
+                            });
+                        });
+                        return batch.commit();
                     });
-                });
-                batch.commit().then(() => alert('Відновлено успішно!')).catch(err => alert('Помилка відновлення: ' + err.message));
+                }
+                chain.then(() => alert('Відновлено успішно!')).catch(err => alert('Помилка відновлення: ' + err.message));
             } catch (err) { alert('Не вдалося прочитати файл: ' + err.message); }
         };
         reader.readAsText(file);
