@@ -19,6 +19,27 @@ db.enablePersistence().catch(function(err) {
     console.warn("Офлайн-режим не активовано: ", err.code);
 });
 
+// Анонімний вхід: каса "представляється" базі, щоб правила Firestore могли
+// дозволяти доступ лише застосунку (request.auth != null), а не будь-кому,
+// хто знає адресу бази. Для дружини це непомітно — жодних додаткових дій.
+const auth = firebase.auth();
+let cloudSubscribed = false;
+function startCloudOnce() {
+    if (cloudSubscribed) return;
+    cloudSubscribed = true;
+    subscribeToCloud();
+    initLockUI();
+}
+auth.onAuthStateChanged(function(user) {
+    if (user) startCloudOnce();
+});
+auth.signInAnonymously().catch(function(err) {
+    // Якщо анонімний вхід ще не увімкнено у Firebase — не блокуємо касу:
+    // пробуємо працювати як раніше (з відкритими правилами).
+    console.warn("Анонімний вхід не вдався, працюю без авторизації:", err && err.code);
+    startCloudOnce();
+});
+
 // ==========================================
 // 2. ГЛОБАЛЬНІ ЗМІННІ
 // ==========================================
@@ -142,11 +163,10 @@ async function handleLockSubmit() {
         lockError.innerText = 'Немає зв\'язку з базою. Спробуйте ще раз.';
     }
 }
-if (lockBtn) {
-    lockBtn.addEventListener('click', handleLockSubmit);
-    lockInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLockSubmit(); });
-    if (lockNowBtn) lockNowBtn.addEventListener('click', lockApp);
-    // Старт: якщо пристрій нещодавно розблоковано — пускаємо одразу
+// Початковий стан екрана блокування. Викликається після анонімного входу
+// (startCloudOnce), бо перевірка PIN читає settings/app із захищеної бази.
+function initLockUI() {
+    if (!lockBtn) return;
     if (deviceUnlocked()) {
         document.body.classList.add('unlocked');
     } else {
@@ -154,24 +174,32 @@ if (lockBtn) {
         setTimeout(() => lockInput.focus(), 200);
     }
 }
+if (lockBtn) {
+    lockBtn.addEventListener('click', handleLockSubmit);
+    lockInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLockSubmit(); });
+    if (lockNowBtn) lockNowBtn.addEventListener('click', lockApp);
+}
 
 // ==========================================
 // 3. ЖИВА СИНХРОНІЗАЦІЯ З ХМАРОЮ
 // ==========================================
 // Ця функція постійно слухає зміни в базі даних.
 // Якщо хтось (навіть з іншого телефону) змінить ціну, вона оновиться тут миттєво.
-db.collection("products").onSnapshot((snapshot) => {
-    productDatabase = {}; // Очищаємо старе
-    snapshot.forEach((doc) => {
-        productDatabase[doc.id] = doc.data(); // Записуємо свіжі дані
+// Викликається після анонімного входу (див. startCloudOnce вище).
+function subscribeToCloud() {
+    db.collection("products").onSnapshot((snapshot) => {
+        productDatabase = {}; // Очищаємо старе
+        snapshot.forEach((doc) => {
+            productDatabase[doc.id] = doc.data(); // Записуємо свіжі дані
+        });
+        renderWarehouse(); // Одразу перемальовуємо склад
+    }, (error) => {
+        console.error("Помилка доступу до бази:", error);
+        if (error.code === 'permission-denied') {
+            alert("Немає доступу до бази даних. Зверніться до адміністратора (правила доступу Firestore).");
+        }
     });
-    renderWarehouse(); // Одразу перемальовуємо склад
-}, (error) => {
-    console.error("Помилка доступу до бази:", error);
-    if (error.code === 'permission-denied') {
-        alert("Немає доступу до бази даних. Зверніться до адміністратора (правила доступу Firestore).");
-    }
-});
+}
 
 // ==========================================
 // 4. ЛОГІКА СКЛАДУ ТА EXCEL-РЕДАГУВАННЯ (ОНОВЛЕНО ДЛЯ ХМАРИ)

@@ -1,0 +1,36 @@
+// Правила доступу до бази Firestore для каси МАНГО (проєкт mangopos-393c4).
+//
+// Як застосувати: Firebase Console → проєкт mangopos-393c4 →
+//   Firestore Database → вкладка "Rules" → вставити цей вміст → Publish.
+// Перед публікацією увімкніть анонімний вхід:
+//   Authentication → Sign-in method → Anonymous → Enable.
+//
+// Суть: писати/читати базу може лише сам застосунок каси, який непомітно
+// входить анонімно (request.auth != null). Випадковий відвідувач, що просто
+// знає адресу бази, доступу не отримає.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Товари складу
+    match /products/{code} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Налаштування каси (зокрема PIN)
+    match /settings/{doc} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Журнал продажів (для сторінки "Звіти")
+    match /sales/{doc} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Усе інше — заборонено
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
