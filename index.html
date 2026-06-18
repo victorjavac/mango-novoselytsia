@@ -1112,8 +1112,29 @@
         document.querySelectorAll('.catalog-item').forEach(item => {
             item.style.cursor = 'pointer'; 
             item.addEventListener('click', function() {
+                trackInstagram('product_card');
                 window.open('https://www.instagram.com/mango_olya_lingeri/', '_blank');
             });
+        });
+
+        // АНАЛІТИКА: рахуємо переходи в Інстаграм у Google Analytics.
+        // Лише додаємо подію — посилання й перехід працюють як раніше.
+        function trackInstagram(source) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'instagram_click', {
+                    source: source,
+                    transport_type: 'beacon'
+                });
+            }
+        }
+        document.querySelectorAll('.btn-cta').forEach(el => {
+            el.addEventListener('click', () => trackInstagram('hero_cta'));
+        });
+        document.querySelectorAll('.float-contact .fc-instagram').forEach(el => {
+            el.addEventListener('click', () => trackInstagram('floating_button'));
+        });
+        document.querySelectorAll('.header-social-icons a[href*="instagram.com"]').forEach(el => {
+            el.addEventListener('click', () => trackInstagram('header'));
         });
     </script>
     <section class="seo-footer-block" style="padding: 40px 20px; text-align: center; background-color: #fdfdfd;">

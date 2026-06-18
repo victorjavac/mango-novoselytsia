@@ -431,11 +431,12 @@ function updateCartUI() {
 
 payButton.addEventListener('click', function() {
     if (cart.length === 0) { alert("Чек порожній!"); return; }
-    let dateStr = new Date().toLocaleString('uk-UA'); let itemsHtml = '';
+    let dateStr = new Date().toLocaleString('uk-UA'); let itemsHtml = ''; let subtotal = 0;
 
     // Формуємо чек
     cart.forEach(item => {
         const lineTotal = item.price * item.qty;
+        subtotal += lineTotal;
         const qtyLabel = item.qty > 1 ? ` <span style="color:#555;">${item.qty}×${item.price}</span>` : '';
         itemsHtml += `<div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>${escapeHtml(item.name)}${qtyLabel}</span><span>${lineTotal}</span></div>`;
     });
@@ -454,6 +455,9 @@ payButton.addEventListener('click', function() {
             });
         }
     });
+
+    // ЗАПИСУЄМО ПРОДАЖ У ЖУРНАЛ (для сторінки «Звіти»)
+    logSale(total, subtotal, currentDiscount);
 
     // Оновлюємо фінанси
     dailyTotal += total; localStorage.setItem('mangoDailySales', dailyTotal);
@@ -613,3 +617,136 @@ if (scanFileInp) {
         scanFileInp.value = '';
     });
 }
+
+// ==========================================
+// 8. ЖУРНАЛ ПРОДАЖІВ ТА ЗВІТИ
+// ==========================================
+// Кожен продаж зберігається в колекції "sales", щоб сторінка «Звіти»
+// показувала виторг за день/тиждень/місяць і топ товарів.
+function localDateKey(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function logSale(total, subtotal, discount) {
+    const now = new Date();
+    const items = cart.map(i => ({ code: i.code, name: i.name, price: i.price, qty: i.qty }));
+    const itemCount = cart.reduce((s, i) => s + i.qty, 0);
+    db.collection('sales').add({
+        ts: firebase.firestore.FieldValue.serverTimestamp(),
+        tsMillis: now.getTime(),
+        dateKey: localDateKey(now),
+        total: total,
+        subtotal: subtotal,
+        discount: discount || 0,
+        itemCount: itemCount,
+        items: items
+    }).catch(err => console.warn('Не вдалося записати продаж у журнал:', err && err.code));
+}
+
+const reportsBtn = document.getElementById('reports-btn');
+const reportsModal = document.getElementById('reports-modal');
+const reportsClose = document.getElementById('reports-close');
+const reportsCards = document.getElementById('reports-cards');
+const reportsDays = document.getElementById('reports-days');
+const reportsTop = document.getElementById('reports-top');
+const reportsEmpty = document.getElementById('reports-empty');
+
+function money(n) { return Math.round(n).toLocaleString('uk-UA'); }
+
+function openReports() {
+    reportsModal.style.display = 'block';
+    reportsCards.innerHTML = '<p style="color:#888; text-align:center; padding:20px;">Завантажую звіт…</p>';
+    reportsDays.innerHTML = '';
+    reportsTop.innerHTML = '';
+    reportsEmpty.style.display = 'none';
+
+    const cutoff = Date.now() - 31 * 24 * 60 * 60 * 1000; // останній місяць
+    db.collection('sales').where('tsMillis', '>=', cutoff).get()
+        .then(snap => {
+            const sales = [];
+            snap.forEach(doc => sales.push(doc.data()));
+            renderReports(sales);
+        })
+        .catch(err => {
+            console.error('Помилка звіту:', err);
+            reportsCards.innerHTML = `<p style="color:#d9534f; text-align:center; padding:20px;">Не вдалося завантажити звіт${err && err.code ? ' (' + escapeHtml(err.code) + ')' : ''}.</p>`;
+        });
+}
+
+function renderReports(sales) {
+    const now = new Date();
+    const todayKey = localDateKey(now);
+    const day = 24 * 60 * 60 * 1000;
+    const week = now.getTime() - 7 * day;
+    const month = now.getTime() - 30 * day;
+
+    let todaySum = 0, todayCnt = 0, weekSum = 0, weekCnt = 0, monthSum = 0, monthCnt = 0;
+    const perDay = {}; // dateKey -> {sum, cnt}
+    const topMap = {}; // name -> {qty, sum}
+
+    sales.forEach(s => {
+        const t = s.tsMillis || 0;
+        const tot = s.total || 0;
+        if (s.dateKey === todayKey) { todaySum += tot; todayCnt++; }
+        if (t >= week) { weekSum += tot; weekCnt++; }
+        if (t >= month) { monthSum += tot; monthCnt++; }
+        if (s.dateKey) {
+            if (!perDay[s.dateKey]) perDay[s.dateKey] = { sum: 0, cnt: 0 };
+            perDay[s.dateKey].sum += tot;
+            perDay[s.dateKey].cnt++;
+        }
+        (s.items || []).forEach(it => {
+            const key = it.name || it.code || '—';
+            if (!topMap[key]) topMap[key] = { qty: 0, sum: 0 };
+            topMap[key].qty += it.qty || 0;
+            topMap[key].sum += (it.price || 0) * (it.qty || 0);
+        });
+    });
+
+    if (sales.length === 0) {
+        reportsCards.innerHTML = '';
+        reportsEmpty.style.display = 'block';
+        return;
+    }
+
+    reportsCards.innerHTML = `
+        <div class="report-card"><div class="rc-label">Сьогодні</div><div class="rc-sum">${money(todaySum)} грн</div><div class="rc-count">${todayCnt} чек(ів)</div></div>
+        <div class="report-card"><div class="rc-label">Останні 7 днів</div><div class="rc-sum">${money(weekSum)} грн</div><div class="rc-count">${weekCnt} чек(ів)</div></div>
+        <div class="report-card"><div class="rc-label">Останні 30 днів</div><div class="rc-sum">${money(monthSum)} грн</div><div class="rc-count">${monthCnt} чек(ів)</div></div>
+    `;
+
+    // Останні 7 календарних днів по днях
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * day);
+        const key = localDateKey(d);
+        const rec = perDay[key] || { sum: 0, cnt: 0 };
+        days.push({ key: key, label: d.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'short' }), sum: rec.sum, cnt: rec.cnt });
+    }
+    const maxDay = Math.max(1, ...days.map(d => d.sum));
+    reportsDays.innerHTML = days.map(d => `
+        <div class="report-row">
+            <div class="rr-main">${escapeHtml(d.label)}
+                <div class="report-bar-wrap"><div class="report-bar" style="width:${Math.round(d.sum / maxDay * 100)}%;"></div></div>
+            </div>
+            <div class="rr-val">${money(d.sum)} грн<br><span class="rr-sub">${d.cnt} чек(ів)</span></div>
+        </div>
+    `).join('');
+
+    // Топ товарів за останні 30 днів
+    const top = Object.keys(topMap).map(name => ({ name: name, qty: topMap[name].qty, sum: topMap[name].sum }))
+        .sort((a, b) => b.qty - a.qty).slice(0, 8);
+    reportsTop.innerHTML = top.map((p, idx) => `
+        <div class="report-row">
+            <div class="rr-main">${idx + 1}. ${escapeHtml(p.name)}<div class="rr-sub">${money(p.sum)} грн виторгу</div></div>
+            <div class="rr-val">${p.qty} шт</div>
+        </div>
+    `).join('');
+}
+
+if (reportsBtn) reportsBtn.addEventListener('click', openReports);
+if (reportsClose) reportsClose.addEventListener('click', () => { reportsModal.style.display = 'none'; });
+window.addEventListener('click', (e) => { if (e.target === reportsModal) reportsModal.style.display = 'none'; });
