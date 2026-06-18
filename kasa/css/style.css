@@ -471,9 +471,49 @@ h2 {
     outline: 2px solid #007bff; /* Синя рамка як в Excel при кліку */
 }
 /* ========================================= */
+/* СТИЛІ ДЛЯ ЗВІТІВ                            */
+/* ========================================= */
+.reports-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.report-card {
+    background: linear-gradient(135deg, #4a2330, #6a3346);
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+}
+.report-card .rc-label { font-size: 13px; opacity: 0.85; }
+.report-card .rc-sum { font-size: 26px; font-weight: bold; margin: 6px 0 2px; color: #d4af37; }
+.report-card .rc-count { font-size: 12px; opacity: 0.8; }
+.reports-subtitle {
+    font-size: 16px;
+    margin: 22px 0 10px;
+    color: #4a2330;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 6px;
+}
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 4px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+}
+.report-row .rr-main { flex: 1; }
+.report-row .rr-sub { color: #888; font-size: 12px; }
+.report-row .rr-val { font-weight: bold; color: #4a2330; white-space: nowrap; margin-left: 10px; }
+.report-bar-wrap { background: #f0f0f0; border-radius: 6px; height: 8px; margin-top: 5px; overflow: hidden; }
+.report-bar { background: #d4af37; height: 100%; }
+/* ========================================= */
 /* АДАПТИВ ДЛЯ ТЕЛЕФОНА                        */
 /* ========================================= */
 @media (max-width: 768px) {
+    .reports-cards { grid-template-columns: 1fr; }
     body { padding: 10px; height: auto; }
     #app-container { flex-direction: column; height: auto; }
     #cart-section, #control-section { flex: none; width: 100%; box-sizing: border-box; }
