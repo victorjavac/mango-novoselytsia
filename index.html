@@ -1136,6 +1136,45 @@
         document.querySelectorAll('.header-social-icons a[href*="instagram.com"]').forEach(el => {
             el.addEventListener('click', () => trackInstagram('header'));
         });
+
+// АВТОМАТИЗАЦІЯ: Додаємо кнопку "Поділитися" для Web Share API
+        document.querySelectorAll('.category-header-block').forEach(block => {
+            const backBtn = block.querySelector('.btn-back');
+            const title = block.querySelector('.category-group-title');
+            
+            // Створюємо контейнер для кнопок, щоб не зламати вашу верстку
+            const btnContainer = document.createElement('div');
+            btnContainer.style.display = 'flex';
+            btnContainer.style.gap = '10px';
+            
+            // Створюємо кнопку
+            const shareBtn = document.createElement('button');
+            shareBtn.innerHTML = '<i class="fas fa-share-nodes"></i>';
+            shareBtn.className = 'btn-back'; 
+            shareBtn.style.padding = '10px 15px';
+            
+            // Логіка відправки посилання
+            shareBtn.onclick = async () => {
+                const currentUrl = window.location.href;
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'МАНГО - ' + title.innerText,
+                            text: 'Дивись, яку красу я знайшла в магазині МАНГО!',
+                            url: currentUrl
+                        });
+                    } catch (err) { console.log('Шеринг скасовано'); }
+                } else {
+                    navigator.clipboard.writeText(currentUrl);
+                    alert('Посилання скопійовано!');
+                }
+            };
+            
+            block.insertBefore(btnContainer, backBtn);
+            btnContainer.appendChild(shareBtn);
+            btnContainer.appendChild(backBtn);
+        });
+
     </script>
     <section class="seo-footer-block" style="padding: 40px 20px; text-align: center; background-color: #fdfdfd;">
         <div style="max-width: 800px; margin: 0 auto;">
