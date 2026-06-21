@@ -1,0 +1,24 @@
+{
+  "name": "mango-novoselytsia",
+  "version": "1.0.0",
+  "description": "",
+  "main": "optimize.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victorjavac/mango-novoselytsia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/victorjavac/mango-novoselytsia/issues"
+  },
+  "homepage": "https://github.com/victorjavac/mango-novoselytsia#readme",
+  "dependencies": {
+    "sharp": "^0.35.2"
+  }
+}
