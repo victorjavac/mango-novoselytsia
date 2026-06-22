@@ -32,7 +32,7 @@
     <meta property="og:image" content="https://victorjavac.github.io/mango-novoselytsia/physical-banner.png">
     <meta property="og:url" content="https://victorjavac.github.io/mango-novoselytsia/">
     <meta property="og:type" content="website">
-    <link rel="icon" type="image/jpeg" href="favicon..jpg">
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.jpg">
     <link rel="icon" type="image/jpeg" sizes="192x192" href="favicon.jpg">
     <link rel="icon" type="image/jpeg" sizes="512x512" href="favicon.jpg">
@@ -639,6 +639,51 @@
         @media print {
             .float-contact { display: none !important; }
         }
+        /* --- МОДАЛЬНЕ ВІКНО ДЛЯ ЗАМОВЛЕНЬ --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 2500;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.modal-content {
+    background: #fff; padding: 35px 25px; border-radius: 20px;
+    width: 90%; max-width: 380px; text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    position: relative;
+    animation: popUp 0.3s ease-out;
+}
+@keyframes popUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.modal-close {
+    position: absolute; top: 15px; right: 15px;
+    font-size: 24px; cursor: pointer; color: #999;
+    transition: color 0.2s;
+}
+.modal-close:hover { color: #111; }
+.modal-title { font-family: 'Comfortaa', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; color: #111; }
+.modal-desc { font-family: 'Comfortaa', sans-serif; font-size: 13px; color: #666; margin-bottom: 15px; line-height: 1.5; }
+.modal-product-name { 
+    display: inline-block; background: #f4e8e1; color: #111; 
+    padding: 8px 15px; border-radius: 50px; font-size: 14px; 
+    font-weight: 700; margin-bottom: 25px; font-family: 'Comfortaa', sans-serif;
+}
+.modal-input {
+    width: 100%; padding: 16px; margin-bottom: 20px;
+    border: 2px solid #eee; border-radius: 12px;
+    font-size: 18px; font-family: 'Comfortaa', sans-serif;
+    text-align: center; outline: none; transition: border-color 0.3s;
+}
+.modal-input:focus { border-color: #111; }
+.modal-btn {
+    background: #111; color: #fff; border: none;
+    padding: 16px; width: 100%; border-radius: 50px;
+    font-size: 16px; font-weight: 700; font-family: 'Comfortaa', sans-serif;
+    cursor: pointer; transition: background 0.3s; text-transform: uppercase;
+}
+.modal-btn:hover { background: #333; }
     </style>
 </head>
 <body>
@@ -650,7 +695,7 @@
         <a class="fc-phone" href="tel:+380507559456" title="Зателефонувати" aria-label="Зателефонувати"><i class="fas fa-phone"></i></a>
     </div>
 
-    <<header class="main-top-header">
+    <header class="main-top-header">
         <div class="header-social-icons">
             <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
             
@@ -665,15 +710,46 @@
 
     <header class="main-header">
         <div class="hero-content">
-            <h1>Якісна та вишукана<br>жіноча нижня білизна,<br>купальники, піжамки</h1>
-            <p>Підкресли свою впевненість.
-               Примірка в Новоселиці та доставка по всій Україні.</p>
-            <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta" target="_blank">
-                <i class="fab fa-instagram"></i> Наш Інстаграм
-            </a>
-            <p class="hero-address">📍 м. Новоселиця, вул. Хотинська, 9а</p>
-        </div>
+    <h1>Якісна та вишукана<br>жіноча нижня білизна,<br>купальники, піжамки</h1>
+    <p>Підкресли свою впевненість. Примірка в Новоселиці та доставка по всій Україні.</p>
+    
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; width: 100%;">
+        <a href="viber://chat?number=%2B380507559456" class="btn-cta" target="_blank" onclick="gtag('event', 'viber_click');" style="background-color: #7360f2; border: none;">
+            <i class="fab fa-viber"></i> Підібрати у Viber
+        </a>
+        <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta" target="_blank" onclick="gtag('event', 'instagram_click');">
+            <i class="fab fa-instagram"></i> Перейти в Instagram
+        </a>
+    </div>
+    
+    <p class="hero-address" style="cursor: pointer;" onclick="document.getElementById('google-map-block').scrollIntoView({ behavior: 'smooth' }); gtag('event', 'map_click');">📍 м. Новоселиця, вул. Хотинська, 9а</p>
+</div>
     </header>
+
+
+    <section style="padding: 50px 20px; background-color: #fff; text-align: center;">
+    <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
+        
+        <div style="flex: 1; min-width: 300px; padding: 30px; border-radius: 20px; background: #fafafa; border: 1px solid #eee;">
+            <h2 style="font-family: 'Comfortaa', sans-serif; font-size: 20px; margin-bottom: 20px;">🛒 Як замовити?</h2>
+            <ul style="text-align: left; font-family: 'Comfortaa', sans-serif; font-size: 14px; color: #444; line-height: 1.8; list-style-position: inside;">
+                <li>Оберіть товар у каталозі нижче.</li>
+                <li>Натисніть кнопку <b>"Замовити"</b> під фото.</li>
+                <li>Viber відкриється автоматично з готовим текстом.</li>
+                <li>Ольга уточнить розмір і відправить замовлення!</li>
+            </ul>
+        </div>
+
+        <div style="flex: 1; min-width: 300px; padding: 30px; border-radius: 20px; background: #fff4f4; border: 1px solid #ffeaea;">
+            <h2 style="font-family: 'Comfortaa', sans-serif; font-size: 20px; margin-bottom: 20px;">🎁 Подарункові сертифікати</h2>
+            <p style="font-family: 'Comfortaa', sans-serif; font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 20px;">
+                Ідеальний подарунок, коли боїтеся не вгадати з розміром. Доступні номінали на будь-яку суму.
+            </p>
+            <a href="viber://chat?number=%2B380507559456&text=Добрий%20день!%20Хочу%20придбати%20подарунковий%20сертифікат" class="btn-cta" onclick="gtag('event', 'product_order_click');" style="padding: 12px 25px; font-size: 12px; background-color: #111; border: none;">Замовити сертифікат</a>
+        </div>
+        
+    </div>
+</section>
 
     <section class="catalog-section" id="catalog-anchor">
         <h2 class="section-title" id="main-title">Оберіть категорію</h2>
@@ -736,7 +812,22 @@
                     <button class="btn-back" onclick="closeCategory()">⬅ Назад</button>
                 </div>
                 <div class="catalog-grid">
-                    <div class="catalog-item"><img src="bust/1.webp" loading="lazy" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Вишуканий стиль</h4></div></div>
+                    <div class="catalog-item" style="flex-direction: column; height: auto; padding-bottom: 20px; align-items: stretch; justify-content: flex-start;">
+    <div style="height: 320px; width: 100%; position: relative; overflow: hidden; border-radius: 20px 20px 0 0;">
+        <img src="bust/1.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentNode.parentNode.style.display='none'">
+    </div>
+    <div style="padding: 15px; text-align: center;">
+        <h4 style="font-family: 'Comfortaa', sans-serif; font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px;">Вишуканий стиль</h4>
+        <p style="font-family: 'Comfortaa', sans-serif; font-size: 12px; color: #777; margin-bottom: 5px;">Розміри уточнюйте</p>
+        <p style="font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 700; color: #111; margin-bottom: 15px;">Ціна: в Instagram/Viber</p>
+        
+       <button class="btn-cta" 
+   onclick="openOrderModal('Бюстгальтери — Вишуканий стиль'); event.stopPropagation();" 
+   style="width: 100%; justify-content: center; background-color: #111; color: #fff; border: none; padding: 14px 0; font-family: 'Comfortaa'; cursor: pointer; border-radius: 50px;">
+    Замовити
+</button>
+    </div>
+</div>
                     <div class="catalog-item"><img src="bust/2.webp" loading="lazy" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Комфорт щодня</h4></div></div>
                     <div class="catalog-item"><img src="bust/3.webp" loading="lazy" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Елегантність</h4></div></div>
                     <div class="catalog-item"><img src="bust/4.webp" loading="lazy" onerror="this.parentNode.style.display='none'"><div class="item-text-overlay"><h4>Ніжність</h4></div></div>
@@ -1093,8 +1184,8 @@
             });
         }
 
-        
         function openCategory(categoryId) {
+            gtag('event', 'category_open', { 'category_name': categoryId });
             document.getElementById('categories-cover-menu').style.display = 'none';
             document.getElementById('main-title').style.display = 'none';
 
@@ -1152,7 +1243,20 @@
             }
         });
 
-        // АВТОМАТИЗАЦІЯ: Усі товари тепер ведуть на головний Інстаграм
+        // Трекінг для плаваючих кнопок
+        document.querySelector('.fc-viber').addEventListener('click', () => gtag('event', 'viber_click'));
+        document.querySelector('.fc-instagram').addEventListener('click', () => gtag('event', 'instagram_click'));
+        document.querySelector('.fc-phone').addEventListener('click', () => gtag('event', 'phone_click'));
+
+        // Трекінг переходу на карту
+        document.querySelector('a[href*="g.page"]').addEventListener('click', () => gtag('event', 'map_click'));
+
+        // Трекінг кліку по відгукам (не плутати з Instagram)
+        document.querySelectorAll('a[href*="/review"]').forEach(el => {
+            el.addEventListener('click', () => gtag('event', 'google_review_click'));
+        });
+
+        // АВТОМАТИЗАЦІЯ: Усі старі товари ведуть на головний Інстаграм
         document.querySelectorAll('.catalog-item').forEach(item => {
             item.style.cursor = 'pointer'; 
             item.addEventListener('click', function() {
@@ -1161,8 +1265,7 @@
             });
         });
 
-        // АНАЛІТИКА: рахуємо переходи в Інстаграм у Google Analytics.
-        // Лише додаємо подію — посилання й перехід працюють як раніше.
+        // АНАЛІТИКА: рахуємо переходи в Інстаграм у Google Analytics
         function trackInstagram(source) {
             if (typeof gtag === 'function') {
                 gtag('event', 'instagram_click', {
@@ -1171,6 +1274,7 @@
                 });
             }
         }
+        
         document.querySelectorAll('.btn-cta').forEach(el => {
             el.addEventListener('click', () => trackInstagram('hero_cta'));
         });
@@ -1181,23 +1285,20 @@
             el.addEventListener('click', () => trackInstagram('header'));
         });
 
-// АВТОМАТИЗАЦІЯ: Додаємо кнопку "Поділитися" для Web Share API
+        // АВТОМАТИЗАЦІЯ: Додаємо кнопку "Поділитися" для Web Share API
         document.querySelectorAll('.category-header-block').forEach(block => {
             const backBtn = block.querySelector('.btn-back');
             const title = block.querySelector('.category-group-title');
             
-            // Створюємо контейнер для кнопок, щоб не зламати вашу верстку
             const btnContainer = document.createElement('div');
             btnContainer.style.display = 'flex';
             btnContainer.style.gap = '10px';
             
-            // Створюємо кнопку
             const shareBtn = document.createElement('button');
             shareBtn.innerHTML = '<i class="fas fa-share-nodes"></i>';
             shareBtn.className = 'btn-back'; 
             shareBtn.style.padding = '10px 15px';
             
-            // Логіка відправки посилання
             shareBtn.onclick = async () => {
                 const currentUrl = window.location.href;
                 if (navigator.share) {
@@ -1218,7 +1319,64 @@
             btnContainer.appendChild(shareBtn);
             btnContainer.appendChild(backBtn);
         });
+        // --- ЛОГІКА ТЕЛЕГРАМ-БОТА ---
+const TELEGRAM_BOT_TOKEN = '8959600890:AAH6qlk1DvVg5jNcyW4ywzpm1AjHND4K97Y'; // Ваш бот WeiyeSi
+const TELEGRAM_CHAT_ID = '669015997'; // Ваш особистий ID
+let currentProductForOrder = '';
 
+function openOrderModal(productName) {
+    currentProductForOrder = productName;
+    document.getElementById('modalProductName').innerText = productName;
+    document.getElementById('orderModal').style.display = 'flex';
+    document.getElementById('clientPhone').value = ''; // очищаємо поле
+    document.getElementById('clientPhone').focus();
+    gtag('event', 'form_open', { 'product': productName });
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
+}
+
+// Закриття вікна по кліку на темний фон
+document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeOrderModal();
+});
+
+function sendOrderToTelegram() {
+    const phoneInput = document.getElementById('clientPhone').value.trim();
+    
+    if(phoneInput.length < 9) {
+        alert('Будь ласка, введіть правильний номер телефону.');
+        return;
+    }
+
+    // Змінюємо текст кнопки, поки йде відправка
+    const btn = document.querySelector('.modal-btn');
+    const originalText = btn.innerText;
+    btn.innerText = 'Відправка...';
+    btn.disabled = true;
+
+    const message = `🛍 НОВА ЗАЯВКА (МАНГО)!\n\n👙 Товар: ${currentProductForOrder}\n📞 Телефон: ${phoneInput}`;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
+
+    fetch(url)
+        .then(response => {
+            if(response.ok) {
+                alert('Дякуємо! Ваша заявка прийнята. Оля скоро зателефонує вам.');
+                closeOrderModal();
+                gtag('event', 'successful_lead'); // Трекаємо успішну заявку
+            } else {
+                alert('Сталася помилка. Будь ласка, напишіть нам у Viber.');
+            }
+        })
+        .catch(err => {
+            alert('Помилка з\'єднання. Перевірте інтернет.');
+        })
+        .finally(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+}
     </script>
     <section class="seo-footer-block" style="padding: 40px 20px; text-align: center; background-color: #fdfdfd;">
         <div style="max-width: 800px; margin: 0 auto;">
@@ -1232,5 +1390,18 @@
     <footer class="main-footer">
         <p style="margin: 0 auto; max-width: 100%;">© 2026 Магазин МАНГО. Усі права захищені.</p>
     </footer>
+    <!-- Спливаюче вікно заявки -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-content">
+        <i class="fas fa-times modal-close" onclick="closeOrderModal()"></i>
+        <h3 class="modal-title">Залишити заявку</h3>
+        <p class="modal-desc">Введіть номер, і Ольга зателефонує вам для уточнення розміру.</p>
+        <div class="modal-product-name" id="modalProductName">Назва товару</div>
+        
+        <input type="tel" id="clientPhone" class="modal-input" placeholder="050 123 45 67">
+        
+        <button class="modal-btn" onclick="sendOrderToTelegram()">Чекаю дзвінка</button>
+    </div>
+</div>
 </body>
 </html>
