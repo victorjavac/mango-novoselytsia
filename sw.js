@@ -8,41 +8,65 @@ const STATIC_ASSETS = [
     './physical-banner.png'
 ];
 
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-    );
-});
+function cacheStaticAssets(cacheStorage) {
+    return cacheStorage.open(CACHE_NAME).then(function (cache) {
+        return cache.addAll(STATIC_ASSETS);
+    });
+}
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.filter(key => key !== CACHE_NAME && key !== DYNAMIC_CACHE)
-                .map(key => caches.delete(key))
-        ))
-    );
-});
+function clearOldCaches(cacheStorage) {
+    return cacheStorage.keys().then(function (keys) {
+        return Promise.all(
+            keys.filter(function (key) { return key !== CACHE_NAME && key !== DYNAMIC_CACHE; })
+                .map(function (key) { return cacheStorage.delete(key); })
+        );
+    });
+}
 
-self.addEventListener('fetch', (event) => {
-    const requestUrl = new URL(event.request.url);
+function isImageRequest(request) {
+    return new URL(request.url).pathname.match(/\.(jpg|jpeg|png|webp|gif)$/);
+}
 
-    // Стратегія Cache First для зображень (офлайн каталог)
-    if (requestUrl.pathname.match(/\.(jpg|jpeg|png|webp|gif)$/)) {
-        event.respondWith(
-            caches.match(event.request).then((cached) => {
-                if (cached) return cached;
-                return fetch(event.request).then((networkRes) => {
-                    return caches.open(DYNAMIC_CACHE).then((cache) => {
-                        cache.put(event.request, networkRes.clone());
-                        return networkRes;
-                    });
+function handleFetch(request, cacheStorage, fetchImpl) {
+    if (isImageRequest(request)) {
+        return cacheStorage.match(request).then(function (cached) {
+            if (cached) return cached;
+            return fetchImpl(request).then(function (networkRes) {
+                return cacheStorage.open(DYNAMIC_CACHE).then(function (cache) {
+                    cache.put(request, networkRes.clone());
+                    return networkRes;
                 });
-            })
-        );
-    } else {
-        // Network First для HTML
-        event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
-        );
+            });
+        });
     }
-});
+
+    return fetchImpl(request).catch(function () {
+        return cacheStorage.match(request);
+    });
+}
+
+if (typeof self !== 'undefined' && self.addEventListener) {
+    self.addEventListener('install', function (event) {
+        event.waitUntil(cacheStaticAssets(caches));
+    });
+
+    self.addEventListener('activate', function (event) {
+        event.waitUntil(clearOldCaches(caches));
+    });
+
+    self.addEventListener('fetch', function (event) {
+        event.respondWith(handleFetch(event.request, caches, fetch));
+    });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CACHE_NAME: CACHE_NAME,
+        DYNAMIC_CACHE: DYNAMIC_CACHE,
+        STATIC_ASSETS: STATIC_ASSETS,
+        cacheStaticAssets: cacheStaticAssets,
+        clearOldCaches: clearOldCaches,
+        isImageRequest: isImageRequest,
+        handleFetch: handleFetch,
+    };
+}

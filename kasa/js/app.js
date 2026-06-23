@@ -216,19 +216,6 @@ if (warehouseSearch) {
 }
 
 // Захист від HTML-ін'єкції: екрануємо все, що показуємо через innerHTML
-function escapeHtml(value) {
-    return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-// Екранування коду, який підставляється всередину onclick="...('CODE')"
-function escapeJsInAttr(value) {
-    return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-}
-
 function renderWarehouse() {
     warehouseTableBody.innerHTML = '';
     const codes = Object.keys(productDatabase).sort((a, b) => {
@@ -623,13 +610,6 @@ if (scanFileInp) {
 // ==========================================
 // Кожен продаж зберігається в колекції "sales", щоб сторінка «Звіти»
 // показувала виторг за день/тиждень/місяць і топ товарів.
-function localDateKey(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-}
-
 function logSale(total, subtotal, discount) {
     const now = new Date();
     const items = cart.map(i => ({ code: i.code, name: i.name, price: i.price, qty: i.qty }));
@@ -653,8 +633,6 @@ const reportsCards = document.getElementById('reports-cards');
 const reportsDays = document.getElementById('reports-days');
 const reportsTop = document.getElementById('reports-top');
 const reportsEmpty = document.getElementById('reports-empty');
-
-function money(n) { return Math.round(n).toLocaleString('uk-UA'); }
 
 function openReports() {
     reportsModal.style.display = 'block';

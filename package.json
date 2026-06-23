@@ -4,7 +4,8 @@
   "description": "",
   "main": "optimize.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,12 @@
   "homepage": "https://github.com/victorjavac/mango-novoselytsia#readme",
   "dependencies": {
     "sharp": "^0.35.2"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.6",
+    "vitest": "^3.2.6"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
   }
 }
