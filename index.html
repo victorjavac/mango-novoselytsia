@@ -1399,7 +1399,7 @@
 
         <a class="fc-viber" href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" title="Написати у Viber" aria-label="Написати у Viber"><i class="fab fa-viber"></i></a>
 
-        <a class="fc-instagram" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" title="Написати в Instagram" aria-label="Написати в Instagram"><i class="fab fa-instagram"></i></a>
+        <a class="fc-instagram" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" title="Написати в Instagram" aria-label="Написати в Instagram" data-instagram-source="floating_button"><i class="fab fa-instagram"></i></a>
 
         <a class="fc-phone" href="tel:+380507559456" title="Зателефонувати" aria-label="Зателефонувати"><i class="fas fa-phone"></i></a>
 
@@ -1411,7 +1411,7 @@
 
         <div class="header-social-icons">
 
-            <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" title="Instagram" data-instagram-source="header"><i class="fab fa-instagram"></i></a>
 
             
 
@@ -1451,7 +1451,7 @@
 
         </a>
 
-        <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta btn-instagram" target="_blank" onclick="gtag('event', 'instagram_click');">
+        <a href="https://www.instagram.com/mango_olya_lingeri/" class="btn-cta btn-instagram" target="_blank" data-instagram-source="hero_cta">
 
             <i class="fab fa-instagram"></i> Перейти в Instagram
 
@@ -2363,7 +2363,7 @@
             <p style="font-family: 'Comfortaa', sans-serif; font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 18px;">
                 Розміри, ціну та наявність уточнюйте в повідомленні. Ми допоможемо підібрати варіант.
             </p>
-            <a id="viewInstaLink" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" class="btn-cta btn-instagram" style="width: 100%; justify-content: center; padding: 14px 0; border-radius: 50px;">
+            <a id="viewInstaLink" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" class="btn-cta btn-instagram" data-instagram-source="product_card" style="width: 100%; justify-content: center; padding: 14px 0; border-radius: 50px;">
                 <i class="fab fa-instagram"></i> В Інстаграм
             </a>
         </div>
@@ -2511,8 +2511,6 @@
 
         document.querySelector('.fc-viber').addEventListener('click', () => gtag('event', 'viber_click'));
 
-        document.querySelector('.fc-instagram').addEventListener('click', () => gtag('event', 'instagram_click'));
-
         document.querySelector('.fc-phone').addEventListener('click', () => gtag('event', 'phone_click'));
 
 
@@ -2637,21 +2635,11 @@ document.getElementById('productViewModal').addEventListener('click', function(e
 
         
 
-        document.querySelectorAll('.btn-cta').forEach(el => {
+        document.querySelectorAll('a[href*="instagram.com"]').forEach(el => {
 
-            el.addEventListener('click', () => trackInstagram('hero_cta'));
+            const source = el.dataset.instagramSource || 'instagram_link';
 
-        });
-
-        document.querySelectorAll('.float-contact .fc-instagram').forEach(el => {
-
-            el.addEventListener('click', () => trackInstagram('floating_button'));
-
-        });
-
-        document.querySelectorAll('.header-social-icons a[href*="instagram.com"]').forEach(el => {
-
-            el.addEventListener('click', () => trackInstagram('header'));
+            el.addEventListener('click', () => trackInstagram(source));
 
         });
 

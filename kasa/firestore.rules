@@ -5,27 +5,98 @@
 // Перед публікацією увімкніть анонімний вхід:
 //   Authentication → Sign-in method → Anonymous → Enable.
 //
-// Суть: писати/читати базу може лише сам застосунок каси, який непомітно
-// входить анонімно (request.auth != null). Випадковий відвідувач, що просто
-// знає адресу бази, доступу не отримає.
+// Суть: каса входить анонімно, а правила нижче обмежують доступ лише потрібними
+// колекціями, полями й типами даних. Для повного захисту від сторонніх клієнтів
+// додатково увімкніть Firebase App Check або перейдіть на іменні акаунти продавців.
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validText(data, field, maxLength) {
+      return !(field in data) || (data[field] is string && data[field].size() <= maxLength);
+    }
+
+    function validProductFields(data) {
+      return validText(data, 'name', 200)
+        && validText(data, 'brand', 100)
+        && validText(data, 'size', 50)
+        && validText(data, 'article', 100)
+        && (!('price' in data) || (data.price is number && data.price >= 0 && data.price <= 1000000))
+        && (!('quantity' in data) || (data.quantity is number && data.quantity >= 0 && data.quantity <= 100000));
+    }
+
+    function validProductCreate() {
+      return request.resource.data.keys().hasAll(['name', 'price', 'quantity'])
+        && request.resource.data.keys().hasOnly(['name', 'price', 'quantity', 'brand', 'size', 'article'])
+        && validProductFields(request.resource.data);
+    }
+
+    function validProductUpdate() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['name', 'price', 'quantity', 'brand', 'size', 'article'])
+        && (!changed.hasAny(['name']) || validText(request.resource.data, 'name', 200))
+        && (!changed.hasAny(['brand']) || validText(request.resource.data, 'brand', 100))
+        && (!changed.hasAny(['size']) || validText(request.resource.data, 'size', 50))
+        && (!changed.hasAny(['article']) || validText(request.resource.data, 'article', 100))
+        && (!changed.hasAny(['price']) || (request.resource.data.price is number && request.resource.data.price >= 0 && request.resource.data.price <= 1000000))
+        && (!changed.hasAny(['quantity']) || (request.resource.data.quantity is number && request.resource.data.quantity >= 0 && request.resource.data.quantity <= 100000));
+    }
+
+    function validPinWrite() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin'])
+        && request.resource.data.pin is string
+        && request.resource.data.pin.matches('^[0-9]{4,12}$');
+    }
+
+    function validSaleCreate() {
+      return request.resource.data.keys().hasAll(['ts', 'tsMillis', 'dateKey', 'total', 'subtotal', 'discount', 'itemCount', 'items'])
+        && request.resource.data.keys().hasOnly(['ts', 'tsMillis', 'dateKey', 'total', 'subtotal', 'discount', 'itemCount', 'items'])
+        && request.resource.data.ts is timestamp
+        && request.resource.data.tsMillis is number
+        && request.resource.data.dateKey is string
+        && request.resource.data.dateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.subtotal is number
+        && request.resource.data.subtotal >= 0
+        && request.resource.data.discount is number
+        && request.resource.data.discount >= 0
+        && request.resource.data.itemCount is number
+        && request.resource.data.itemCount > 0
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 100;
+    }
 
     // Товари складу
     match /products/{code} {
-      allow read, write: if request.auth != null;
+      allow read: if signedIn();
+      allow create: if signedIn() && validProductCreate();
+      allow update: if signedIn() && validProductUpdate();
+      allow delete: if signedIn();
     }
 
     // Налаштування каси (зокрема PIN)
     match /settings/{doc} {
-      allow read, write: if request.auth != null;
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && doc == 'app'
+        && request.resource.data.keys().hasOnly(['pin'])
+        && request.resource.data.pin is string
+        && request.resource.data.pin.matches('^[0-9]{4,12}$');
+      allow update: if signedIn() && doc == 'app' && validPinWrite();
+      allow delete: if false;
     }
 
     // Журнал продажів (для сторінки "Звіти")
     match /sales/{doc} {
-      allow read, write: if request.auth != null;
+      allow read: if signedIn();
+      allow create: if signedIn() && validSaleCreate();
+      allow update, delete: if false;
     }
 
     // Усе інше — заборонено

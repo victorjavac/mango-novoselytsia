@@ -429,12 +429,14 @@ function updateCartUI() {
     } else { totalPriceElement.innerHTML = `<span>${total}</span>`; }
 }
 
-payButton.addEventListener('click', function() {
+payButton.addEventListener('click', async function() {
     if (cart.length === 0) { alert("Чек порожній!"); return; }
+    if (payButton.disabled) return;
     let dateStr = new Date().toLocaleString('uk-UA'); let itemsHtml = ''; let subtotal = 0;
+    const saleItems = cart.map(item => ({ code: item.code, name: item.name, price: item.price, qty: item.qty }));
 
     // Формуємо чек
-    cart.forEach(item => {
+    saleItems.forEach(item => {
         const lineTotal = item.price * item.qty;
         subtotal += lineTotal;
         const qtyLabel = item.qty > 1 ? ` <span style="color:#555;">${item.qty}×${item.price}</span>` : '';
@@ -443,25 +445,23 @@ payButton.addEventListener('click', function() {
     let discountHtml = currentDiscount > 0 ? `<div style="text-align: right; margin-top: 5px;">Знижка: -${currentDiscount} грн</div>` : '';
     printSection.innerHTML = `<div class="receipt-print"><img src="img/logo_print.jpg" alt="МАНГО"><div style="text-align: center; font-weight: bold; margin-top: 5px;">ФОП ТАРАСОВА О.М.</div><div style="text-align: center; font-size: 10px; font-weight: bold;">МАГАЗИН "МАНГО"</div><div style="text-align: center; font-size: 10px;">м. Новоселиця, вул. Хотинська 9А</div><div class="line"></div><div style="font-size: 10px; margin-bottom: 5px;">${dateStr}</div>${itemsHtml}<div class="line"></div>${discountHtml}<div style="font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px;">ДО СПЛАТИ: ${total} грн</div><div class="line"></div><div style="text-align: center; font-size: 10px; margin-top: 10px;">Дякуємо за покупку!</div></div>`;
 
-    // Відправляємо на друк
-    window.print();
-
-    // СПИСУЄМО ТОВАРИ З ХМАРИ (за кількістю в чеку)
-    cart.forEach(item => {
-        if (productDatabase[item.code]) {
-            // Атомарне списання на сервері (без втрати паралельних продажів)
-            db.collection("products").doc(item.code).update({
-                quantity: firebase.firestore.FieldValue.increment(-item.qty)
-            });
-        }
-    });
-
-    // ЗАПИСУЄМО ПРОДАЖ У ЖУРНАЛ (для сторінки «Звіти»)
-    logSale(total, subtotal, currentDiscount);
-
-    // Оновлюємо фінанси
-    dailyTotal += total; localStorage.setItem('mangoDailySales', dailyTotal);
-    cart = []; currentDiscount = 0; discountInput.value = ''; updateCartUI(); barcodeInput.focus();
+    const saleTotal = total;
+    const saleDiscount = currentDiscount;
+    const oldPayText = payButton.innerText;
+    payButton.disabled = true;
+    payButton.innerText = 'Зберігаю продаж…';
+    try {
+        await saveSaleAndDecrementStock(saleItems, saleTotal, subtotal, saleDiscount);
+        window.print();
+        dailyTotal += saleTotal; localStorage.setItem('mangoDailySales', dailyTotal);
+        cart = []; currentDiscount = 0; discountInput.value = ''; updateCartUI(); barcodeInput.focus();
+    } catch (err) {
+        console.error('Помилка оплати:', err);
+        alert(err && err.message ? err.message : 'Не вдалося зберегти продаж. Чек не очищено — спробуйте ще раз.');
+    } finally {
+        payButton.disabled = false;
+        payButton.innerText = oldPayText;
+    }
 });
 
 zReportBtn.addEventListener('click', function() {
@@ -630,11 +630,11 @@ function localDateKey(d) {
     return `${y}-${m}-${day}`;
 }
 
-function logSale(total, subtotal, discount) {
+function buildSaleData(total, subtotal, discount, saleItems) {
     const now = new Date();
-    const items = cart.map(i => ({ code: i.code, name: i.name, price: i.price, qty: i.qty }));
-    const itemCount = cart.reduce((s, i) => s + i.qty, 0);
-    db.collection('sales').add({
+    const items = saleItems.map(i => ({ code: i.code, name: i.name, price: i.price, qty: i.qty }));
+    const itemCount = saleItems.reduce((s, i) => s + i.qty, 0);
+    return {
         ts: firebase.firestore.FieldValue.serverTimestamp(),
         tsMillis: now.getTime(),
         dateKey: localDateKey(now),
@@ -643,7 +643,28 @@ function logSale(total, subtotal, discount) {
         discount: discount || 0,
         itemCount: itemCount,
         items: items
-    }).catch(err => console.warn('Не вдалося записати продаж у журнал:', err && err.code));
+    };
+}
+
+async function saveSaleAndDecrementStock(saleItems, total, subtotal, discount) {
+    const saleRef = db.collection('sales').doc();
+    await db.runTransaction(async (transaction) => {
+        const rows = [];
+        for (const item of saleItems) {
+            const ref = db.collection("products").doc(item.code);
+            const snap = await transaction.get(ref);
+            if (!snap.exists) throw new Error(`Товар "${item.name}" більше не існує в базі. Чек не збережено.`);
+            const available = parseInt(snap.data().quantity, 10) || 0;
+            if (available < item.qty) {
+                throw new Error(`Недостатньо товару "${item.name}". Доступно ${available} шт, у чеку ${item.qty} шт. Чек не збережено.`);
+            }
+            rows.push({ ref: ref, available: available, qty: item.qty });
+        }
+        rows.forEach(row => {
+            transaction.update(row.ref, { quantity: row.available - row.qty });
+        });
+        transaction.set(saleRef, buildSaleData(total, subtotal, discount, saleItems));
+    });
 }
 
 const reportsBtn = document.getElementById('reports-btn');
