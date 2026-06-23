@@ -34,10 +34,7 @@ auth.onAuthStateChanged(function(user) {
     if (user) startCloudOnce();
 });
 auth.signInAnonymously().catch(function(err) {
-    // Якщо анонімний вхід ще не увімкнено у Firebase — не блокуємо касу:
-    // пробуємо працювати як раніше (з відкритими правилами).
-    console.warn("Анонімний вхід не вдався, працюю без авторизації:", err && err.code);
-    startCloudOnce();
+    showOperationError("Не вдалося увійти до Firebase. Каса не може працювати з базою.", err);
 });
 
 // ==========================================
@@ -135,10 +132,10 @@ async function prepareLockUI() {
             lockBtn.innerText = 'Увійти';
         }
     } catch (e) {
-        // Якщо немає зв'язку з базою — не блокуємо назавжди
+        console.error('Не вдалося прочитати PIN:', e);
         lockMode = 'enter';
         lockTitle.innerText = 'Введіть PIN-код';
-        lockHint.innerText = 'Немає зв\'язку з базою. Перевірте інтернет і спробуйте ще раз.';
+        lockHint.innerText = `Немає зв'язку з базою. Перевірте інтернет і спробуйте ще раз${formatErrorDetails(e)}.`;
         lockBtn.innerText = 'Спробувати ще раз';
     }
 }
@@ -150,7 +147,10 @@ async function handleLockSubmit() {
         try {
             await saveStoredPin(entered);
             unlockApp();
-        } catch (e) { lockError.innerText = 'Не вдалося зберегти PIN. Перевірте інтернет.'; }
+        } catch (e) {
+            console.error('Не вдалося зберегти PIN:', e);
+            lockError.innerText = `Не вдалося зберегти PIN. Перевірте інтернет${formatErrorDetails(e)}.`;
+        }
         return;
     }
     // режим введення існуючого
@@ -160,7 +160,8 @@ async function handleLockSubmit() {
         if (entered === pin) { unlockApp(); }
         else { lockError.innerText = 'Невірний PIN-код.'; lockInput.value = ''; lockInput.focus(); }
     } catch (e) {
-        lockError.innerText = 'Немає зв\'язку з базою. Спробуйте ще раз.';
+        console.error('Не вдалося перевірити PIN:', e);
+        lockError.innerText = `Немає зв'язку з базою. Спробуйте ще раз${formatErrorDetails(e)}.`;
     }
 }
 // Початковий стан екрана блокування. Викликається після анонімного входу
@@ -228,6 +229,14 @@ function escapeHtml(value) {
 function escapeJsInAttr(value) {
     return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 }
+function formatErrorDetails(err) {
+    const detail = err && (err.code || err.message);
+    return detail ? ` (${detail})` : '';
+}
+function showOperationError(message, err) {
+    console.error(message, err);
+    alert(`${message}${formatErrorDetails(err)}`);
+}
 
 function renderWarehouse() {
     warehouseTableBody.innerHTML = '';
@@ -281,14 +290,18 @@ window.updateProduct = function(code, field, newValue) {
     // ВІДПРАВКА ОНОВЛЕННЯ В ХМАРУ
     db.collection("products").doc(code).update({
         [field]: val
-    }).catch(error => console.error("Помилка оновлення:", error));
+    }).catch(error => {
+        showOperationError("Не вдалося оновити товар у хмарі.", error);
+        renderWarehouse();
+    });
 };
 
 window.deleteProduct = function(code) {
     const item = productDatabase[code];
     if(confirm(`УВАГА!\nВи дійсно хочете назавжди видалити товар "${item.name}" з хмарної бази?`)) {
         // ВИДАЛЕННЯ З ХМАРИ
-        db.collection("products").doc(code).delete();
+        db.collection("products").doc(code).delete()
+            .catch(error => showOperationError("Не вдалося видалити товар із хмари.", error));
     }
 };
 
@@ -303,7 +316,7 @@ addRowBtn.addEventListener('click', function() {
         name: "Новий товар (натисніть щоб змінити)",
         price: 0,
         quantity: 0
-    });
+    }).catch(error => showOperationError("Не вдалося створити рядок товару в хмарі.", error));
 });
 
 window.printSingleLabel = function(code) {
@@ -318,7 +331,7 @@ window.printSingleLabel = function(code) {
 // ==========================================
 // 5. ПРИЙОМ ТОВАРУ, СКАНЕР ТА КАСА (ОНОВЛЕНО ДЛЯ ХМАРИ)
 // ==========================================
-addProductBtn.addEventListener('click', function() {
+addProductBtn.addEventListener('click', async function() {
     const code = newBarcodeInp.value.trim(); const name = newNameInp.value.trim();
     const brand = newBrandInp.value.trim(); const size = newSizeInp.value.trim(); const article = newArticleInp.value.trim();
     const price = parseFloat(newPriceInp.value); const quantity = parseInt(newQuantityInp.value);
@@ -327,22 +340,28 @@ addProductBtn.addEventListener('click', function() {
         alert("Помилка: Заповніть обов'язкові поля (штрихкод, назва, ціна, кількість)!"); return;
     }
 
-    if (productDatabase[code]) {
-        // Атомарне додавання залишку на сервері (без втрати паралельних оновлень)
-        const estimatedQty = (productDatabase[code].quantity || 0) + quantity;
-        const payload = { quantity: firebase.firestore.FieldValue.increment(quantity), price: price, name: name };
-        if (brand) payload.brand = brand;
-        if (size) payload.size = size;
-        if (article) payload.article = article;
-        db.collection("products").doc(code).update(payload);
-        alert(`Товар оновлено в хмарі! Залишок: ~${estimatedQty} шт.`);
-    } else {
-        db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
-        alert(`Товар додано в хмару!`);
+    addProductBtn.disabled = true;
+    try {
+        if (productDatabase[code]) {
+            // Атомарне додавання залишку на сервері (без втрати паралельних оновлень)
+            const estimatedQty = (productDatabase[code].quantity || 0) + quantity;
+            const payload = { quantity: firebase.firestore.FieldValue.increment(quantity), price: price, name: name };
+            if (brand) payload.brand = brand;
+            if (size) payload.size = size;
+            if (article) payload.article = article;
+            await db.collection("products").doc(code).update(payload);
+            alert(`Товар оновлено в хмарі! Залишок: ~${estimatedQty} шт.`);
+        } else {
+            await db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
+            alert(`Товар додано в хмару!`);
+        }
+        newBarcodeInp.value = ''; newNameInp.value = ''; newBrandInp.value = ''; newSizeInp.value = ''; newArticleInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
+        newBarcodeInp.focus();
+    } catch (error) {
+        showOperationError("Не вдалося зберегти товар у хмарі.", error);
+    } finally {
+        addProductBtn.disabled = false;
     }
-
-    newBarcodeInp.value = ''; newNameInp.value = ''; newBrandInp.value = ''; newSizeInp.value = ''; newArticleInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
-    newBarcodeInp.focus();
 });
 
 printLabelBtn.addEventListener('click', function() {
@@ -456,8 +475,7 @@ payButton.addEventListener('click', async function() {
         dailyTotal += saleTotal; localStorage.setItem('mangoDailySales', dailyTotal);
         cart = []; currentDiscount = 0; discountInput.value = ''; updateCartUI(); barcodeInput.focus();
     } catch (err) {
-        console.error('Помилка оплати:', err);
-        alert(err && err.message ? err.message : 'Не вдалося зберегти продаж. Чек не очищено — спробуйте ще раз.');
+        showOperationError('Не вдалося зберегти продаж. Чек не очищено — спробуйте ще раз.', err);
     } finally {
         payButton.disabled = false;
         payButton.innerText = oldPayText;
@@ -520,8 +538,8 @@ if (importBtn && importFile) {
                         return batch.commit();
                     });
                 }
-                chain.then(() => alert('Відновлено успішно!')).catch(err => alert('Помилка відновлення: ' + err.message));
-            } catch (err) { alert('Не вдалося прочитати файл: ' + err.message); }
+                chain.then(() => alert('Відновлено успішно!')).catch(err => showOperationError('Помилка відновлення.', err));
+            } catch (err) { showOperationError('Не вдалося прочитати файл.', err); }
         };
         reader.readAsText(file);
         importFile.value = '';
@@ -561,13 +579,14 @@ function openScanner(mode) {
         if (result) onCodeScanned(result.getText());
     }).then(() => {
         scanStatus.innerText = 'Наведіть камеру на штрихкод товару.';
-    }).catch(() => {
+    }).catch((err) => {
+        console.error('Камеру сканера недоступно:', err);
         scanStatus.innerHTML = 'Камеру недоступно. Дозвольте доступ до камери або скористайтесь «🖼️ зчитати з фото».';
     });
 }
 
 function closeScanner() {
-    try { if (codeReader) codeReader.reset(); } catch (e) {}
+    try { if (codeReader) codeReader.reset(); } catch (e) { console.warn('Не вдалося зупинити сканер:', e); }
     scanModal.style.display = 'none';
 }
 
@@ -605,12 +624,13 @@ if (scanFileInp) {
         if (!window.ZXing) { alert('Сканер не завантажився.'); return; }
         scanStatus.innerText = 'Розпізнаю фото…';
         const reader = getReader();
-        try { reader.reset(); } catch (err) {}
+        try { reader.reset(); } catch (err) { console.warn('Не вдалося перезапустити сканер:', err); }
         const url = URL.createObjectURL(file);
         reader.decodeFromImageUrl(url).then(result => {
             URL.revokeObjectURL(url);
             onCodeScanned(result.getText());
-        }).catch(() => {
+        }).catch((err) => {
+            console.error('Не вдалося розпізнати штрихкод із фото:', err);
             URL.revokeObjectURL(url);
             scanStatus.innerText = 'Не вдалося розпізнати штрихкод на фото. Сфотографуйте ближче і рівніше.';
         });
