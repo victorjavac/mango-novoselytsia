@@ -20,13 +20,14 @@
 </head>
 <body>
 
-    <!-- Екран блокування (PIN) -->
+    <!-- Екран входу -->
     <div id="lock-screen">
         <div id="lock-box">
             <img src="img/logo.png" alt="МАНГО" id="lock-logo">
-            <h2 id="lock-title">Введіть PIN-код</h2>
+            <h2 id="lock-title">Вхід у касу</h2>
             <p id="lock-hint"></p>
-            <input type="password" id="lock-input" inputmode="numeric" autocomplete="off" placeholder="PIN" maxlength="12">
+            <input type="email" id="auth-email" autocomplete="username" placeholder="Email">
+            <input type="password" id="auth-password" autocomplete="current-password" placeholder="Пароль">
             <button id="lock-btn">Увійти</button>
             <div id="lock-error"></div>
         </div>
@@ -59,7 +60,7 @@
             
             <div class="control-head">
                 <h2 style="border:none; padding:0; margin:0;">Склад / Сканер</h2>
-                <button id="lock-now-btn" title="Заблокувати касу">🔒</button>
+                <button id="lock-now-btn" title="Вийти з каси">🔒</button>
             </div>
             <input type="text" id="barcode-input" placeholder="Пікніть сканером або введіть код..." autofocus autocomplete="off">
             <button id="scan-sell-btn" class="scan-btn">📷 Сканувати товар камерою</button>
