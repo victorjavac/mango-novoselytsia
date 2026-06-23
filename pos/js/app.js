@@ -64,12 +64,12 @@ auth.onAuthStateChanged(user => {
                 userDisplay.innerText = `(${doc.data().displayName})`;
                 startLiveSync();
             } else {
-                auth.signOut();
+                auth.signOut().catch(signOutErr => showError("Не вдалося вийти після відмови в доступі.", signOutErr));
                 showError("Доступ заблоковано адміністратором або профіль відсутній.");
             }
         }).catch(err => {
-            auth.signOut();
-            showError("Помилка читання профілю доступу.");
+            auth.signOut().catch(signOutErr => showError("Не вдалося вийти після помилки профілю.", signOutErr));
+            showError("Помилка читання профілю доступу.", err);
         });
     } else {
         // Користувач не авторизований
@@ -84,15 +84,26 @@ loginButton.addEventListener('click', () => {
     if(email === "" || password === "") return;
     
     auth.signInWithEmailAndPassword(email, password).catch(err => {
-        showError("Невірний email або пароль.");
+        showError("Невірний email або пароль.", err);
     });
 });
 
-logoutButton.addEventListener('click', () => { auth.signOut(); });
+logoutButton.addEventListener('click', () => {
+    auth.signOut().catch(err => showError("Не вдалося вийти з акаунта.", err));
+});
 
-function showError(msg) {
-    authError.innerText = msg;
+function formatErrorDetails(err) {
+    const detail = err && (err.code || err.message);
+    return detail ? ` (${detail})` : '';
+}
+function showError(msg, err) {
+    if (err) console.error(msg, err);
+    authError.innerText = `${msg}${formatErrorDetails(err)}`;
     authError.style.display = 'block';
+}
+function showOperationError(msg, err) {
+    console.error(msg, err);
+    alert(`${msg}${formatErrorDetails(err)}`);
 }
 
 // ==========================================
@@ -106,7 +117,7 @@ function startLiveSync() {
         });
         renderWarehouse();
     }, err => {
-        console.error("Помилка синхронізації зі складом:", err);
+        showOperationError("Помилка синхронізації зі складом.", err);
     });
 }
 
@@ -140,14 +151,19 @@ window.updateProduct = function(code, field, newValue) {
     let val = newValue.trim();
     if (field === 'price' || field === 'quantity') {
         val = parseFloat(val);
-        if (isNaN(val) || val < 0) { renderWarehouse(); return; }
+        if (isNaN(val) || val < 0) { alert("Помилка! Введіть цифру."); renderWarehouse(); return; }
     }
-    db.collection("продукти").doc(code).update({ [field]: val });
+    db.collection("продукти").doc(code).update({ [field]: val })
+        .catch(err => {
+            showOperationError("Не вдалося оновити товар у хмарі.", err);
+            renderWarehouse();
+        });
 };
 
 window.archiveProduct = function(code) {
     if(confirm("Перенести товар в архів складу МАНГО?")) {
-        db.collection("продукти").doc(code).update({ quantity: 0, archived: true });
+        db.collection("продукти").doc(code).update({ quantity: 0, archived: true })
+            .catch(err => showOperationError("Не вдалося перенести товар в архів.", err));
     }
 };
 
@@ -216,8 +232,8 @@ payButton.addEventListener('click', function() {
         return Promise.all(reps).then((docs) => {
             // Перевірка залишків перед списанням
             docs.forEach(doc => {
-                if (!doc.exists) throw "Товар зник з бази даних!";
-                if (doc.data().quantity < itemCounts[doc.id]) throw `Товар "${doc.data().name}" розкупили раніше!`;
+                if (!doc.exists) throw new Error("Товар зник з бази даних!");
+                if (doc.data().quantity < itemCounts[doc.id]) throw new Error(`Товар "${doc.data().name}" розкупили раніше!`);
             });
 
             // Якщо все ок — списуємо залишки
@@ -243,7 +259,7 @@ payButton.addEventListener('click', function() {
         payButton.disabled = false; payButton.innerText = "ОПЛАТИТИ ТА ДРУКУВАТИ ЧЕК";
         barcodeInput.focus();
     }).catch((err) => {
-        alert("Помилка транзакції: " + err);
+        showOperationError("Помилка транзакції.", err);
         payButton.disabled = false; payButton.innerText = "ОПЛАТИТИ ТА ДРУКУВАТИ ЧЕК";
     });
 });
@@ -277,5 +293,5 @@ addProductBtn.addEventListener('click', () => {
     }).then(() => {
         alert("Товар успішно внесено на склад.");
         newBarcodeInp.value = ''; newNameInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
-    });
+    }).catch(err => showOperationError("Не вдалося внести товар на склад.", err));
 });
