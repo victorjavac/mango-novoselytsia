@@ -1,28 +1,13 @@
 // ==========================================
 // 1. ІНІЦІАЛІЗАЦІЯ GOOGLE FIREBASE ТА ОФЛАЙН-РЕЖИМУ
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-    authDomain: "mangopos-393c4.firebaseapp.com",
-    projectId: "mangopos-393c4",
-    storageBucket: "mangopos-393c4.firebasestorage.app",
-    messagingSenderId: "742965231195",
-    appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-};
-
-// Запускаємо хмару
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Вмикаємо офлайн-магію (Кешування без інтернету)
-db.enablePersistence().catch(function(err) {
-    console.warn("Офлайн-режим не активовано: ", err.code);
-});
+const firebaseServices = MangoFirebase.initialize({ persistence: true });
+const db = firebaseServices.db;
+const auth = firebaseServices.auth;
 
 // Анонімний вхід: каса "представляється" базі, щоб правила Firestore могли
 // дозволяти доступ лише застосунку (request.auth != null), а не будь-кому,
 // хто знає адресу бази. Для дружини це непомітно — жодних додаткових дій.
-const auth = firebase.auth();
 let cloudSubscribed = false;
 function startCloudOnce() {
     if (cloudSubscribed) return;
@@ -216,19 +201,8 @@ if (warehouseSearch) {
     });
 }
 
-// Захист від HTML-ін'єкції: екрануємо все, що показуємо через innerHTML
-function escapeHtml(value) {
-    return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-// Екранування коду, який підставляється всередину onclick="...('CODE')"
-function escapeJsInAttr(value) {
-    return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-}
+const escapeHtml = MangoText.escapeHtml;
+const escapeJsInAttr = MangoText.escapeJsInAttr;
 function formatErrorDetails(err) {
     const detail = err && (err.code || err.message);
     return detail ? ` (${detail})` : '';

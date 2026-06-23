@@ -1,18 +1,11 @@
 // ==========================================
 // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-    authDomain: "mangopos-393c4.firebaseapp.com",
-    projectId: "mangopos-393c4",
-    storageBucket: "mangopos-393c4.firebasestorage.app",
-    messagingSenderId: "742965231195",
-    appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+const firebaseServices = MangoFirebase.initialize();
+const db = firebaseServices.db;
+const auth = firebaseServices.auth;
+const escapeHtml = MangoText.escapeHtml;
+const escapeJsInAttr = MangoText.escapeJsInAttr;
 
 // Елементи інтерфейсу авторизації
 const authContainer = document.getElementById('auth-container');
@@ -133,14 +126,15 @@ function renderWarehouse() {
         let item = productDatabase[code];
         let tr = document.createElement('tr');
         let qtyStyle = item.quantity <= 0 ? 'color: red; font-weight: bold;' : '';
+        const c = escapeJsInAttr(code);
 
         tr.innerHTML = `
-            <td><strong>${code}</strong></td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'name', this.innerText)">${item.name}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'price', this.innerText)">${item.price}</td>
-            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${code}', 'quantity', this.innerText)">${item.quantity}</td>
+            <td><strong>${escapeHtml(code)}</strong></td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'name', this.innerText)">${escapeHtml(item.name)}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'price', this.innerText)">${escapeHtml(item.price)}</td>
+            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${c}', 'quantity', this.innerText)">${escapeHtml(item.quantity)}</td>
             <td>
-                <button class="delete-row-btn" onclick="archiveProduct('${code}')">🗑️ Архів</button>
+                <button class="delete-row-btn" onclick="archiveProduct('${c}')">🗑️ Архів</button>
             </td>
         `;
         warehouseTableBody.appendChild(tr);
@@ -199,7 +193,7 @@ function updateCartUI() {
         subtotal += item.price;
         const li = document.createElement('li');
         li.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; font-size:18px;";
-        li.innerHTML = `<span>${item.name} <strong>${item.price} грн</strong></span>`;
+        li.innerHTML = `<span>${escapeHtml(item.name)} <strong>${escapeHtml(item.price)} грн</strong></span>`;
         
         const removeBtn = document.createElement('button');
         removeBtn.innerText = "❌"; removeBtn.style = "background:none; border:none; cursor:pointer;";

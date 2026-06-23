@@ -53,6 +53,7 @@
     <div class="product-list" id="inventory-list"></div>
 </div>
 
+<script src="../shared/js/text-utils.js"></script>
 <script>
     // Посилання зібране правильно і взяте в лапки!
     const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxos6i8tMy4xwHgLc7M72ngnBCdZiSAyZlMgCbMcgSx7-hfBsxur2cti_t_M79MLWxC/exec";
@@ -104,6 +105,7 @@
 
         filtered.forEach(item => {
             let actionsHtml = '';
+            const id = escapeJsInAttr(item.id);
             
             // Збираємо додаткові характеристики до купи
             let details = [];
@@ -114,19 +116,19 @@
 
             if (item.status === 'active') {
                 actionsHtml = `
-                    <button class="btn-sell" onclick="sendAction('sell', '${item.id}')">🛒 ПРОДАТИ</button>
-                    <button class="btn-archive" onclick="sendAction('status', '${item.id}', 'archive')">В архів</button>
-                    <button class="btn-trash" onclick="sendAction('status', '${item.id}', 'trash')">В кошик</button>
+                    <button class="btn-sell" onclick="sendAction('sell', '${id}')">🛒 ПРОДАТИ</button>
+                    <button class="btn-archive" onclick="sendAction('status', '${id}', 'archive')">В архів</button>
+                    <button class="btn-trash" onclick="sendAction('status', '${id}', 'trash')">В кошик</button>
                 `;
             } else if (item.status === 'archive') {
                 actionsHtml = `
-                    <button class="btn-restore" onclick="sendAction('status', '${item.id}', 'active')">Відновити</button>
-                    <button class="btn-trash" onclick="sendAction('status', '${item.id}', 'trash')">В кошик</button>
+                    <button class="btn-restore" onclick="sendAction('status', '${id}', 'active')">Відновити</button>
+                    <button class="btn-trash" onclick="sendAction('status', '${id}', 'trash')">В кошик</button>
                 `;
             } else if (item.status === 'trash') {
                 actionsHtml = `
-                    <button class="btn-restore" onclick="sendAction('status', '${item.id}', 'active')">Відновити</button>
-                    <button class="btn-delete" onclick="if(confirm('Видалити назавжди?')) sendAction('delete', '${item.id}')">Знищити</button>
+                    <button class="btn-restore" onclick="sendAction('status', '${id}', 'active')">Відновити</button>
+                    <button class="btn-delete" onclick="if(confirm('Видалити назавжди?')) sendAction('delete', '${id}')">Знищити</button>
                 `;
             }
 
@@ -146,7 +148,8 @@
         });
     }
 
-    function escapeHtml(str) { return str ? str.toString().replace(/[&<>'"]/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[x])) : ''; }
+    const escapeHtml = MangoText.escapeHtml;
+    const escapeJsInAttr = MangoText.escapeJsInAttr;
     loadData();
 </script>
 </body>
