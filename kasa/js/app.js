@@ -243,6 +243,14 @@ function escapeJsInAttr(value) {
 function isValidProductCode(code) {
     return typeof code === 'string' && code.length > 0 && code.length <= 128 && !/[\/\x00-\x1F\x7F]/.test(code) && code !== '.' && code !== '..' && !/^__.*__$/.test(code);
 }
+function formatErrorDetails(err) {
+    const detail = err && (err.code || err.message);
+    return detail ? ` (${detail})` : '';
+}
+function showOperationError(message, err) {
+    console.error(message, err);
+    alert(`${message}${formatErrorDetails(err)}`);
+}
 
 function renderWarehouse() {
     warehouseTableBody.innerHTML = '';
@@ -296,14 +304,18 @@ window.updateProduct = function(code, field, newValue) {
     // ВІДПРАВКА ОНОВЛЕННЯ В ХМАРУ
     db.collection("products").doc(code).update({
         [field]: val
-    }).catch(error => console.error("Помилка оновлення:", error));
+    }).catch(error => {
+        showOperationError("Не вдалося оновити товар у хмарі.", error);
+        renderWarehouse();
+    });
 };
 
 window.deleteProduct = function(code) {
     const item = productDatabase[code];
     if(confirm(`УВАГА!\nВи дійсно хочете назавжди видалити товар "${item.name}" з хмарної бази?`)) {
         // ВИДАЛЕННЯ З ХМАРИ
-        db.collection("products").doc(code).delete();
+        db.collection("products").doc(code).delete()
+            .catch(error => showOperationError("Не вдалося видалити товар із хмари.", error));
     }
 };
 
@@ -319,7 +331,7 @@ addRowBtn.addEventListener('click', function() {
         name: "Новий товар (натисніть щоб змінити)",
         price: 0,
         quantity: 0
-    });
+    }).catch(error => showOperationError("Не вдалося створити рядок товару в хмарі.", error));
 });
 
 window.printSingleLabel = function(code) {
@@ -334,7 +346,7 @@ window.printSingleLabel = function(code) {
 // ==========================================
 // 5. ПРИЙОМ ТОВАРУ, СКАНЕР ТА КАСА (ОНОВЛЕНО ДЛЯ ХМАРИ)
 // ==========================================
-addProductBtn.addEventListener('click', function() {
+addProductBtn.addEventListener('click', async function() {
     const code = newBarcodeInp.value.trim(); const name = newNameInp.value.trim();
     const brand = newBrandInp.value.trim(); const size = newSizeInp.value.trim(); const article = newArticleInp.value.trim();
     const price = parseFloat(newPriceInp.value); const quantity = parseInt(newQuantityInp.value);
@@ -344,22 +356,28 @@ addProductBtn.addEventListener('click', function() {
     }
     if (!isValidProductCode(code)) { alert('Некоректний штрихкод. Не використовуйте / або службові символи.'); return; }
 
-    if (productDatabase[code]) {
-        // Атомарне додавання залишку на сервері (без втрати паралельних оновлень)
-        const estimatedQty = (productDatabase[code].quantity || 0) + quantity;
-        const payload = { quantity: firebase.firestore.FieldValue.increment(quantity), price: price, name: name };
-        if (brand) payload.brand = brand;
-        if (size) payload.size = size;
-        if (article) payload.article = article;
-        db.collection("products").doc(code).update(payload);
-        alert(`Товар оновлено в хмарі! Залишок: ~${estimatedQty} шт.`);
-    } else {
-        db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
-        alert(`Товар додано в хмару!`);
+    addProductBtn.disabled = true;
+    try {
+        if (productDatabase[code]) {
+            // Атомарне додавання залишку на сервері (без втрати паралельних оновлень)
+            const estimatedQty = (productDatabase[code].quantity || 0) + quantity;
+            const payload = { quantity: firebase.firestore.FieldValue.increment(quantity), price: price, name: name };
+            if (brand) payload.brand = brand;
+            if (size) payload.size = size;
+            if (article) payload.article = article;
+            await db.collection("products").doc(code).update(payload);
+            alert(`Товар оновлено в хмарі! Залишок: ~${estimatedQty} шт.`);
+        } else {
+            await db.collection("products").doc(code).set({ name: name, price: price, quantity: quantity, brand: brand, size: size, article: article });
+            alert(`Товар додано в хмару!`);
+        }
+        newBarcodeInp.value = ''; newNameInp.value = ''; newBrandInp.value = ''; newSizeInp.value = ''; newArticleInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
+        newBarcodeInp.focus();
+    } catch (error) {
+        showOperationError("Не вдалося зберегти товар у хмарі.", error);
+    } finally {
+        addProductBtn.disabled = false;
     }
-
-    newBarcodeInp.value = ''; newNameInp.value = ''; newBrandInp.value = ''; newSizeInp.value = ''; newArticleInp.value = ''; newPriceInp.value = ''; newQuantityInp.value = '';
-    newBarcodeInp.focus();
 });
 
 printLabelBtn.addEventListener('click', function() {
@@ -447,7 +465,7 @@ function updateCartUI() {
     } else { totalPriceElement.innerHTML = `<span>${total}</span>`; }
 }
 
-payButton.addEventListener('click', function() {
+payButton.addEventListener('click', async function() {
     if (cart.length === 0) { alert("Чек порожній!"); return; }
     let dateStr = new Date().toLocaleString('uk-UA'); let itemsHtml = ''; let subtotal = 0;
 
@@ -461,25 +479,33 @@ payButton.addEventListener('click', function() {
     let discountHtml = currentDiscount > 0 ? `<div style="text-align: right; margin-top: 5px;">Знижка: -${currentDiscount} грн</div>` : '';
     printSection.innerHTML = `<div class="receipt-print"><img src="img/logo_print.jpg" alt="МАНГО"><div style="text-align: center; font-weight: bold; margin-top: 5px;">ФОП ТАРАСОВА О.М.</div><div style="text-align: center; font-size: 10px; font-weight: bold;">МАГАЗИН "МАНГО"</div><div style="text-align: center; font-size: 10px;">м. Новоселиця, вул. Хотинська 9А</div><div class="line"></div><div style="font-size: 10px; margin-bottom: 5px;">${dateStr}</div>${itemsHtml}<div class="line"></div>${discountHtml}<div style="font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px;">ДО СПЛАТИ: ${total} грн</div><div class="line"></div><div style="text-align: center; font-size: 10px; margin-top: 10px;">Дякуємо за покупку!</div></div>`;
 
-    // Відправляємо на друк
-    window.print();
-
-    // СПИСУЄМО ТОВАРИ З ХМАРИ (за кількістю в чеку)
-    cart.forEach(item => {
-        if (productDatabase[item.code]) {
-            // Атомарне списання на сервері (без втрати паралельних продажів)
-            db.collection("products").doc(item.code).update({
+    payButton.disabled = true;
+    try {
+        const batch = db.batch();
+        cart.forEach(item => {
+            if (!productDatabase[item.code]) throw new Error(`Товар "${item.name}" більше не знайдено в базі.`);
+            batch.update(db.collection("products").doc(item.code), {
                 quantity: firebase.firestore.FieldValue.increment(-item.qty)
             });
+        });
+        await batch.commit();
+        try {
+            await logSale(total, subtotal, currentDiscount);
+        } catch (error) {
+            showOperationError("Продаж проведено, але не вдалося записати його у журнал звітів.", error);
         }
-    });
 
-    // ЗАПИСУЄМО ПРОДАЖ У ЖУРНАЛ (для сторінки «Звіти»)
-    logSale(total, subtotal, currentDiscount);
+        // Відправляємо на друк
+        window.print();
 
-    // Оновлюємо фінанси
-    dailyTotal += total; localStorage.setItem('mangoDailySales', dailyTotal);
-    cart = []; currentDiscount = 0; discountInput.value = ''; updateCartUI(); barcodeInput.focus();
+        // Оновлюємо фінанси
+        dailyTotal += total; localStorage.setItem('mangoDailySales', dailyTotal);
+        cart = []; currentDiscount = 0; discountInput.value = ''; updateCartUI(); barcodeInput.focus();
+    } catch (error) {
+        showOperationError("Не вдалося провести продаж. Чек залишився відкритим.", error);
+    } finally {
+        payButton.disabled = false;
+    }
 });
 
 zReportBtn.addEventListener('click', function() {
@@ -538,8 +564,8 @@ if (importBtn && importFile) {
                         return batch.commit();
                     });
                 }
-                chain.then(() => alert('Відновлено успішно!')).catch(err => alert('Помилка відновлення: ' + err.message));
-            } catch (err) { alert('Не вдалося прочитати файл: ' + err.message); }
+                chain.then(() => alert('Відновлено успішно!')).catch(err => showOperationError('Помилка відновлення.', err));
+            } catch (err) { showOperationError('Не вдалося прочитати файл.', err); }
         };
         reader.readAsText(file);
         importFile.value = '';
@@ -579,13 +605,14 @@ function openScanner(mode) {
         if (result) onCodeScanned(result.getText());
     }).then(() => {
         scanStatus.innerText = 'Наведіть камеру на штрихкод товару.';
-    }).catch(() => {
+    }).catch((err) => {
+        console.error('Камеру сканера недоступно:', err);
         scanStatus.innerHTML = 'Камеру недоступно. Дозвольте доступ до камери або скористайтесь «🖼️ зчитати з фото».';
     });
 }
 
 function closeScanner() {
-    try { if (codeReader) codeReader.reset(); } catch (e) {}
+    try { if (codeReader) codeReader.reset(); } catch (e) { console.warn('Не вдалося зупинити сканер:', e); }
     scanModal.style.display = 'none';
 }
 
@@ -623,7 +650,7 @@ if (scanFileInp) {
         if (!window.ZXing) { alert('Сканер не завантажився.'); return; }
         scanStatus.innerText = 'Розпізнаю фото…';
         const reader = getReader();
-        try { reader.reset(); } catch (err) {}
+        try { reader.reset(); } catch (err) { console.warn('Не вдалося перезапустити сканер:', err); }
         const url = URL.createObjectURL(file);
         reader.decodeFromImageUrl(url).then(result => {
             URL.revokeObjectURL(url);
@@ -652,7 +679,7 @@ function logSale(total, subtotal, discount) {
     const now = new Date();
     const items = cart.map(i => ({ code: i.code, name: i.name, price: i.price, qty: i.qty }));
     const itemCount = cart.reduce((s, i) => s + i.qty, 0);
-    db.collection('sales').add({
+    return db.collection('sales').add({
         ts: firebase.firestore.FieldValue.serverTimestamp(),
         tsMillis: now.getTime(),
         dateKey: localDateKey(now),
@@ -661,7 +688,7 @@ function logSale(total, subtotal, discount) {
         discount: discount || 0,
         itemCount: itemCount,
         items: items
-    }).catch(err => console.warn('Не вдалося записати продаж у журнал:', err && err.code));
+    });
 }
 
 const reportsBtn = document.getElementById('reports-btn');
