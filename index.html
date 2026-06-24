@@ -5,6 +5,8 @@
 <head>
 
     <meta name="description" content="Магазин білизни в Новоселиці: стильні купальники, зручні піжами та якісна спідня білизна. Примірка в магазині та доставка по Чернівецькій області.">
+    <link rel="canonical" href="https://victorjavac.github.io/mango-novoselytsia/">
+    <meta name="robots" content="index,follow">
 
     
 
@@ -103,6 +105,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="preconnect" href="https://elfsightcdn.com">
 
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -985,15 +989,15 @@
 
             background-color: #111;
 
-            color: #777;
+            color: #fff;
 
-            padding: 30px 20px;
+            padding: 25px 20px;
 
             text-align: center;
 
             font-family: 'Comfortaa', sans-serif;
 
-            font-size: 12px;
+            font-size: 13px;
 
         }
 
@@ -1409,7 +1413,7 @@
 
     <header class="main-top-header">
 
-        <div class="header-social-icons">
+        <nav class="header-social-icons" aria-label="Соціальні мережі">
 
             <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
 
@@ -1425,19 +1429,21 @@
 
             <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" title="Показати на карті"><i class="fas fa-map-marked-alt"></i></a>
 
-        </div>
+        </nav>
 
         <a href="#" class="header-logo">МАНГО</a>
 
     </header>
 
 
+    <main id="page-content">
 
-    <header class="main-header">
+
+    <section class="main-header" aria-labelledby="hero-title">
 
         <div class="hero-content">
 
-    <h1>Якісна та вишукана<br>жіноча нижня білизна,<br>купальники, піжамки</h1>
+    <h1 id="hero-title">Якісна та вишукана<br>жіноча нижня білизна,<br>купальники, піжамки</h1>
 
     <p>Підкресли свою впевненість. Примірка в Новоселиці та доставка по всій Україні.</p>
 
@@ -1465,7 +1471,7 @@
 
 </div>
 
-    </header>
+    </section>
 
 
 
@@ -2369,6 +2375,8 @@
         </div>
     </div>
 
+    </main>
+
     <script>
 
         // РЕЄСТРАЦІЯ PWA ДОДАТКА (Офлайн-режим)
@@ -2504,6 +2512,47 @@
             }
 
         });
+
+
+        document.querySelectorAll('.category-cover-item img').forEach(img => {
+
+            if (!img.alt) {
+
+                const title = img.closest('.category-cover-item')?.querySelector('.category-cover-title')?.innerText?.trim();
+
+                img.alt = title ? `${title} МАНГО` : 'Категорія МАНГО';
+
+            }
+
+        });
+
+        document.querySelectorAll('.catalog-item img').forEach(img => {
+
+            if (!img.alt) {
+
+                const card = img.closest('.catalog-item');
+
+                const title = card?.querySelector('h4')?.innerText?.trim();
+
+                const groupTitle = card?.closest('.category-group')?.querySelector('.category-group-title')?.innerText?.trim();
+
+                img.alt = title ? `${title}${groupTitle ? ` — ${groupTitle}` : ''}` : 'Товар МАНГО';
+
+            }
+
+        });
+
+        const productModal = document.getElementById('productViewModal');
+
+        if (productModal) {
+
+            productModal.setAttribute('role', 'dialog');
+
+            productModal.setAttribute('aria-modal', 'true');
+
+            productModal.setAttribute('aria-labelledby', 'viewProductTitle');
+
+        }
 
 
 
@@ -2744,7 +2793,7 @@ document.getElementById('productViewModal').addEventListener('click', function(e
         </div>
     </section>
 
-    <footer style="padding: 25px 20px; text-align: center; background: #111; color: #fff; font-family: 'Comfortaa', sans-serif; font-size: 13px;">
+    <footer class="main-footer">
         © 2026 МАНГО. Всі права захищені.
     </footer>
 </body>
