@@ -9,7 +9,7 @@ body {
 }
 
 /* ========================================= */
-/* ЕКРАН БЛОКУВАННЯ (PIN)                      */
+/* ЕКРАН ВХОДУ                                  */
 /* ========================================= */
 #lock-screen {
     position: fixed;
@@ -33,18 +33,18 @@ body {
 #lock-logo { width: 90px; margin-bottom: 6px; }
 #lock-title { border: none; padding: 0; margin: 6px 0; font-size: 22px; }
 #lock-hint { color: #777; font-size: 14px; margin: 0 0 14px; }
-#lock-input {
+#auth-email,
+#auth-password {
     width: 100%;
     box-sizing: border-box;
     padding: 14px;
-    font-size: 22px;
-    text-align: center;
-    letter-spacing: 6px;
+    font-size: 17px;
     border: 2px solid #ccc;
     border-radius: 8px;
     margin-bottom: 14px;
 }
-#lock-input:focus { outline: none; border-color: #4a2330; }
+#auth-email:focus,
+#auth-password:focus { outline: none; border-color: #4a2330; }
 #lock-btn {
     width: 100%;
     padding: 14px;
