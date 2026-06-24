@@ -1,18 +1,11 @@
 // ==========================================
 // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-    authDomain: "mangopos-393c4.firebaseapp.com",
-    projectId: "mangopos-393c4",
-    storageBucket: "mangopos-393c4.firebasestorage.app",
-    messagingSenderId: "742965231195",
-    appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+const firebaseServices = MangoFirebase.initialize();
+const db = firebaseServices.db;
+const auth = firebaseServices.auth;
+const escapeHtml = MangoText.escapeHtml;
+const escapeJsInAttr = MangoText.escapeJsInAttr;
 
 // Елементи інтерфейсу авторизації
 const authContainer = document.getElementById('auth-container');
@@ -106,17 +99,6 @@ function showOperationError(msg, err) {
     alert(`${msg}${formatErrorDetails(err)}`);
 }
 
-function escapeHtml(value) {
-    return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-function escapeJsInAttr(value) {
-    return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-}
 function isValidProductCode(code) {
     return typeof code === 'string' && code.length > 0 && code.length <= 128 && !/[\/\x00-\x1F\x7F]/.test(code) && code !== '.' && code !== '..' && !/^__.*__$/.test(code);
 }
@@ -148,7 +130,6 @@ function renderWarehouse() {
         let item = productDatabase[code];
         let tr = document.createElement('tr');
         let qtyStyle = item.quantity <= 0 ? 'color: red; font-weight: bold;' : '';
-
         const c = escapeJsInAttr(code);
         tr.innerHTML = `
             <td><strong>${escapeHtml(code)}</strong></td>
