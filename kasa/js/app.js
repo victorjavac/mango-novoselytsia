@@ -1,41 +1,71 @@
 // ==========================================
 // 1. ІНІЦІАЛІЗАЦІЯ GOOGLE FIREBASE ТА ОФЛАЙН-РЕЖИМУ
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-    authDomain: "mangopos-393c4.firebaseapp.com",
-    projectId: "mangopos-393c4",
-    storageBucket: "mangopos-393c4.firebasestorage.app",
-    messagingSenderId: "742965231195",
-    appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-};
+const firebaseServices = MangoFirebase.initialize({ persistence: true });
+const db = firebaseServices.db;
+const auth = firebaseServices.auth;
 
-// Запускаємо хмару
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Вмикаємо офлайн-магію (Кешування без інтернету)
-db.enablePersistence().catch(function(err) {
-    console.warn("Офлайн-режим не активовано: ", err.code);
-});
-
-// Анонімний вхід: каса "представляється" базі, щоб правила Firestore могли
-// дозволяти доступ лише застосунку (request.auth != null), а не будь-кому,
-// хто знає адресу бази. Для дружини це непомітно — жодних додаткових дій.
-const auth = firebase.auth();
 let cloudSubscribed = false;
+let cloudUnsubscribe = null;
+let pendingLoginUnlock = false;
+let currentUserProfile = null;
+
 function startCloudOnce() {
     if (cloudSubscribed) return;
     cloudSubscribed = true;
-    subscribeToCloud();
-    initLockUI();
+    cloudUnsubscribe = subscribeToCloud();
 }
-auth.onAuthStateChanged(function(user) {
-    if (user) startCloudOnce();
-});
-auth.signInAnonymously().catch(function(err) {
-    showOperationError("Не вдалося увійти до Firebase. Каса не може працювати з базою.", err);
-});
+function resetCloudSubscription() {
+    if (typeof cloudUnsubscribe === 'function') cloudUnsubscribe();
+    cloudSubscribed = false;
+    cloudUnsubscribe = null;
+    productDatabase = {};
+}
+async function getActiveUserProfile(user) {
+    if (!user || user.isAnonymous) return null;
+    const doc = await db.collection('users').doc(user.uid).get();
+    if (!doc.exists) return null;
+    const profile = doc.data();
+    return profile && profile.active === true ? profile : null;
+}
+async function handleAuthState(user) {
+    if (!user) {
+        currentUserProfile = null;
+        resetCloudSubscription();
+        showAuthUI();
+        return;
+    }
+
+    try {
+        const profile = await getActiveUserProfile(user);
+        if (!profile) {
+            currentUserProfile = null;
+            resetCloudSubscription();
+            await auth.signOut();
+            showAuthUI('\u0414\u043e\u0441\u0442\u0443\u043f \u0437\u0430\u0431\u043e\u0440\u043e\u043d\u0435\u043d\u043e: \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447 \u043d\u0435 \u0430\u043a\u0442\u0438\u0432\u043d\u0438\u0439.');
+            return;
+        }
+
+        const canUnlock = pendingLoginUnlock || deviceUnlocked();
+        pendingLoginUnlock = false;
+        if (!canUnlock) {
+            await auth.signOut();
+            showAuthUI();
+            return;
+        }
+
+        currentUserProfile = profile;
+        startCloudOnce();
+        unlockApp();
+    } catch (err) {
+        pendingLoginUnlock = false;
+        currentUserProfile = null;
+        resetCloudSubscription();
+        console.error('Auth check failed:', err);
+        try { await auth.signOut(); } catch (signOutErr) { console.warn('Sign out failed:', signOutErr); }
+        showAuthUI('\u041d\u0435 \u0432\u0434\u0430\u043b\u043e\u0441\u044f \u043f\u0435\u0440\u0435\u0432\u0456\u0440\u0438\u0442\u0438 \u0434\u043e\u0441\u0442\u0443\u043f.');
+    }
+}
 
 // ==========================================
 // 2. ГЛОБАЛЬНІ ЗМІННІ
@@ -77,21 +107,17 @@ const addRowBtn = document.getElementById('add-row-btn');
 const warehouseSearch = document.getElementById('warehouse-search');
 
 // ==========================================
-// 2.5 ЗАХИСТ ВХОДУ (PIN-КОД)
+// 2.5 FIREBASE AUTH GATE
 // ==========================================
-// PIN зберігається у хмарі (settings/app), тому однаковий на всіх пристроях
-// і його можна змінити в одному місці. Після входу пристрій лишається
-// розблокованим 12 годин, щоб не вводити PIN постійно.
-const LOCK_TTL_MS = 12 * 60 * 60 * 1000; // 12 годин
+const LOCK_TTL_MS = 12 * 60 * 60 * 1000;
 const lockScreen = document.getElementById('lock-screen');
-const lockInput = document.getElementById('lock-input');
+const authEmailInput = document.getElementById('auth-email');
+const authPasswordInput = document.getElementById('auth-password');
 const lockBtn = document.getElementById('lock-btn');
 const lockTitle = document.getElementById('lock-title');
 const lockHint = document.getElementById('lock-hint');
 const lockError = document.getElementById('lock-error');
 const lockNowBtn = document.getElementById('lock-now-btn');
-
-let lockMode = 'enter'; // 'enter' = ввести існуючий PIN, 'create' = створити новий
 
 function deviceUnlocked() {
     const t = parseInt(localStorage.getItem('mangoUnlockTime'), 10) || 0;
@@ -100,95 +126,65 @@ function deviceUnlocked() {
 function unlockApp() {
     localStorage.setItem('mangoUnlockTime', Date.now().toString());
     document.body.classList.add('unlocked');
+    if (lockError) lockError.innerText = '';
+    if (authPasswordInput) authPasswordInput.value = '';
     setTimeout(() => barcodeInput && barcodeInput.focus(), 100);
 }
-function lockApp() {
-    localStorage.removeItem('mangoUnlockTime');
+function showAuthUI(message) {
     document.body.classList.remove('unlocked');
-    lockError.innerText = '';
-    lockInput.value = '';
-    prepareLockUI();
-    lockInput.focus();
+    if (!lockBtn) return;
+    lockTitle.innerText = '\u0412\u0445\u0456\u0434 \u0443 \u043a\u0430\u0441\u0443';
+    lockHint.innerText = '\u0423\u0432\u0456\u0439\u0434\u0456\u0442\u044c Firebase-\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0435\u043c \u0437 active=true.';
+    lockBtn.innerText = '\u0423\u0432\u0456\u0439\u0442\u0438';
+    lockBtn.disabled = false;
+    if (lockError) lockError.innerText = message || '';
+    if (authEmailInput && auth.currentUser && auth.currentUser.email) authEmailInput.value = auth.currentUser.email;
+    if (authPasswordInput) authPasswordInput.value = '';
+    setTimeout(() => authEmailInput && authEmailInput.focus(), 100);
 }
-async function getStoredPin() {
-    const doc = await db.collection('settings').doc('app').get();
-    return doc.exists && doc.data().pin ? String(doc.data().pin) : null;
-}
-async function saveStoredPin(pin) {
-    await db.collection('settings').doc('app').set({ pin: String(pin) }, { merge: true });
-}
-async function prepareLockUI() {
-    try {
-        const pin = await getStoredPin();
-        if (!pin) {
-            lockMode = 'create';
-            lockTitle.innerText = 'Створіть PIN-код';
-            lockHint.innerText = 'Перший вхід: придумайте код (мінімум 4 цифри). Його вводитиме продавець.';
-            lockBtn.innerText = 'Зберегти і увійти';
-        } else {
-            lockMode = 'enter';
-            lockTitle.innerText = 'Введіть PIN-код';
-            lockHint.innerText = 'Доступ до каси захищено.';
-            lockBtn.innerText = 'Увійти';
-        }
-    } catch (e) {
-        console.error('Не вдалося прочитати PIN:', e);
-        lockMode = 'enter';
-        lockTitle.innerText = 'Введіть PIN-код';
-        lockHint.innerText = `Немає зв'язку з базою. Перевірте інтернет і спробуйте ще раз${formatErrorDetails(e)}.`;
-        lockBtn.innerText = 'Спробувати ще раз';
-    }
+async function lockApp() {
+    localStorage.removeItem('mangoUnlockTime');
+    resetCloudSubscription();
+    await auth.signOut();
+    showAuthUI();
 }
 async function handleLockSubmit() {
-    const entered = lockInput.value.trim();
-    lockError.innerText = '';
-    if (lockMode === 'create') {
-        if (!/^\d{4,12}$/.test(entered)) { lockError.innerText = 'PIN має містити 4–12 цифр.'; return; }
-        try {
-            await saveStoredPin(entered);
-            unlockApp();
-        } catch (e) {
-            console.error('Не вдалося зберегти PIN:', e);
-            lockError.innerText = `Не вдалося зберегти PIN. Перевірте інтернет${formatErrorDetails(e)}.`;
-        }
+    const email = authEmailInput ? authEmailInput.value.trim() : '';
+    const password = authPasswordInput ? authPasswordInput.value : '';
+    if (!email || !password) {
+        lockError.innerText = '\u0412\u0432\u0435\u0434\u0456\u0442\u044c email \u0456 \u043f\u0430\u0440\u043e\u043b\u044c.';
         return;
     }
-    // режим введення існуючого
+
+    lockError.innerText = '';
+    lockBtn.disabled = true;
+    lockBtn.innerText = '\u041f\u0435\u0440\u0435\u0432\u0456\u0440\u044f\u044e...';
+    pendingLoginUnlock = true;
     try {
-        const pin = await getStoredPin();
-        if (pin === null) { await prepareLockUI(); return; }
-        if (entered === pin) { unlockApp(); }
-        else { lockError.innerText = 'Невірний PIN-код.'; lockInput.value = ''; lockInput.focus(); }
-    } catch (e) {
-        console.error('Не вдалося перевірити PIN:', e);
-        lockError.innerText = `Немає зв'язку з базою. Спробуйте ще раз${formatErrorDetails(e)}.`;
-    }
-}
-// Початковий стан екрана блокування. Викликається після анонімного входу
-// (startCloudOnce), бо перевірка PIN читає settings/app із захищеної бази.
-function initLockUI() {
-    if (!lockBtn) return;
-    if (deviceUnlocked()) {
-        document.body.classList.add('unlocked');
-    } else {
-        prepareLockUI();
-        setTimeout(() => lockInput.focus(), 200);
+        await auth.signInWithEmailAndPassword(email, password);
+    } catch (err) {
+        pendingLoginUnlock = false;
+        lockBtn.disabled = false;
+        lockBtn.innerText = '\u0423\u0432\u0456\u0439\u0442\u0438';
+        lockError.innerText = '\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 email \u0430\u0431\u043e \u043f\u0430\u0440\u043e\u043b\u044c.';
     }
 }
 if (lockBtn) {
     lockBtn.addEventListener('click', handleLockSubmit);
-    lockInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLockSubmit(); });
+    authPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLockSubmit(); });
+    authEmailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLockSubmit(); });
     if (lockNowBtn) lockNowBtn.addEventListener('click', lockApp);
 }
+auth.onAuthStateChanged(handleAuthState);
 
 // ==========================================
 // 3. ЖИВА СИНХРОНІЗАЦІЯ З ХМАРОЮ
 // ==========================================
 // Ця функція постійно слухає зміни в базі даних.
 // Якщо хтось (навіть з іншого телефону) змінить ціну, вона оновиться тут миттєво.
-// Викликається після анонімного входу (див. startCloudOnce вище).
+// Викликається після успішної перевірки Firebase Auth (див. startCloudOnce вище).
 function subscribeToCloud() {
-    db.collection("products").onSnapshot((snapshot) => {
+    return db.collection("products").onSnapshot((snapshot) => {
         productDatabase = {}; // Очищаємо старе
         snapshot.forEach((doc) => {
             productDatabase[doc.id] = doc.data(); // Записуємо свіжі дані
@@ -216,18 +212,10 @@ if (warehouseSearch) {
     });
 }
 
-// Захист від HTML-ін'єкції: екрануємо все, що показуємо через innerHTML
-function escapeHtml(value) {
-    return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-// Екранування коду, який підставляється всередину onclick="...('CODE')"
-function escapeJsInAttr(value) {
-    return escapeHtml(String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+const escapeHtml = MangoText.escapeHtml;
+const escapeJsInAttr = MangoText.escapeJsInAttr;
+function isValidProductCode(code) {
+    return typeof code === 'string' && code.length > 0 && code.length <= 128 && !/[\/\x00-\x1F\x7F]/.test(code) && code !== '.' && code !== '..' && !/^__.*__$/.test(code);
 }
 function formatErrorDetails(err) {
     const detail = err && (err.code || err.message);
@@ -309,6 +297,7 @@ addRowBtn.addEventListener('click', function() {
     const code = prompt("Введіть штрихкод зі сканера або придумайте свій:");
     if (!code || code.trim() === "") return;
     const cleanCode = code.trim();
+    if (!isValidProductCode(cleanCode)) { alert('Некоректний штрихкод. Не використовуйте / або службові символи.'); return; }
     if (productDatabase[cleanCode]) { alert("Товар з таким кодом вже існує!"); return; }
 
     // СТВОРЕННЯ ПОРОЖНЬОГО РЯДКА В ХМАРІ
@@ -339,6 +328,7 @@ addProductBtn.addEventListener('click', async function() {
     if (code === "" || name === "" || isNaN(price) || price <= 0 || isNaN(quantity) || quantity <= 0) {
         alert("Помилка: Заповніть обов'язкові поля (штрихкод, назва, ціна, кількість)!"); return;
     }
+    if (!isValidProductCode(code)) { alert('Некоректний штрихкод. Не використовуйте / або службові символи.'); return; }
 
     addProductBtn.disabled = true;
     try {
@@ -367,6 +357,7 @@ addProductBtn.addEventListener('click', async function() {
 printLabelBtn.addEventListener('click', function() {
     const code = newBarcodeInp.value.trim();
     if (code === "") { alert("Введіть штрихкод для друку."); return; }
+    if (!isValidProductCode(code)) { alert('Некоректний штрихкод.'); return; }
     window.printSingleLabel(code);
 });
 
@@ -629,8 +620,7 @@ if (scanFileInp) {
         reader.decodeFromImageUrl(url).then(result => {
             URL.revokeObjectURL(url);
             onCodeScanned(result.getText());
-        }).catch((err) => {
-            console.error('Не вдалося розпізнати штрихкод із фото:', err);
+        }).catch(() => {
             URL.revokeObjectURL(url);
             scanStatus.innerText = 'Не вдалося розпізнати штрихкод на фото. Сфотографуйте ближче і рівніше.';
         });

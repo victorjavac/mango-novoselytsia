@@ -1,18 +1,11 @@
 // ==========================================
 // 1. ІНІЦІАЛІЗАЦІЯ FIREBASE
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyBcar7UEjzulfsCrT7EGtldZwzmPNfaRM0",
-    authDomain: "mangopos-393c4.firebaseapp.com",
-    projectId: "mangopos-393c4",
-    storageBucket: "mangopos-393c4.firebasestorage.app",
-    messagingSenderId: "742965231195",
-    appId: "1:742965231195:web:4ae1755e1b25f60457c97e"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+const firebaseServices = MangoFirebase.initialize();
+const db = firebaseServices.db;
+const auth = firebaseServices.auth;
+const escapeHtml = MangoText.escapeHtml;
+const escapeJsInAttr = MangoText.escapeJsInAttr;
 
 // Елементи інтерфейсу авторизації
 const authContainer = document.getElementById('auth-container');
@@ -55,7 +48,7 @@ const printSection = document.getElementById('print-section');
 // 2. БЛОК АВТОРИЗАЦІЇ ТА ПЕРЕВІРКИ РОЛЕЙ
 // ==========================================
 auth.onAuthStateChanged(user => {
-    if (user) {
+    if (user && !user.isAnonymous) {
         // Користувач увійшов, перевіряємо його статус у колекції users
         db.collection("users").doc(user.uid).get().then(doc => {
             if (doc.exists && doc.data().active === true) {
@@ -106,6 +99,10 @@ function showOperationError(msg, err) {
     alert(`${msg}${formatErrorDetails(err)}`);
 }
 
+function isValidProductCode(code) {
+    return typeof code === 'string' && code.length > 0 && code.length <= 128 && !/[\/\x00-\x1F\x7F]/.test(code) && code !== '.' && code !== '..' && !/^__.*__$/.test(code);
+}
+
 // ==========================================
 // 3. ЖИВА СИНХРОНІЗАЦІЯ СКЛАДУ ("продукти")
 // ==========================================
@@ -133,14 +130,14 @@ function renderWarehouse() {
         let item = productDatabase[code];
         let tr = document.createElement('tr');
         let qtyStyle = item.quantity <= 0 ? 'color: red; font-weight: bold;' : '';
-
+        const c = escapeJsInAttr(code);
         tr.innerHTML = `
-            <td><strong>${code}</strong></td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'name', this.innerText)">${item.name}</td>
-            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${code}', 'price', this.innerText)">${item.price}</td>
-            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${code}', 'quantity', this.innerText)">${item.quantity}</td>
+            <td><strong>${escapeHtml(code)}</strong></td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'name', this.innerText)">${escapeHtml(item.name || '')}</td>
+            <td contenteditable="true" class="excel-cell" onblur="updateProduct('${c}', 'price', this.innerText)">${escapeHtml(item.price)}</td>
+            <td contenteditable="true" class="excel-cell" style="${qtyStyle}" onblur="updateProduct('${c}', 'quantity', this.innerText)">${escapeHtml(item.quantity)}</td>
             <td>
-                <button class="delete-row-btn" onclick="archiveProduct('${code}')">🗑️ Архів</button>
+                <button class="delete-row-btn" onclick="archiveProduct('${c}')">🗑 Архів</button>
             </td>
         `;
         warehouseTableBody.appendChild(tr);
@@ -199,7 +196,7 @@ function updateCartUI() {
         subtotal += item.price;
         const li = document.createElement('li');
         li.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; font-size:18px;";
-        li.innerHTML = `<span>${item.name} <strong>${item.price} грн</strong></span>`;
+        li.innerHTML = `<span>${escapeHtml(item.name)} <strong>${escapeHtml(item.price)} \u0433\u0440\u043d</strong></span>`;
         
         const removeBtn = document.createElement('button');
         removeBtn.innerText = "❌"; removeBtn.style = "background:none; border:none; cursor:pointer;";
@@ -266,7 +263,7 @@ payButton.addEventListener('click', function() {
 
 function printReceipt() {
     let dateStr = new Date().toLocaleString('uk-UA'); let itemsHtml = '';
-    cart.forEach(item => { itemsHtml += `<div style="display:flex; justify-content:space-between;"><span>${item.name}</span><span>${item.price}</span></div>`; });
+    cart.forEach(item => { itemsHtml += `<div style="display:flex; justify-content:space-between;"><span>${escapeHtml(item.name)}</span><span>${escapeHtml(item.price)}</span></div>`; });
     
     printSection.innerHTML = `
         <div class="receipt-print">
@@ -286,7 +283,8 @@ addProductBtn.addEventListener('click', () => {
     const code = newBarcodeInp.value.trim(); const name = newNameInp.value.trim();
     const price = parseFloat(newPriceInp.value); const quantity = parseInt(newQuantityInp.value);
 
-    if (code === "" || name === "" || isNaN(price) || isNaN(quantity)) { alert("Заповніть поля!"); return; }
+    if (code === "" || name === "" || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) { alert("\u0417\u0430\u043f\u043e\u0432\u043d\u0456\u0442\u044c \u043f\u043e\u043b\u044f!"); return; }
+    if (!isValidProductCode(code)) { alert("\u041d\u0435\u043a\u043e\u0440\u0435\u043a\u0442\u043d\u0438\u0439 \u0448\u0442\u0440\u0438\u0445\u043a\u043e\u0434."); return; }
     
     db.collection("продукти").doc(code).set({
         name: name, price: price, quantity: quantity, archived: false
