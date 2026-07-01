@@ -122,8 +122,7 @@
 
             background-color: #f4e8e1;
 
-            background-image: url('physical-banner.png');
-
+           background-image: url('../physical-banner.png');
             background-repeat: no-repeat;
 
             background-origin: border-box;
