@@ -1269,3 +1269,53 @@
 }
 
 .modal-btn:hover { background: #333; }
+/* Преміальні заголовки */
+h1, h2, h3 {
+    font-weight: 400 !important; /* Робить шрифт тоншим */
+    letter-spacing: 1.5px; /* Додає "повітря" між літерами */
+    color: #2c2c2c; /* М'який графітовий колір замість агресивного чорного */
+}
+
+/* Збільшуємо відступи між блоками (додаємо простір) */
+section {
+    padding: 80px 20px !important;
+}
+/* Мінімалістична преміум-кнопка */
+.premium-btn {
+    background-color: transparent !important;
+    color: #2c2c2c !important;
+    border: 1px solid #2c2c2c !important;
+    padding: 14px 28px !important;
+    border-radius: 4px !important; /* Гостріші кути виглядають суворіше */
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Ефект при наведенні мишки */
+.premium-btn:hover {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+}
+/* Знебарвлення карти для збереження стилю */
+iframe {
+    filter: grayscale(100%);
+    transition: filter 0.4s ease;
+    border-radius: 8px; /* Легке заокруглення кутів карти */
+}
+
+iframe:hover {
+    filter: grayscale(0%); /* Колір повертається при взаємодії */
+}
+/* Елегантна картка сертифіката */
+.certificate-block {
+    background-color: #ffffff !important;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Дуже м'яка тінь */
+    border-radius: 12px;
+    padding: 40px;
+}
