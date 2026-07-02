@@ -421,4 +421,21 @@
     window.scrollToMap = scrollToMap;
     window.openProductView = openProductView;
     window.closeProductView = closeProductView;
+    // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
+        const scrollTopBtn = document.getElementById('scrollToTopBtn');
+        if (scrollTopBtn) {
+            window.addEventListener('scroll', () => {
+                // Показувати кнопку, якщо прокрутили більше 400 пікселів вниз
+                if (window.scrollY > 400) {
+                    scrollTopBtn.classList.add('show');
+                } else {
+                    scrollTopBtn.classList.remove('show');
+                }
+            });
+
+            // Плавний скрол нагору при кліку
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
 })();
