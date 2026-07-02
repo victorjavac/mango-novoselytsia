@@ -210,11 +210,6 @@
         image.src = imageSrc;
         heading.textContent = fullTitle;
 
-        if (viberLink) {
-            const text = encodeURIComponent(`Добрий день! Хочу уточнити ціну, розмір і наявність: ${fullTitle}`);
-            viberLink.href = `${VIBER_LINK}&text=${text}`;
-        }
-
         modal.classList.add('active');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
