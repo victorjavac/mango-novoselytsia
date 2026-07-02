@@ -213,7 +213,7 @@ p {
     padding-top: 112px;
     background:
         linear-gradient(90deg, rgba(255, 250, 247, 0.88), rgba(255, 250, 247, 0.50)),
-        url('../physical-banner.png') center right / cover no-repeat;
+        url('../img/physical-banner.png') center right / cover no-repeat;
 }
 
 .main-header::before {
@@ -666,11 +666,14 @@ p {
 }
 
 .main-footer {
-    padding: 28px 18px;
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    padding: 30px 20px;
     text-align: center;
-    color: var(--muted);
-    background: #fff;
-    border-top: 1px solid var(--line);
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 14px;
+    border-top: 1px solid #333333;
+}
 }
 
 @media (max-width: 1080px) {
