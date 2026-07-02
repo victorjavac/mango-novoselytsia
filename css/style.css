@@ -805,10 +805,9 @@ p {
 }
 /* --- БЛОК ПРО ЗАСНОВНИЦЮ (ЖУРНАЛЬНИЙ СТИЛЬ) --- */
 .founder-section {
-    background-color: var(--blush); /* Використовуємо ніжний преміальний фон Девіна */
+    background-color: var(--blush); 
     overflow: hidden;
 }
-
 .founder-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -817,13 +816,11 @@ p {
     margin: 0 auto;
     align-items: center;
 }
-
 .founder-images {
     position: relative;
     height: clamp(400px, 45vw, 550px);
     width: 100%;
 }
-
 .img-main {
     position: absolute;
     top: 0;
@@ -835,7 +832,6 @@ p {
     box-shadow: var(--shadow);
     z-index: 1;
 }
-
 .img-secondary {
     position: absolute;
     bottom: 0;
@@ -846,21 +842,42 @@ p {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-strong);
     z-index: 2;
-    border: 8px solid var(--blush); /* Рамка кольору фону створює ефект прорізу */
+    border: 8px solid var(--blush);
 }
-
 @media (max-width: 820px) {
     .founder-container {
         grid-template-columns: 1fr;
     }
     .founder-images {
         height: 380px;
-        order: -1; /* На мобільному фото будуть зверху над текстом */
+        order: -1; 
     }
     .img-main {
         width: 85%;
     }
     .img-secondary {
         width: 60%;
+    }
+}
+/* --- ВИПРАВЛЕННЯ ВІКНА ТОВАРУ ДЛЯ МОБІЛЬНИХ (ЩОБ БЕЗ СКРОЛУ) --- */
+@media (max-width: 820px) {
+    .modal-content {
+        padding: 18px 16px;
+    }
+    .modal-content img {
+        max-height: 42svh; /* Картинка займає менше місця, залишаючи простір для кнопки */
+        margin-bottom: 5px;
+    }
+    #viewProductTitle {
+        font-size: 18px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+    .modal-content p {
+        font-size: 12px;
+        margin: 5px 0 15px;
+    }
+    .modal-btn, .btn-cta {
+        min-height: 48px; /* Трохи компактніша кнопка */
     }
 }
