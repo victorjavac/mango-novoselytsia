@@ -803,3 +803,64 @@ p {
     transform: translateY(-6px) scale(1.02);
     box-shadow: var(--shadow-strong);
 }
+/* --- БЛОК ПРО ЗАСНОВНИЦЮ (ЖУРНАЛЬНИЙ СТИЛЬ) --- */
+.founder-section {
+    background-color: var(--blush); /* Використовуємо ніжний преміальний фон Девіна */
+    overflow: hidden;
+}
+
+.founder-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 80px);
+    max-width: 1120px;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.founder-images {
+    position: relative;
+    height: clamp(400px, 45vw, 550px);
+    width: 100%;
+}
+
+.img-main {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80%;
+    height: 85%;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    z-index: 1;
+}
+
+.img-secondary {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 55%;
+    height: 60%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-strong);
+    z-index: 2;
+    border: 8px solid var(--blush); /* Рамка кольору фону створює ефект прорізу */
+}
+
+@media (max-width: 820px) {
+    .founder-container {
+        grid-template-columns: 1fr;
+    }
+    .founder-images {
+        height: 380px;
+        order: -1; /* На мобільному фото будуть зверху над текстом */
+    }
+    .img-main {
+        width: 85%;
+    }
+    .img-secondary {
+        width: 60%;
+    }
+}
