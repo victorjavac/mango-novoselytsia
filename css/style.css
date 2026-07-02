@@ -780,3 +780,26 @@ p {
         animation-iteration-count: 1 !important;
     }
 }
+/* --- СІТКА ДЛЯ СКРІНШОТІВ ВІДГУКІВ --- */
+.screenshot-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.review-screen {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(198, 161, 91, 0.16);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.review-screen:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--shadow-strong);
+}
