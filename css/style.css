@@ -881,3 +881,25 @@ p {
         min-height: 48px; /* Трохи компактніша кнопка */
     }
 }
+/* --- ВИПРАВЛЕННЯ НАКЛАДАННЯ КОНТАКТІВ НА МОБІЛЬНОМУ --- */
+@media (max-width: 1080px) {
+    .info-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 40px !important;
+    }
+    .info-contacts, .info-text {
+        width: 100% !important;
+    }
+}
+
+/* --- ОНОВЛЕНИЙ ФУТЕР (ТЕМНІШИЙ ТЕКСТ) --- */
+.main-footer {
+    background-color: #0a0a0a !important; /* Глибокий чорний фон */
+    color: #777777 !important; /* Приглушений сірий текст замість білого */
+    padding: 30px 20px !important;
+    text-align: center !important;
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13px !important;
+    border-top: 1px solid #1f1f1f !important; /* Ледь помітна межа */
+}
