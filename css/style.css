@@ -855,6 +855,7 @@ p {
     background: var(--cream);
     transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
+.review-screen { width: 100%; height: auto; aspect-ratio: 9 / 16; object-fit: cover !important; object-position: top; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid rgba(198, 161, 91, 0.16); background: var(--cream); transition: transform 0.4s ease, box-shadow 0.4s ease; }
 
 .review-screen:hover {
     transform: translateY(-6px) scale(1.02);
