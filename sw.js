@@ -4,8 +4,7 @@ const STATIC_ASSETS = [
     './',
     './index.html',
     './manifest.json',
-    './favicon.jpg',
-    './physical-banner.png'
+    './favicon.jpg'
 ];
 
 self.addEventListener('install', (event) => {
