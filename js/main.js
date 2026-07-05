@@ -332,6 +332,13 @@
             ['a[href*="/review"]', 'google_review_click']
         ];
 
+        // Обробник для кнопок скролу до карти
+        $all('[data-action="scroll-to-map"]').forEach(element => {
+            if (element.dataset.analyticsBound) return;
+            element.dataset.analyticsBound = 'map_scroll';
+            element.addEventListener('click', () => scrollToMap());
+        });
+
         trackedLinks.forEach(([selector, eventName]) => {
             $all(selector).forEach(element => {
                 if (element.dataset.analyticsBound === eventName) {

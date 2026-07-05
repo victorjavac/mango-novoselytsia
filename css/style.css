@@ -292,9 +292,22 @@ p {
     font-weight: 700;
 }
 
-.hero-meta a,
-.address {
+.address-btn {
+    all: unset; /* Скидаємо всі стилі кнопки */
+    display: block; /* Робимо блочним елементом */
+    color: var(--graphite);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: inherit;
     cursor: pointer;
+    transition: color var(--ease);
+}
+
+.address-btn:hover,
+.address-btn:focus-visible {
+    cursor: pointer;
+    color: var(--rose-dark);
+    text-decoration: underline;
 }
 
 .btn-cta,

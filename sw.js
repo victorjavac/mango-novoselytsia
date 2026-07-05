@@ -1,5 +1,5 @@
-const CACHE_NAME = 'mango-v2';
-const DYNAMIC_CACHE = 'mango-dynamic-v1';
+const STATIC_CACHE_NAME = 'mango-static-v3';
+const DYNAMIC_CACHE_NAME = 'mango-dynamic-v3';
 const STATIC_ASSETS = [
     './',
     './index.html',
@@ -10,10 +10,10 @@ const STATIC_ASSETS = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
+        caches.open(STATIC_CACHE_NAME)
             .then((cache) => cache.addAll(STATIC_ASSETS))
             .catch((err) => {
-                console.error('Не вдалося підготувати офлайн-кеш:', err);
+                console.error('Не вдалося підготувати статичний кеш:', err);
                 throw err;
             })
     );
@@ -22,7 +22,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then(keys => Promise.all(
-            keys.filter(key => key !== CACHE_NAME && key !== DYNAMIC_CACHE)
+            keys.filter(key => key !== STATIC_CACHE_NAME && key !== DYNAMIC_CACHE_NAME)
                 .map(key => caches.delete(key))
         )).catch((err) => {
             console.error('Не вдалося оновити кеші service worker:', err);
@@ -34,33 +34,47 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // Стратегія Cache First для зображень (офлайн каталог)
-    if (requestUrl.pathname.match(/\.(jpg|jpeg|png|webp|gif)$/)) {
+    // Стратегія: Cache First для зображень
+    if (requestUrl.pathname.match(/\.(jpg|jpeg|png|webp|gif|svg)$/)) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;
                 return fetch(event.request)
                     .then((networkRes) => {
-                        return caches.open(DYNAMIC_CACHE).then((cache) => {
+                        return caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
                             return cache.put(event.request, networkRes.clone())
                                 .catch((err) => console.warn('Не вдалося закешувати ресурс:', err))
                                 .then(() => networkRes);
                         });
                     })
-                    .catch((err) => {
-                        console.error('Не вдалося завантажити ресурс:', err);
-                        throw err;
+                    .catch(() => caches.match('./favicon.jpg')); // Фоллбек на іконку
+            })
+        );
+    // Стратегія: Stale-While-Revalidate для CSS, JS та шрифтів
+    } else if (requestUrl.pathname.match(/\.(css|js)$/) || requestUrl.hostname.includes('fonts.gstatic.com')) {
+        event.respondWith(
+            caches.open(DYNAMIC_CACHE_NAME).then(cache => {
+                return cache.match(event.request).then(cachedResponse => {
+                    const fetchPromise = fetch(event.request).then(networkResponse => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
                     });
+                    return cachedResponse || fetchPromise;
+                });
             })
         );
     } else {
-        // Network First для HTML
+        // Стратегія: Network First для HTML та інших запитів
         event.respondWith(
             fetch(event.request).catch((err) => {
                 console.warn('Мережа недоступна, пробую кеш:', err);
                 return caches.match(event.request).then((cached) => {
-                    if (cached) return cached;
-                    throw err;
+                    // Якщо запит є навігаційним і кешу немає, повертаємо головну сторінку
+                    if (cached) {
+                        return cached;
+                    } else if (event.request.mode === 'navigate') {
+                        return caches.match('./index.html');
+                    }
                 });
             })
         );
