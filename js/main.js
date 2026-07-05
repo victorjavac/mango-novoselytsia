@@ -469,32 +469,29 @@
         init();
     }
 
-    // Глобальні функції більше не потрібні, оскільки події обробляються всередині модуля
+   // Глобальні функції більше не потрібні, оскільки події обробляються всередині модуля
 
-// --- ЕКСПОРТ ГЛОБАЛЬНИХ ФУНКЦІЙ ДЛЯ HTML ---
+    // --- ЕКСПОРТ ГЛОБАЛЬНИХ ФУНКЦІЙ ДЛЯ HTML ---
     window.track = track;
     window.scrollToMap = scrollToMap;
     window.closeProductView = closeProductView;
 
     // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
     const scrollTopBtn = document.getElementById('scrollToTopBtn');
-    // ... далі твій код кнопки без змін
+    if (scrollTopBtn) {
+        const handleScroll = () => {
+            if (window.scrollY > 400) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        };
 
-    // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
-        const scrollTopBtn = document.getElementById('scrollToTopBtn');
-        if (scrollTopBtn) {
-            const handleScroll = () => {
-                if (window.scrollY > 400) {
-                    scrollTopBtn.classList.add('show');
-                } else {
-                    scrollTopBtn.classList.remove('show');
-                }
-            };
-
-            window.addEventListener('scroll', throttle(handleScroll, 150));
-            // Плавний скрол нагору при кліку
-            scrollTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
+        window.addEventListener('scroll', throttle(handleScroll, 150));
+        
+        // Плавний скрол нагору при кліку
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 })();
