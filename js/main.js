@@ -1,5 +1,3 @@
-/* MANGO premium JavaScript. Save as js/main.js */
-
 (() => {
     'use strict';
 
@@ -49,18 +47,18 @@
 
     function escapeHtml(value) {
         return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+            .replace(/&/g, '&')
+            .replace(/</g, '<')
+            .replace(/>/g, '>')
+            .replace(/"/g, '"')
+            .replace(/'/g, '&#39;');
     }
 
     function escapeJs(value) {
         return String(value)
             .replace(/\\/g, '\\\\')
             .replace(/'/g, "\\'")
-            .replace(/"/g, '&quot;')
+            .replace(/"/g, '\\"')
             .replace(/\n/g, ' ');
     }
 
@@ -212,7 +210,6 @@
         const modal = $('#productViewModal');
         const image = $('#viewLargeImage');
         const heading = $('#viewProductTitle');
-        const viberLink = $('#viewViberLink') || $('#viewInstaLink');
 
         if (!modal || !image || !heading) {
             return;
@@ -253,14 +250,12 @@
         container.dataset.eventsBound = 'true';
 
         container.addEventListener('click', event => {
-            // Клік по кнопці "Назад до категорій"
             const closeBtn = event.target.closest('[data-action="close-category"]');
             if (closeBtn) {
                 closeCategory();
                 return;
             }
 
-            // Клік по картці товару
             const item = event.target.closest('.catalog-item');
             if (!item) {
                 return;
@@ -271,7 +266,6 @@
             if (imageSrc) {
                 openProductView(imageSrc, title, category);
             } else {
-                // Фоллбек для старих версій, якщо дані не в data-атрибутах
                 const image = $('img', item);
                 if (image?.src) openProductView(image.src, title, category);
             }
@@ -280,19 +274,13 @@
 
     function setMissingAltText() {
         $all('.category-cover-item img').forEach(image => {
-            if (image.alt) {
-                return;
-            }
-
+            if (image.alt) return;
             const title = image.closest('.category-cover-item')?.querySelector('.category-cover-title')?.textContent?.trim();
             image.alt = title ? `${title} МАНГО Новоселиця` : 'Категорія МАНГО Новоселиця';
         });
 
         $all('.catalog-item img').forEach(image => {
-            if (image.alt) {
-                return;
-            }
-
+            if (image.alt) return;
             const card = image.closest('.catalog-item');
             const title = card?.querySelector('h4')?.textContent?.trim();
             const groupTitle = card?.closest('.category-group')?.querySelector('.category-group-title, h3')?.textContent?.trim();
@@ -302,24 +290,18 @@
 
     function enhanceModalAccessibility() {
         const modal = $('#productViewModal');
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-labelledby', 'viewProductTitle');
 
         modal.addEventListener('click', event => {
-            if (event.target === modal) {
-                closeProductView();
-            }
+            if (event.target === modal) closeProductView();
         });
 
         document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-                closeProductView();
-            }
+            if (event.key === 'Escape') closeProductView();
         });
     }
 
@@ -332,7 +314,6 @@
             ['a[href*="/review"]', 'google_review_click']
         ];
 
-        // Обробник для кнопок скролу до карти
         $all('[data-action="scroll-to-map"]').forEach(element => {
             if (element.dataset.analyticsBound) return;
             element.dataset.analyticsBound = 'map_scroll';
@@ -341,10 +322,7 @@
 
         trackedLinks.forEach(([selector, eventName]) => {
             $all(selector).forEach(element => {
-                if (element.dataset.analyticsBound === eventName) {
-                    return;
-                }
-
+                if (element.dataset.analyticsBound === eventName) return;
                 element.dataset.analyticsBound = eventName;
                 element.addEventListener('click', () => track(eventName));
             });
@@ -356,9 +334,7 @@
         const fallback = $('#instagram-widget-fallback');
         const widget = $('.elfsight-app-939efd3d-ab40-4a1b-8ea6-fce18e0f5e96', wrapper);
 
-        if (!wrapper || !fallback || !widget) {
-            return;
-        }
+        if (!wrapper || !fallback || !widget) return;
 
         const hasWidgetContent = widget.childElementCount > 0 || widget.textContent?.trim();
         if (!hasWidgetContent) {
@@ -369,16 +345,12 @@
 
     function addShareButtons() {
         $all('.category-header-block').forEach(block => {
-            if (block.dataset.shareReady === 'true') {
-                return;
-            }
+            if (block.dataset.shareReady === 'true') return;
 
             const backButton = $('.btn-back', block);
             const title = $('.category-group-title, h3', block);
 
-            if (!backButton || !title) {
-                return;
-            }
+            if (!backButton || !title) return;
 
             const wrapper = document.createElement('div');
             wrapper.className = 'category-actions';
@@ -406,7 +378,6 @@
                         track('share_category');
                     } catch (err) {
                         console.info('Шеринг скасовано', err);
-                        // Фоллбек: копіювання в буфер, якщо шеринг не вдався
                         if (navigator.clipboard) {
                             await navigator.clipboard.writeText(window.location.href);
                             alert('Посилання скопійовано.');
@@ -435,16 +406,13 @@
                 openCategory(event.state.category, { skipHistory: true });
                 return;
             }
-
             closeCategory(true);
         });
     }
 
     function bindCategoryCovers() {
         const menu = $('#categories-cover-menu');
-        if (!menu || menu.dataset.eventsBound) {
-            return;
-        }
+        if (!menu || menu.dataset.eventsBound) return;
 
         menu.dataset.eventsBound = 'true';
         menu.addEventListener('click', event => {
@@ -476,8 +444,6 @@
         init();
     }
 
-   // Глобальні функції більше не потрібні, оскільки події обробляються всередині модуля
-
     // --- ЕКСПОРТ ГЛОБАЛЬНИХ ФУНКЦІЙ ДЛЯ HTML ---
     window.track = track;
     window.scrollToMap = scrollToMap;
@@ -496,7 +462,6 @@
 
         window.addEventListener('scroll', throttle(handleScroll, 150));
         
-        // Плавний скрол нагору при кліку
         scrollTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
