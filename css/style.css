@@ -279,6 +279,10 @@ p {
     gap: 14px;
 }
 
+.premium-card .contact-actions,
+.info-contacts .contact-actions {
+    margin-top: 24px;
+}
 .hero-meta {
     display: grid;
     gap: 10px;
@@ -417,7 +421,7 @@ p {
 .main-categories-grid,
 .catalog-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: clamp(16px, 2vw, 26px);
     max-width: 1220px;
     margin: 0 auto;
@@ -642,6 +646,10 @@ p {
     background: #fff;
 }
 
+.modal-content h3 {
+    margin-top: 18px;
+}
+
 .modal-close {
     position: absolute;
     top: 18px;
@@ -665,23 +673,11 @@ p {
     background: var(--cream);
 }
 
-.main-footer {
-    background-color: #111111 !important;
-    color: #ffffff !important;
-    padding: 30px 20px;
-    text-align: center;
-    font-family: 'Comfortaa', sans-serif;
-    font-size: 14px;
-    border-top: 1px solid #333333;
+.modal-content .btn-cta {
+    width: 100%;
 }
 
-
 @media (max-width: 1080px) {
-    .main-categories-grid,
-    .catalog-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .info-container {
         grid-template-columns: 1fr;
     }
@@ -747,7 +743,6 @@ p {
     .cards-grid,
     .reviews-grid,
     .features-grid,
-    .main-categories-grid,
     .catalog-grid {
         grid-template-columns: 1fr;
     }
@@ -803,6 +798,11 @@ p {
     transform: translateY(-6px) scale(1.02);
     box-shadow: var(--shadow-strong);
 }
+
+.centered-action {
+    margin-top: 40px;
+}
+
 /* --- БЛОК ПРО ЗАСНОВНИЦЮ (ЖУРНАЛЬНИЙ СТИЛЬ) --- */
 .founder-section {
     background-color: var(--blush); 
@@ -816,6 +816,15 @@ p {
     margin: 0 auto;
     align-items: center;
 }
+.founder-content p {
+    color: var(--graphite);
+    margin-bottom: 20px;
+}
+
+.founder-content p:last-of-type {
+    margin-bottom: 30px;
+}
+
 .founder-images {
     position: relative;
     height: clamp(400px, 45vw, 550px);
@@ -893,20 +902,26 @@ p {
     }
 }
 
-/* --- ОНОВЛЕНИЙ ФУТЕР (ТЕМНІШИЙ ТЕКСТ) --- */
-.main-footer {
-    background-color: #0a0a0a !important; /* Глибокий чорний фон */
-    color: #777777 !important; /* Приглушений сірий текст замість білого */
-    padding: 30px 20px !important;
-    text-align: center !important;
-    font-family: 'Comfortaa', sans-serif !important;
-    font-size: 13px !important;
-    border-top: 1px solid #1f1f1f !important; /* Ледь помітна межа */
+/* --- FOOTER --- */
+body > footer.main-footer {
+    background-color: #0a0a0a;
+    color: #777777;
+    padding: 30px 20px;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 13px;
+    border-top: 1px solid #1f1f1f;
 }
+
+.seo-footer-content {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
 /* --- КНОПКА "ВГОРУ" --- */
 .scroll-to-top {
     position: fixed;
-    left: 20px;
+    right: 20px;
     bottom: 20px;
     z-index: 1100;
     width: 50px;
@@ -941,10 +956,16 @@ p {
 
 @media (max-width: 820px) {
     .scroll-to-top {
-        left: 14px;
-        bottom: 14px;
+        right: 12px;
+        /* Піднімаємо кнопку над блоком .float-contact (3 * 50px + 2 * 9px + 12px + 10px margin) */
+        bottom: 190px;
         width: 44px;
         height: 44px;
-        font-size: 16px;
+        font-size: 18px;
     }
+}
+
+/* --- UTILITY CLASSES --- */
+.text-google-blue {
+    color: #4285f4;
 }

@@ -88,7 +88,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </header>
 
     <main id="top">
-        <section class="main-header" aria-labelledby="hero-title">
+        <section class="main-header" aria-labelledby="hero-title" style="--bg-image-desktop: url('../img/physical-banner.webp'); --bg-image-mobile: url('../img/physical-banner-mobile.webp');">
+            <!-- 
+                Примітка: Я замінив інлайновий background-image на CSS Custom Properties для чистоти коду.
+                Тепер CSS може керувати, яку версію фону показувати, використовуючи медіа-запити.
+                .main-header { background-image: var(--bg-image-mobile); }
+                @media (min-width: 821px) { .main-header { background-image: var(--bg-image-desktop); } }
+            -->
             <div class="hero-content">
                 <div class="eyebrow">Бутик білизни у Новоселиці</div>
                 <h1 id="hero-title">Жіноча білизна, купальники та піжами </h1>
@@ -129,7 +135,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <article class="premium-card">
                     <h2>Подарункові сертифікати</h2>
                     <p>Ідеальний подарунок, коли хочеться зробити приємно, але складно вгадати розмір. Підготуємо сертифікат на потрібну суму та допоможемо з оформленням.</p>
-                    <div class="contact-actions" style="margin-top: 24px;">
+                    <div class="contact-actions">
                         <a href="viber://chat?number=%2B380507559456" class="btn-cta btn-viber" target="_blank" rel="noopener" onclick="track('certificate_viber_click')">
                             <i class="fab fa-viber"></i> Написати про сертифікат
                         </a>
@@ -164,16 +170,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p class="section-kicker">Реальні емоції дівчат, які вже обрали МАНГО. Гортайте скріншоти з нашого Direct та Viber.</p>
             
            <div class="screenshot-reviews-grid">
-                <img src="img/reviews/1.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen">
-                <img src="img/reviews/2.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen">
-                <img src="img/reviews/3.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen">
-                <img src="img/reviews/4.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen">
-                <img src="img/reviews/5.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen">
+                <img src="img/reviews/1.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/2.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/3.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/4.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/5.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
             </div>
 
-            <div style="margin-top: 40px;">
+            <div class="centered-action">
                 <a href="https://g.page/r/CUvGEdAAMeq4EBM/review" target="_blank" rel="noopener" class="btn-cta btn-soft" onclick="track('google_reviews_click')">
-                    <i class="fab fa-google" style="color:#4285f4"></i> Читати більше відгуків у Google
+                    <i class="fab fa-google text-google-blue"></i> Читати більше відгуків у Google
                 </a>
             </div>
            <!-- БЛОК ПРО ЗАСНОВНИЦЮ -->
@@ -182,17 +188,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="founder-content">
                     <div class="eyebrow">Обличчя бренду</div>
                     <h2 id="founder-title">Привіт! Я Оля, засновниця МАНГО</h2>
-                    <p style="color: var(--graphite); margin-bottom: 20px;">Моя головна мета — не просто підібрати вам білизну. Я хочу, щоб ви відчули себе впевнено, розкішно та абсолютно комфортно у своєму тілі щодня.</p>
-                    <p style="color: var(--graphite); margin-bottom: 20px;">У нашому бутику я особисто проводжу <strong>професійний брафітинг</strong> — точний підбір ідеальної форми та розміру бюстгальтера, враховуючи всі унікальні особливості вашої фігури.</p>
-                    <p style="color: var(--graphite); margin-bottom: 30px;">Більше жодних кісточок, що тиснуть, чи бретелей, що спадають. Чекаю на вас для створення ідеального образу!</p>
+                    <p>Моя головна мета — не просто підібрати вам білизну. Я хочу, щоб ви відчули себе впевнено, розкішно та абсолютно комфортно у своєму тілі щодня.</p>
+                    <p>У нашому бутику я особисто проводжу <strong>професійний брафітинг</strong> — точний підбір ідеальної форми та розміру бюстгальтера, враховуючи всі унікальні особливості вашої фігури.</p>
+                    <p>Більше жодних кісточок, що тиснуть, чи бретелей, що спадають. Чекаю на вас для створення ідеального образу!</p>
                     
                     <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="btn-cta btn-instagram" onclick="track('founder_insta_click')">
                         <i class="fab fa-instagram"></i> Написати мені особисто
                     </a>
                 </div>
                 <div class="founder-images">
-                    <img src="img/founder/olya-1.jpg" loading="lazy" alt="Ольга Тарасова, засновниця бутика МАНГО" class="img-main">
-                    <img src="img/founder/olya-2.jpg" loading="lazy" alt="Брафітинг у магазині МАНГО Новоселиця" class="img-secondary">
+                    <img src="img/founder/olya-1.jpg" loading="lazy" alt="Ольга Тарасова, засновниця бутика МАНГО" class="img-main" width="400" height="500">
+                    <img src="img/founder/olya-2.jpg" loading="lazy" alt="Брафітинг у магазині МАНГО Новоселиця" class="img-secondary" width="400" height="300">
                 </div>
             </div>
         </section>
@@ -209,16 +215,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <strong>📦 Доставка по Україні</strong>
                         <p>Якщо немає можливості прийти — відправимо замовлення Новою поштою або Укрпоштою.</p>
                     </div>
-                    <img src="img/shop-interior.jpg" loading="lazy" alt="Інтер'єр магазину білизни МАНГО Новоселиця" class="shop-banner-img">
+                    <img src="img/shop-interior.jpg" loading="lazy" alt="Інтер'єр магазину білизни МАНГО Новоселиця" class="shop-banner-img" width="600" height="400">
                 </div>
 
                 <div class="info-contacts">
-                    <h2 id="contacts-title">Контакти</h2>
-                    <img src="img/physical-banner.png" loading="lazy" alt="Магазин МАНГО у Новоселиці" class="shop-banner-img">
+                    <h2 id="contacts-title">Контакти</h2><img src="img/physical-banner.png" loading="lazy" alt="Магазин МАНГО у Новоселиці" class="shop-banner-img" width="400" height="600">
                     <p class="address" onclick="scrollToMap(); track('address_contacts_click')">📍 м. Новоселиця, вул. Хотинська, 9а</p>
                     <p class="work-time">🕒 Пн–Пт 09:00–19:00 · Сб–Нд 09:00–16:00</p>
 
-                    <div class="contact-actions" style="margin-top: 22px;">
+                    <div class="contact-actions">
                         <a href="tel:+380507559456" class="btn-cta" onclick="track('phone_contacts_click')"><i class="fas fa-phone"></i> Подзвонити</a>
                         <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn-cta btn-route" onclick="track('route_contacts_click')"><i class="fas fa-location-arrow"></i> Маршрут</a>
                     </div>
@@ -231,7 +236,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="seo-footer-block">
-            <div style="max-width: 860px; margin: 0 auto;">
+            <div class="seo-footer-content">
                 <h2>Магазин білизни у Новоселиці — МАНГО</h2>
                 <p>У нас ви знайдете жіночу нижню білизну, бюстгальтери, комплекти, купальники, піжами, трусики, топи, домашній одяг і подарункові сертифікати. Доступна примірка у магазині на вул. Хотинська, 9а та доставка по Україні.</p>
             </div>
@@ -241,10 +246,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="modal-overlay" id="productViewModal" role="dialog" aria-modal="true" aria-label="Швидкий перегляд товару">
         <div class="modal-content">
             <button class="modal-close" type="button" onclick="closeProductView()" aria-label="Закрити"><i class="fas fa-times"></i></button>
-            <img id="viewLargeImage" src="" alt="Товар МАНГО">
-            <h3 id="viewProductTitle" style="margin-top: 18px;"></h3>
+            <img id="viewLargeImage" src="" alt="Товар МАНГО" width="516" height="516"> 
+            <h3 id="viewProductTitle"></h3>
             
-           <a id="viewInstaLink" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="btn-cta btn-instagram" style="width:100%;" onclick="track('product_insta_click')">
+           <a id="viewInstaLink" href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="btn-cta btn-instagram" onclick="track('product_insta_click')">
                 <i class="fab fa-instagram"></i> В Instagram
             </a>
         </div>

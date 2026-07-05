@@ -64,6 +64,18 @@
             .replace(/\n/g, ' ');
     }
 
+    function throttle(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => (inThrottle = false), limit);
+            }
+        };
+    }
+
     function registerServiceWorker() {
         if (!('serviceWorker' in navigator)) {
             return;
@@ -90,7 +102,7 @@
 
         if (shouldRenderMenu) {
             menu.innerHTML = categories.map(category => `
-                <button class="category-cover-item" type="button" onclick="openCategory('${category.id}')" aria-label="${escapeHtml(category.title)}">
+                <button class="category-cover-item" type="button" data-category-id="${category.id}" aria-label="${escapeHtml(category.title)}">
                     <img src="${category.cover}" loading="lazy" alt="${escapeHtml(category.alt)}" onerror="this.closest('.category-cover-item').style.display='none'">
                     <span class="cover-overlay"><span class="category-cover-title">${escapeHtml(category.title)}</span></span>
                 </button>
@@ -102,7 +114,7 @@
                 <section class="category-group" id="${category.id}" aria-labelledby="${category.id}-title">
                     <div class="category-header-block">
                         <h3 class="category-group-title" id="${category.id}-title">${escapeHtml(category.title)}</h3>
-                        <button class="btn-back" type="button" onclick="closeCategory()">← До категорій</button>
+                        <button class="btn-back" type="button" data-action="close-category">← До категорій</button>
                     </div>
                     <p class="category-seo-text">${escapeHtml(category.text)}</p>
                     <div class="catalog-grid">
@@ -119,10 +131,10 @@
         const alt = `${title} — ${category.title} МАНГО Новоселиця`;
 
         return `
-            <button class="catalog-item" type="button" onclick="openProductView('${src}', '${escapeJs(title)}', '${escapeJs(category.title)}')" aria-label="${escapeHtml(alt)}">
+            <article class="catalog-item" data-image-src="${src}" data-title="${escapeHtml(title)}" data-category="${escapeHtml(category.title)}" aria-label="${escapeHtml(alt)}">
                 <img src="${src}" loading="lazy" alt="${escapeHtml(alt)}" onerror="this.closest('.catalog-item').style.display='none'">
                 <span class="item-text-overlay"><h4>${escapeHtml(title)}</h4></span>
-            </button>
+            </article>
         `;
     }
 
@@ -206,6 +218,11 @@
             return;
         }
 
+        const modalContent = $('.modal-content', modal);
+        if (modalContent) {
+            modalContent.scrollTop = 0;
+        }
+
         const fullTitle = category ? `${title} · ${category}` : title;
         image.src = imageSrc;
         heading.textContent = fullTitle;
@@ -228,31 +245,36 @@
     }
 
     function bindCatalogItems() {
-        $all('.catalog-item').forEach(item => {
-            if (item.dataset.mangoBound === 'true') {
+        const container = $('#catalog-container');
+        if (!container || container.dataset.eventsBound) {
+            return;
+        }
+
+        container.dataset.eventsBound = 'true';
+
+        container.addEventListener('click', event => {
+            // Клік по кнопці "Назад до категорій"
+            const closeBtn = event.target.closest('[data-action="close-category"]');
+            if (closeBtn) {
+                closeCategory();
                 return;
             }
 
-            item.dataset.mangoBound = 'true';
-            item.style.cursor = 'pointer';
+            // Клік по картці товару
+            const item = event.target.closest('.catalog-item');
+            if (!item) {
+                return;
+            }
 
-            item.addEventListener('click', event => {
-                if (event.target.closest('a, button') && event.currentTarget.tagName.toLowerCase() !== 'button') {
-                    return;
-                }
+            const { imageSrc, title, category } = item.dataset;
 
-                if (event.currentTarget.getAttribute('onclick')) {
-                    return;
-                }
-
+            if (imageSrc) {
+                openProductView(imageSrc, title, category);
+            } else {
+                // Фоллбек для старих версій, якщо дані не в data-атрибутах
                 const image = $('img', item);
-                const title = $('h4', item)?.textContent?.trim() || image?.alt?.split('—')[0]?.trim() || 'Товар МАНГО';
-                const category = item.closest('.category-group')?.querySelector('.category-group-title, h3')?.textContent?.trim() || '';
-
-                if (image?.src) {
-                    openProductView(image.src, title, category);
-                }
-            });
+                if (image?.src) openProductView(image.src, title, category);
+            }
         });
     }
 
@@ -359,15 +381,14 @@
                     try {
                         await navigator.share(shareData);
                         track('share_category');
-                    } catch (error) {
+                    } catch (err) {
                         console.info('Шеринг скасовано', error);
+                        // Фоллбек: копіювання в буфер, якщо шеринг не вдався
+                        if (navigator.clipboard) {
+                            await navigator.clipboard.writeText(window.location.href);
+                            alert('Посилання скопійовано.');
+                        }
                     }
-                    return;
-                }
-
-                if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert('Посилання скопійовано.');
                 }
             });
 
@@ -396,11 +417,27 @@
         });
     }
 
+    function bindCategoryCovers() {
+        const menu = $('#categories-cover-menu');
+        if (!menu || menu.dataset.eventsBound) {
+            return;
+        }
+
+        menu.dataset.eventsBound = 'true';
+        menu.addEventListener('click', event => {
+            const cover = event.target.closest('[data-category-id]');
+            if (cover) {
+                openCategory(cover.dataset.categoryId);
+            }
+        });
+    }
+
     function init() {
         renderCatalogIfEmpty();
         setMissingAltText();
         enhanceModalAccessibility();
         bindCatalogItems();
+        bindCategoryCovers();
         bindAnalytics();
         addShareButtons();
         bindHistory();
@@ -415,24 +452,20 @@
         init();
     }
 
-    window.track = track;
-    window.openCategory = openCategory;
-    window.closeCategory = closeCategory;
-    window.scrollToMap = scrollToMap;
-    window.openProductView = openProductView;
-    window.closeProductView = closeProductView;
+    // Глобальні функції більше не потрібні, оскільки події обробляються всередині модуля
+
     // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
         const scrollTopBtn = document.getElementById('scrollToTopBtn');
         if (scrollTopBtn) {
-            window.addEventListener('scroll', () => {
-                // Показувати кнопку, якщо прокрутили більше 400 пікселів вниз
+            const handleScroll = () => {
                 if (window.scrollY > 400) {
                     scrollTopBtn.classList.add('show');
                 } else {
                     scrollTopBtn.classList.remove('show');
                 }
-            });
+            };
 
+            window.addEventListener('scroll', throttle(handleScroll, 150));
             // Плавний скрол нагору при кліку
             scrollTopBtn.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
