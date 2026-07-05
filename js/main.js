@@ -344,6 +344,22 @@
         });
     }
 
+    function handleInstagramWidgetFallback() {
+        const wrapper = $('.instagram-widget-wrapper');
+        const fallback = $('#instagram-widget-fallback');
+        const widget = $('.elfsight-app-939efd3d-ab40-4a1b-8ea6-fce18e0f5e96', wrapper);
+
+        if (!wrapper || !fallback || !widget) {
+            return;
+        }
+
+        const hasWidgetContent = widget.childElementCount > 0 || widget.textContent?.trim();
+        if (!hasWidgetContent) {
+            wrapper.classList.add('widget-fallback-active');
+            fallback.setAttribute('aria-hidden', 'false');
+        }
+    }
+
     function addShareButtons() {
         $all('.category-header-block').forEach(block => {
             if (block.dataset.shareReady === 'true') {
@@ -382,7 +398,7 @@
                         await navigator.share(shareData);
                         track('share_category');
                     } catch (err) {
-                        console.info('Шеринг скасовано', error);
+                        console.info('Шеринг скасовано', err);
                         // Фоллбек: копіювання в буфер, якщо шеринг не вдався
                         if (navigator.clipboard) {
                             await navigator.clipboard.writeText(window.location.href);
@@ -442,6 +458,7 @@
         addShareButtons();
         bindHistory();
         handleInitialHash();
+        window.setTimeout(handleInstagramWidgetFallback, 2500);
     }
 
     registerServiceWorker();
@@ -453,6 +470,15 @@
     }
 
     // Глобальні функції більше не потрібні, оскільки події обробляються всередині модуля
+
+// --- ЕКСПОРТ ГЛОБАЛЬНИХ ФУНКЦІЙ ДЛЯ HTML ---
+    window.track = track;
+    window.scrollToMap = scrollToMap;
+    window.closeProductView = closeProductView;
+
+    // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
+    const scrollTopBtn = document.getElementById('scrollToTopBtn');
+    // ... далі твій код кнопки без змін
 
     // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
         const scrollTopBtn = document.getElementById('scrollToTopBtn');

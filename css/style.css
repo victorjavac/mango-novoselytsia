@@ -586,12 +586,40 @@ p {
 }
 
 .instagram-widget-wrapper {
+    position: relative;
     max-width: 1040px;
     margin: 0 auto;
     overflow: hidden;
     border: 1px solid rgba(198, 161, 91, 0.16);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow);
+}
+
+.instagram-widget-wrapper .instagram-widget-fallback {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 260px;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #fff8f3 0%, #ffffff 100%);
+    color: var(--ink);
+    text-align: center;
+}
+
+.instagram-widget-wrapper .instagram-widget-fallback p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.instagram-widget-wrapper.widget-fallback-active .instagram-widget-fallback {
+    display: flex;
+}
+
+.instagram-widget-wrapper.widget-fallback-active .elfsight-app-939efd3d-ab40-4a1b-8ea6-fce18e0f5e96 {
+    display: none;
 }
 
 .reviews-grid {
