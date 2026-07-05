@@ -816,6 +816,7 @@ p {
 .review-screen {
     width: 100%;
     height: auto;
+    object-fit: cover;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     border: 1px solid rgba(198, 161, 91, 0.16);
