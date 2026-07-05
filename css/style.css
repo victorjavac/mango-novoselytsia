@@ -34,9 +34,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--ink);
-    background:
-        radial-gradient(circle at 8% 0%, rgba(247, 235, 232, 0.92), transparent 34rem),
-        linear-gradient(180deg, #fffdfb 0%, #fff8f4 48%, #ffffff 100%);
+    background: radial-gradient(circle at 15% 50%, rgba(247, 235, 232, 0.65), transparent 45vw), radial-gradient(circle at 85% 30%, rgba(235, 230, 240, 0.45), transparent 40vw), linear-gradient(180deg, #fffaf7 0%, #fffdfb 40%, #ffffff 100%);
     font-family: 'Comfortaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     text-rendering: geometricPrecision;
 }
