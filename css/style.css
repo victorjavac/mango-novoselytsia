@@ -901,7 +901,7 @@ p {
     right: 0;
     width: 80%;
     height: 85%;
-    object-fit: cover !important;
+    object-fit: cover;
     object-position: center top;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow);
@@ -914,7 +914,7 @@ p {
     left: 0;
     width: 55%;
     height: 60%;
-    object-fit: cover !important;
+    object-fit: cover;
     object-position: center;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-strong);
