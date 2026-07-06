@@ -734,6 +734,15 @@ p {
     width: 100%;
 }
 
+.modal-content.review-modal-content {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    width: min(720px, 95%);
+    max-height: 95svh;
+}
+
 @media (max-width: 1080px) {
     .info-container {
         grid-template-columns: 1fr;
@@ -844,18 +853,17 @@ p {
 }
 
 .review-screen {
-	width: 100%;
-	height: auto;
-	aspect-ratio: 9 / 16;
-	object-fit: cover;
-	object-position: top;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    object-position: top;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     border: 1px solid rgba(198, 161, 91, 0.16);
     background: var(--cream);
     transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
-.review-screen { width: 100%; height: auto; aspect-ratio: 9 / 16; object-fit: cover !important; object-position: top; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid rgba(198, 161, 91, 0.16); background: var(--cream); transition: transform 0.4s ease, box-shadow 0.4s ease; }
 
 .review-screen:hover {
     transform: translateY(-6px) scale(1.02);

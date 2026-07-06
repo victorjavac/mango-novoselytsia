@@ -28,6 +28,14 @@
         'Преміальна якість'
     ];
 
+    const reviews = [
+        { src: 'img/reviews/1.jpg', alt: 'Відгук клієнтки про сорочку' },
+        { src: 'img/reviews/2.jpg', alt: 'Відгук клієнтки про підбір розміру' },
+        { src: 'img/reviews/3.jpg', alt: 'Подяка від клієнтки за посилку' },
+        { src: 'img/reviews/4.jpg', alt: 'Відгук клієнтки про попереднє замовлення' },
+        { src: 'img/reviews/5.jpg', alt: 'Відгук клієнтки про купальник' }
+    ];
+
     function $(selector, root = document) {
         return root.querySelector(selector);
     }
@@ -113,6 +121,18 @@
                 </section>
             `).join('');
         }
+    }
+
+    function renderReviews() {
+        const grid = $('#screenshot-reviews-grid');
+        if (!grid) return;
+
+        // Перевіряємо, чи сітка вже заповнена (наприклад, через noscript)
+        if (grid.children.length > 0 && grid.children[0].tagName === 'IMG') return;
+
+        grid.innerHTML = reviews.map(review => `
+            <img src="${review.src}" loading="lazy" alt="${escapeHtml(review.alt)}" class="review-screen" width="270">
+        `).join('');
     }
 
     function productCard(category, number) {
@@ -211,11 +231,17 @@
         image.src = imageSrc;
         heading.textContent = fullTitle;
 
-        if (viberBtn) {
+        if (viberBtn && category !== 'review') {
+            viberBtn.style.display = 'inline-flex';
             const viberMessage = `Доброго дня! Мене цікавить «${title}» з категорії «${category}». Розкажіть, будь ласка, про наявність та ціну.`;
             viberBtn.href = `viber://chat?number=%2B380507559456&text=${encodeURIComponent(viberMessage)}`;
             viberBtn.innerHTML = '<i class="fab fa-viber"></i> Уточнити у Viber';
+        } else if (viberBtn) {
+            viberBtn.style.display = 'none';
         }
+
+        // Спеціальні налаштування для зображень відгуків
+        modalContent.classList.toggle('review-modal-content', category === 'review');
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -228,6 +254,7 @@
         if (!modal) return;
 
         modal.classList.remove('active');
+        $('.modal-content', modal)?.classList.remove('review-modal-content');
         document.body.style.overflow = '';
     }
 
@@ -398,13 +425,30 @@
         });
     }
 
+    function bindReviewScreenshots() {
+        const grid = $('.screenshot-reviews-grid');
+        if (!grid || grid.dataset.eventsBound) return;
+
+        grid.dataset.eventsBound = 'true';
+        grid.addEventListener('click', event => {
+            const reviewImage = event.target.closest('.review-screen');
+            if (reviewImage) {
+                const imageSrc = reviewImage.src;
+                const title = reviewImage.alt || 'Відгук клієнта';
+                openProductView(imageSrc, title, 'review');
+            }
+        });
+    }
+
     function init() {
         renderCatalogIfEmpty();
+        renderReviews();
         setMissingAltText();
         enhanceModalAccessibility();
         bindCatalogItems();
         bindCategoryCovers();
         bindAnalytics();
+        bindReviewScreenshots();
         addShareButtons();
         bindHistory();
         handleInitialHash();
