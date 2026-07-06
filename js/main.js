@@ -54,14 +54,6 @@
             .replace(/'/g, '&#39;');
     }
 
-    function escapeJs(value) {
-        return String(value)
-            .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, ' ');
-    }
-
     function throttle(func, limit) {
         let inThrottle;
         return function(...args) {
@@ -208,36 +200,27 @@
 
     function openProductView(imageSrc, title = 'Товар МАНГО', category = '') {
         const modal = $('#productViewModal');
-        const image = $('#viewLargeImage');
-        const heading = $('#viewProductTitle');
+        if (!modal) return;
 
-        if (!modal || !image || !heading) {
-            return;
-        }
-
+        const image = $('#viewLargeImage', modal);
+        const heading = $('#viewProductTitle', modal);
         const modalContent = $('.modal-content', modal);
-        if (modalContent) {
-            modalContent.scrollTop = 0;
-        }
 
         const fullTitle = category ? `${title} · ${category}` : title;
         image.src = imageSrc;
         heading.textContent = fullTitle;
 
         modal.classList.add('active');
-        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        if (modalContent) modalContent.scrollTop = 0;
         track('product_quick_view', { product: fullTitle });
     }
 
     function closeProductView() {
         const modal = $('#productViewModal');
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.classList.remove('active');
-        modal.style.display = 'none';
         document.body.style.overflow = '';
     }
 
