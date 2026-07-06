@@ -1,0 +1,526 @@
+/* Базові налаштування екрану */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+/* ========================================= */
+/* ЕКРАН ВХОДУ                                  */
+/* ========================================= */
+#lock-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    background: linear-gradient(160deg, #4a2330, #2c1620);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+#lock-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 26px;
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+#lock-logo { width: 90px; margin-bottom: 6px; }
+#lock-title { border: none; padding: 0; margin: 6px 0; font-size: 22px; }
+#lock-hint { color: #777; font-size: 14px; margin: 0 0 14px; }
+#auth-email,
+#auth-password {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: 17px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+#auth-email:focus,
+#auth-password:focus { outline: none; border-color: #4a2330; }
+#lock-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background: #28a745;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#lock-btn:hover { background: #218838; }
+#lock-error { color: #d9534f; font-weight: bold; margin-top: 12px; min-height: 18px; }
+body.unlocked #lock-screen { display: none; }
+
+/* Шапки колонок із кнопками */
+.cart-head, .control-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+#cart-count { color: #888; font-size: 16px; font-weight: normal; }
+#clear-cart-btn {
+    background: #f8f9fa;
+    color: #555;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#clear-cart-btn:hover { background: #f1c6c6; color: #c82333; border-color: #c82333; }
+#lock-now-btn {
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 16px;
+    cursor: pointer;
+}
+#lock-now-btn:hover { background: #e2e6ea; }
+
+/* Поле пошуку на складі */
+#warehouse-search {
+    flex: 1;
+    min-width: 120px;
+    margin: 0 12px;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+#warehouse-search:focus { outline: none; border-color: #007bff; }
+
+/* Рядок товару в чеку: кількість */
+.cart-qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 10px;
+}
+.cart-qty button {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+    border: 1px solid #ccc;
+    background: #f8f9fa;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.cart-qty button:hover { background: #e2e6ea; }
+.cart-qty .qty-num { min-width: 24px; text-align: center; font-weight: bold; }
+
+/* Головний контейнер ділить екран навпіл */
+#app-container {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+}
+
+/* Ліва та права колонки */
+#cart-section, #control-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+#cart-section {
+    flex: 2; /* Займає більше місця для списку товарів */
+}
+
+#control-section {
+    flex: 1; /* Панель сканера */
+}
+
+h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Список товарів у чеку */
+#cart-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Нижня панель з сумою */
+#total-price {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: right;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+}
+
+/* Поле для сканера */
+#barcode-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Кнопки сканування камерою */
+.scan-btn {
+    background-color: #6f42c1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+    transition: background-color 0.2s;
+}
+.scan-btn:hover { background-color: #59359a; }
+#scan-receive-btn { width: auto; padding: 12px 16px; margin: 0; font-size: 18px; flex: none; }
+
+/* Вікно сканера */
+#scan-video {
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 8px;
+    background: #000;
+}
+.scan-photo-label {
+    display: inline-block;
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+.scan-photo-label:hover { background: #e2e6ea; }
+
+/* Горизонтальний скрол широкої таблиці складу на телефоні */
+.table-scroll { width: 100%; overflow-x: auto; }
+
+/* Кнопка Оплати */
+#pay-button {
+    background-color: #28a745;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#pay-button:hover {
+    background-color: #218838;
+}
+/* Панель прийому товару */
+#admin-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.admin-inputs input {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#add-product-btn {
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#add-product-btn:hover {
+    background-color: #0056b3;
+}
+/* Панель бази даних */
+#database-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.db-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.db-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.db-buttons button:hover {
+    background-color: #e2e6ea;
+}
+/* ========================================= */
+/* СТИЛІ ДЛЯ ДРУКУ (ЧЕКИ ТА ЕТИКЕТКИ)        */
+/* ========================================= */
+
+/* Ховаємо зону друку на звичайному екрані */
+#print-section {
+    display: none;
+}
+
+@media print {
+    /* Під час друку ховаємо саму програму і показуємо тільки зону друку */
+    body { margin: 0; padding: 0; background-color: white; }
+    #app-container, .modal { display: none !important; }
+    #print-section { display: block !important; width: 100%; }
+
+    /* Налаштування для вузького касового чека (58мм термопринтер) */
+    .receipt-print {
+        width: 58mm;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        color: black;
+        margin: 0 auto;
+    }
+    .receipt-print img {
+        width: 80%;
+        margin: 0 auto;
+        display: block;
+        /* Робимо логотип чорно-білим для термопринтера */
+        filter: grayscale(100%) contrast(1.2); 
+    }
+    .receipt-print .line {
+        border-bottom: 1px dashed black;
+        margin: 5px 0;
+    }
+
+    /* Налаштування для етикетки на товар (40х20мм) */
+    .label-print {
+        width: 38mm;
+        height: 18mm;
+        overflow: hidden;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .label-print .label-name {
+        font-size: 10px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+    .label-print .label-price {
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .label-print svg {
+        height: 35px !important; /* Обмежуємо висоту штрихкоду */
+        width: 100% !important;
+    }
+}
+/* ========================================= */
+/* СТИЛІ ДЛЯ ВІКНА СКЛАДУ (МОДАЛКА)          */
+/* ========================================= */
+.modal {
+    display: none; /* Приховано за замовчуванням */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6); /* Темний фон */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-height: 80vh;
+    overflow-y: auto; /* Скрол, якщо товарів багато */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: black;
+}
+
+#warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#warehouse-table th, #warehouse-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+#warehouse-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+#warehouse-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.print-row-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.print-row-btn:hover { background-color: #138496; }
+.delete-row-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.delete-row-btn:hover { background-color: #c82333; }
+/* ========================================= */
+/* СТИЛІ ДЛЯ EXCEL-РЕДАГУВАННЯ У СКЛАДІ      */
+/* ========================================= */
+.excel-cell {
+    cursor: text;
+    border-bottom: 1px dashed #ccc !important;
+    background-color: #fafafa;
+    transition: background-color 0.2s;
+}
+.excel-cell:hover {
+    background-color: #e9ecef; /* Підсвічування при наведенні */
+}
+.excel-cell:focus {
+    background-color: #fff;
+    outline: 2px solid #007bff; /* Синя рамка як в Excel при кліку */
+}
+/* ========================================= */
+/* СТИЛІ ДЛЯ ЗВІТІВ                            */
+/* ========================================= */
+.reports-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.report-card {
+    background: linear-gradient(135deg, #4a2330, #6a3346);
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+}
+.report-card .rc-label { font-size: 13px; opacity: 0.85; }
+.report-card .rc-sum { font-size: 26px; font-weight: bold; margin: 6px 0 2px; color: #d4af37; }
+.report-card .rc-count { font-size: 12px; opacity: 0.8; }
+.reports-subtitle {
+    font-size: 16px;
+    margin: 22px 0 10px;
+    color: #4a2330;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 6px;
+}
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 4px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+}
+.report-row .rr-main { flex: 1; }
+.report-row .rr-sub { color: #888; font-size: 12px; }
+.report-row .rr-val { font-weight: bold; color: #4a2330; white-space: nowrap; margin-left: 10px; }
+.report-bar-wrap { background: #f0f0f0; border-radius: 6px; height: 8px; margin-top: 5px; overflow: hidden; }
+.report-bar { background: #d4af37; height: 100%; }
+/* ========================================= */
+/* АДАПТИВ ДЛЯ ТЕЛЕФОНА                        */
+/* ========================================= */
+@media (max-width: 768px) {
+    .reports-cards { grid-template-columns: 1fr; }
+    body { padding: 10px; height: auto; }
+    #app-container { flex-direction: column; height: auto; }
+    #cart-section, #control-section { flex: none; width: 100%; box-sizing: border-box; }
+    #cart-items { max-height: 40vh; }
+    #pay-button { font-size: 22px; padding: 22px; }
+    .modal-content { width: 95%; margin: 5% auto; padding: 14px; }
+    #warehouse-search { width: 100%; margin: 10px 0; flex: none; }
+    .modal-content > div:first-of-type { flex-wrap: wrap; }
+    #warehouse-table th, #warehouse-table td { padding: 8px; }
+}

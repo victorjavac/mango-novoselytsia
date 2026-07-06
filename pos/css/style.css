@@ -1,0 +1,167 @@
+/* Загальні налаштування касового екрану */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Розподіл екрану навпіл для планшета */
+#app-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 40px);
+}
+
+#cart-section, #control-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+#cart-section { flex: 1.5; }
+#control-section { flex: 1; }
+
+h2, h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #f4f6f8;
+    padding-bottom: 10px;
+}
+
+/* Список товарів у чеку */
+#cart-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Панель підсумку */
+#total-price {
+    font-size: 26px;
+    font-weight: bold;
+    text-align: right;
+    padding-top: 15px;
+    border-top: 2px solid #f4f6f8;
+    color: #111;
+}
+
+/* Поле для сканера штрихкодів */
+#barcode-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    margin-bottom: 15px;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    box-sizing: border-box;
+    outline: none;
+}
+#barcode-input:focus {
+    box-shadow: 0 0 8px rgba(40,167,69,0.3);
+}
+
+/* Головна кнопка оплати */
+#pay-button {
+    background-color: #28a745;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#pay-button:hover { background-color: #218838; }
+#pay-button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+/* Зона прийому товару */
+.admin-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.admin-inputs input {
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+#add-product-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#add-product-btn:hover { background-color: #0056b3; }
+
+/* Модальне вікно складу */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 25px;
+    width: 75%;
+    max-height: 75vh;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover { color: #000; }
+
+#warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+#warehouse-table th, #warehouse-table td {
+    border: 1px solid #eee;
+    padding: 12px;
+    text-align: left;
+}
+#warehouse-table th { background-color: #007bff; color: white; }
+.excel-cell { background-color: #fafafa; cursor: text; }
+.excel-cell:focus { background-color: #fff; outline: 2px solid #007bff; }
+.delete-row-btn { background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+
+/* Зона друку чека */
+#print-section { display: none; }
+@media print {
+    body { margin: 0; padding: 0; background: white; }
+    #app-container, .modal { display: none !important; }
+    #print-section { display: block !important; width: 100%; }
+    .receipt-print {
+        width: 58mm;
+        font-family: monospace;
+        font-size: 12px;
+        color: black;
+        margin: 0 auto;
+    }
+    .receipt-print .line { border-bottom: 1px dashed black; margin: 5px 0; }
+}

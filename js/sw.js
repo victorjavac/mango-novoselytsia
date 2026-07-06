@@ -1,12 +1,11 @@
-const STATIC_CACHE_NAME = 'mango-static-v4';
-const DYNAMIC_CACHE_NAME = 'mango-dynamic-v4';
+const STATIC_CACHE_NAME = 'mango-static-v3';
+const DYNAMIC_CACHE_NAME = 'mango-dynamic-v3';
 const STATIC_ASSETS = [
-    '../',
-    '../html/index.html',
-    '../css/style.css',
-    './main.js',
-    '../manifest.json',
-    '../favicon.jpg'
+    './',
+    './index.html',
+    './manifest.json',
+    './favicon.jpg',
+    './physical-banner.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -48,7 +47,7 @@ self.addEventListener('fetch', (event) => {
                                 .then(() => networkRes);
                         });
                     })
-                    .catch(() => caches.match('../favicon.jpg')); // Фоллбек на іконку
+                    .catch(() => caches.match('./favicon.jpg')); // Фоллбек на іконку
             })
         );
     // Стратегія: Stale-While-Revalidate для CSS, JS та шрифтів
@@ -74,7 +73,7 @@ self.addEventListener('fetch', (event) => {
                     if (cached) {
                         return cached;
                     } else if (event.request.mode === 'navigate') {
-                        return caches.match('../html/index.html');
+                        return caches.match('./index.html');
                     }
                 });
             })
