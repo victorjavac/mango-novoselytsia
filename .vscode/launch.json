@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open index.html",
-            "file": "c:\\Users\\vitek\\OneDrive - Чернівецький національний університет імені Юрія Федьковича\\Документы\\GitHub\\mango-novoselytsia\\index.html"
+            "file": "${workspaceFolder}/index.html"
         }
     ]
 }
