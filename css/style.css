@@ -835,23 +835,20 @@ p {
 
 /* --- СІТКА ДЛЯ СКРІНШОТІВ ВІДГУКІВ --- */
 .screenshot-reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 15px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 20px;
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 15px;
 }
 
 .review-screen {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    object-position: center;
-    aspect-ratio: 9 / 16;
-    object-fit: cover !important;
-    object-position: top;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 9 / 16;
+	object-fit: cover;
+	object-position: top;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     border: 1px solid rgba(198, 161, 91, 0.16);
