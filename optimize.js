@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-const directories = ['bust', 'sets', 'pajamas', 'swim', 'panties', 'homewear', 'tops', 'teen', 'shop'];
+const directories = ['reviews','bust','img','sets', 'pajamas', 'swim', 'panties', 'homewear', 'tops', 'teen', 'shop'];
 
 directories.forEach(dir => {
     const dirPath = path.join(__dirname, dir);
