@@ -47,10 +47,10 @@
 
     function escapeHtml(value) {
         return String(value)
-            .replace(/&/g, '&')
-            .replace(/</g, '<')
-            .replace(/>/g, '>')
-            .replace(/"/g, '"')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
 
@@ -204,11 +204,18 @@
 
         const image = $('#viewLargeImage', modal);
         const heading = $('#viewProductTitle', modal);
+        const viberBtn = $('#viewViberLink', modal);
         const modalContent = $('.modal-content', modal);
 
         const fullTitle = category ? `${title} · ${category}` : title;
         image.src = imageSrc;
         heading.textContent = fullTitle;
+
+        if (viberBtn) {
+            const viberMessage = `Доброго дня! Мене цікавить «${title}» з категорії «${category}». Розкажіть, будь ласка, про наявність та ціну.`;
+            viberBtn.href = `viber://chat?number=%2B380507559456&text=${encodeURIComponent(viberMessage)}`;
+            viberBtn.innerHTML = '<i class="fab fa-viber"></i> Уточнити у Viber';
+        }
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -289,27 +296,12 @@
     }
 
     function bindAnalytics() {
-        const trackedLinks = [
-            ['.fc-viber, a[href^="viber:"]', 'viber_click'],
-            ['.fc-instagram, a[href*="instagram.com"]', 'instagram_click'],
-            ['.fc-phone, a[href^="tel:"]', 'phone_click'],
-            ['a[href*="g.page"], a[href*="maps.google"]', 'map_click'],
-            ['a[href*="/review"]', 'google_review_click']
-        ];
-
         $all('[data-action="scroll-to-map"]').forEach(element => {
             if (element.dataset.analyticsBound) return;
             element.dataset.analyticsBound = 'map_scroll';
             element.addEventListener('click', () => scrollToMap());
         });
 
-        trackedLinks.forEach(([selector, eventName]) => {
-            $all(selector).forEach(element => {
-                if (element.dataset.analyticsBound === eventName) return;
-                element.dataset.analyticsBound = eventName;
-                element.addEventListener('click', () => track(eventName));
-            });
-        });
     }
 
     function handleInstagramWidgetFallback() {
@@ -430,7 +422,7 @@
     // --- ЕКСПОРТ ГЛОБАЛЬНИХ ФУНКЦІЙ ДЛЯ HTML ---
     window.track = track;
     window.scrollToMap = scrollToMap;
-    window.closeProductView = closeProductView;
+    window.closeProductView = closeProductView; 
 
     // --- ЛОГІКА КНОПКИ "ВГОРУ" ---
     const scrollTopBtn = document.getElementById('scrollToTopBtn');

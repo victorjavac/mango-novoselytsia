@@ -3,6 +3,8 @@ const DYNAMIC_CACHE_NAME = 'mango-dynamic-v4';
 const STATIC_ASSETS = [
     './',
     './index.html',
+    './css/style.css',
+    './js/main.js',
     './manifest.json',
     './favicon.jpg'
 ];
