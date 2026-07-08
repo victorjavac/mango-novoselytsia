@@ -26,7 +26,7 @@
 
     <meta property="og:title" content="МАНГО Новоселиця — жіноча білизна та купальники">
     <meta property="og:description" content="Завітайте на примірку у магазин МАНГО: вул. Хотинська, 9а, Новоселиця. Допоможемо підібрати розмір.">
-    <meta property="og:image" content="https://mango-bilyzna.com.ua/physical-banner.png">
+    <meta property="og:image" content="https://mango-bilyzna.com.ua/img/physical-banner.png">
     <meta property="og:url" content="https://mango-bilyzna.com.ua/">
     <meta property="og:type" content="website">
 
@@ -41,7 +41,7 @@
       "@type": "ClothingStore",
       "name": "МАНГО Новоселиця",
       "description": "Магазин жіночої білизни, купальників, піжам і домашнього одягу у Новоселиці.",
-      "image": "https://mango-bilyzna.com.ua/physical-banner.png",
+      "image": "https://mango-bilyzna.com.ua/img/physical-banner.png",
       "url": "https://mango-bilyzna.com.ua/",
       "telephone": "+380507559456",
       "priceRange": "$$",
@@ -72,6 +72,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Примусове вирівнювання кнопки скролу вліво */
+        .scroll-to-top {
+            right: auto !important;
+            left: 20px !important;
+        }
+        @media (max-width: 820px) {
+            .scroll-to-top {
+                left: 12px !important;
+                bottom: 120px !important; /* Піднято, щоб не перекривати інший контент на мобільному */
+            }
+        }
+    </style>
 </head>
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2TRM6HS"
@@ -176,9 +190,11 @@
             <p class="section-kicker">Реальні емоції дівчат, які вже обрали МАНГО. Гортайте скріншоти з нашого Direct та Viber.</p>
             
             <div class="screenshot-reviews-grid">
-                <img src="reviews/1.webp" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
-                <img src="reviews/2.webp" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
-                <img src="reviews/3.webp" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/1.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/2.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/3.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/4.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
+                <img src="img/reviews/5.jpg" loading="lazy" alt="Відгук клієнтки про білизну МАНГО" class="review-screen" width="270" height="480">
             </div>
 
             <div class="centered-action">
@@ -202,8 +218,8 @@
                     </a>
                 </div>
                 <div class="founder-images">
-                    <img src="img/olya-1.jpg" loading="lazy" alt="Ольга Тарасова, засновниця бутика МАНГО" class="img-main" width="400" height="500">
-                    <img src="img/olya-2.jpg" loading="lazy" alt="Брафітинг у магазині МАНГО Новоселиця" class="img-secondary" width="400" height="300">
+                    <img src="img/founder/olya-1.jpg" loading="lazy" alt="Ольга Тарасова, засновниця бутика МАНГО" class="img-main" width="400" height="500">
+                    <img src="img/founder/olya-2.jpg" loading="lazy" alt="Брафітинг у магазині МАНГО Новоселиця" class="img-secondary" width="400" height="300">
                 </div>
             </div>
         </section>
@@ -220,12 +236,12 @@
                         <strong>📦 Доставка по Україні</strong>
                         <p>Якщо немає можливості прийти — відправимо замовлення Новою поштою або Укрпоштою.</p>
                     </div>
-                    <img src="shop-interior.jpg" loading="lazy" alt="Інтер'єр магазину білизни МАНГО Новоселиця" class="shop-banner-img" width="600" height="400">
+                    <img src="img/shop-interior.jpg" loading="lazy" alt="Інтер'єр магазину білизни МАНГО Новоселиця" class="shop-banner-img" width="600" height="400">
                 </div>
 
                 <div class="info-contacts">
                     <h2 id="contacts-title">Контакти</h2>
-                    <img src="physical-banner.png" loading="lazy" alt="Магазин МАНГО у Новоселиці" class="shop-banner-img" width="400" height="600">
+                    <img src="img/physical-banner.png" loading="lazy" alt="Магазин МАНГО у Новоселиці" class="shop-banner-img" width="400" height="600">
                     <button type="button" class="address-btn" data-action="scroll-to-map">📍 м. Новоселиця, вул. Хотинська, 9а</button>
                     <p class="work-time">🕒 Пн–Пт 09:00–19:00 · Сб–Нд 09:00–16:00</p>
 
