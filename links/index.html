@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МАНГО | Посилання</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../favicon.jpg">
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-W2TRM6HS');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3C72Z0WXNG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-3C72Z0WXNG');
+    </script>
+    <!-- End Google Analytics -->
+
+    <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #333333;
+            --btn-bg: #ffffff;
+            --btn-border: #eaeaea;
+            --accent-color: #8b5cf6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        .profile-header h1 {
+            font-size: 1.25rem;
+            margin: 0 0 4px 0;
+            font-weight: 600;
+        }
+
+        .profile-header p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .links-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .link-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            border-color: #ddd;
+        }
+
+        .link-btn.primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+        }
+
+        .link-btn.primary:hover {
+            background-color: #7c3aed;
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2TRM6HS"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="profile-header">
+        <!-- Шлях веде на один рівень вгору (у корінь), де лежить favicon.jpg -->
+        <img src="../favicon.jpg" alt="МАНГО Логотип">
+        <h1>МАНГО</h1>
+        <p>Піжами та нижня білизна</p>
+    </div>
+
+    <div class="links-container">
+        <!-- Акцентна кнопка з трекінгом -->
+        <a href="https://mango-bilyzna.com.ua" class="link-btn primary" onclick="track('linktree_to_website')">Перейти в каталог (Сайт)</a>
+        
+        <a href="https://instagram.com/mango_olya_lingeri" class="link-btn" target="_blank" rel="noopener noreferrer" onclick="track('linktree_to_instagram')">Instagram</a>
+        <a href="https://tiktok.com/@mango_olya_linger" class="link-btn" target="_blank" rel="noopener noreferrer" onclick="track('linktree_to_tiktok')">TikTok</a>
+        
+        <a href="viber://chat?number=%2B380507559456" class="link-btn" onclick="track('linktree_to_viber')">Написати у Viber</a>
+        
+        <a href="https://share.google/LsJxfNLBdjzC57Ugy" class="link-btn" target="_blank" rel="noopener noreferrer" onclick="track('linktree_to_map')">Маршрут до магазину</a>
+    </div>
+
+    <!-- Скрипт для роботи функції track() -->
+    <script>
+        function track(eventName) {
+            if (typeof dataLayer !== 'undefined') {
+                dataLayer.push({'event': eventName});
+            }
+        }
+    </script>
+</body>
+</html>
