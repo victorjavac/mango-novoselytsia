@@ -162,7 +162,7 @@
         </section>
 
         <section class="reveal" aria-labelledby="help-title">
-            <div class="cards-grid">
+            <div class="cards-grid" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;">
                 <article class="premium-card">
                     <h2 id="help-title">Як швидко підібрати модель?</h2>
                     <ul class="premium-list">
@@ -172,16 +172,21 @@
                         <li>Можемо відкласти модель, щоб ви прийшли на примірку.</li>
                     </ul>
                 </article>
+            </div>
+        </section>
 
-                <article class="premium-card">
+        <section class="gift-certificate-banner">
+            <div class="banner-container">
+                <div class="certificate-image">
+                    <img src="img/certificate-mango.webp" loading="lazy" alt="Подарунковий сертифікат МАНГО Новоселиця" width="500" height="500">
+                </div>
+                <div class="certificate-content">
                     <h2>Подарункові сертифікати</h2>
                     <p>Ідеальний подарунок, коли хочеться зробити приємно, але складно вгадати розмір. Підготуємо сертифікат на потрібну суму та допоможемо з оформленням.</p>
-                    <div class="contact-actions">
-                        <a href="viber://chat?number=%2B380507559456" class="btn-cta btn-viber" target="_blank" rel="noopener" onclick="track('certificate_viber_click')">
-                            <i class="fab fa-viber"></i> Написати про сертифікат
-                        </a>
-                    </div>
-                </article>
+                    <a href="viber://chat?number=%2B380507559456" class="btn-cta btn-viber" target="_blank" rel="noopener" onclick="track('certificate_banner_viber_click')">
+                        <i class="fab fa-viber"></i> Написати про сертифікат
+                    </a>
+                </div>
             </div>
         </section>
 
