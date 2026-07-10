@@ -1075,3 +1075,22 @@ body > footer.main-footer {
         justify-content: center; /* Розтягуємо кнопку на всю ширину для зручного кліку */
     }
 }
+/* Покращення для сертифіката */
+.certificate-image {
+    position: relative;
+    padding: 15px; /* "Обгортка" */
+    background: #fdf5f2; /* Теплий підтон для фону рамки */
+    border-radius: 20px;
+}
+
+.certificate-image img {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Глибина */
+    border: 1px solid rgba(255,255,255,0.5); /* Ефект рамки */
+}
+
+/* Робимо трохи темнішим фон банера для контрасту */
+.banner-container {
+    background-color: #fdfaf8; /* Легкий беж замість чистого білого */
+    border: 1px solid rgba(198, 161, 91, 0.1);
+}

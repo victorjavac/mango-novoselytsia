@@ -502,3 +502,22 @@
         });
     }
 })();
+
+// Логіка для збільшення фото відгуків
+document.addEventListener('DOMContentLoaded', () => {
+    const reviews = document.querySelectorAll('.review-screen');
+    const modal = document.getElementById('productViewModal');
+    const modalImg = document.getElementById('viewLargeImage');
+    const modalTitle = document.getElementById('viewProductTitle');
+    const instaBtn = document.getElementById('viewInstaLink');
+
+    reviews.forEach(img => {
+        img.style.cursor = 'zoom-in'; 
+        img.addEventListener('click', () => {
+            modalImg.src = img.src;
+            modalTitle.innerText = "Відгук клієнтки";
+            instaBtn.style.display = 'none'; 
+            modal.classList.add('active');
+        });
+    });
+});
