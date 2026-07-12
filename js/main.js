@@ -5,30 +5,67 @@
 
     const VIBER_LINK = 'viber://chat?number=%2B380507559456';
 
-    const categories = [
-        { id: 'shop', title: 'Наш магазин', cover: 'shop/1.webp', count: 12, alt: 'Вітрина та інтер’єр магазину МАНГО Новоселиця', text: 'Атмосфера магазину, примірочні, сертифікати та затишний простір для вибору.' },
-        { id: 'bust', title: 'Бюстгальтери', cover: 'bust/1.webp', count: 20, alt: 'Жіночі бюстгальтери МАНГО Новоселиця', text: 'Базові, мереживні та комфортні моделі. Допоможемо підібрати правильний розмір.' },
-        { id: 'sets', title: 'Комплекти білизни', cover: 'sets/1.webp', count: 13, alt: 'Комплекти жіночої білизни МАНГО', text: 'Комплекти для щоденного комфорту, особливих моментів і подарунків.' },
-        { id: 'pajamas', title: 'Піжами', cover: 'pajamas/1.webp', count: 13, alt: 'Жіночі піжами та одяг для сну МАНГО', text: 'М’які тканини, затишні фасони та красивий домашній стиль.' },
-        { id: 'swim', title: 'Купальники', cover: 'swim/1.webp', count: 20, alt: 'Жіночі купальники МАНГО Новоселиця', text: 'Купальники для відпочинку, пляжу та басейну. Підкажемо посадку і розмір.' },
-        { id: 'panties', title: 'Трусики', cover: 'panties/1.webp', count: 6, alt: 'Жіночі трусики МАНГО', text: 'Зручні базові та ніжні моделі на кожен день.' },
-        { id: 'homewear', title: 'Одяг для дому', cover: 'homewear/1.webp', count: 4, alt: 'Жіночий домашній одяг МАНГО', text: 'Комфортний одяг для дому, відпочинку і спокійних вечорів.' },
-        { id: 'tops', title: 'Топи', cover: 'tops/1.webp', count: 8, alt: 'Жіночі топи МАНГО', text: 'М’які топи для щоденного комфорту та легкого образу.' },
-        { id: 'teen', title: 'Підліткова білизна', cover: 'teen/1.webp', count: 4, alt: 'Підліткова білизна МАНГО', text: 'Делікатні та зручні моделі для підлітків.' }
-    ];
+    let catalogData = [];
 
-    const productNames = [
-        'Вишуканий стиль',
-        'Комфорт щодня',
-        'Елегантність',
-        'Ніжність',
-        'Естетика МАНГО',
-        'Твій стиль',
-        'Колекція МАНГО',
-        'Краса та затишок',
-        'Новинка',
-        'Преміальна якість'
-    ];
+    async function fetchCatalog() {
+        try {
+            const response = await fetch('./products.json');
+            if (!response.ok) throw new Error('Помилка завантаження каталогу');
+            
+            catalogData = await response.json();
+            renderCatalogIfEmpty();
+        } catch (error) {
+            console.error('Дані каталогу недоступні:', error);
+        }
+    }
+
+    function renderCatalogIfEmpty() {
+        const menu = $('#categories-cover-menu');
+        const container = $('#catalog-container') || $('.catalog-container');
+
+        if (!menu || !container || catalogData.length === 0) return;
+
+        if (!$all('.category-cover-item', menu).length) {
+            menu.innerHTML = catalogData.map(category => `
+                <button class="category-cover-item" type="button" data-category-id="${category.id}" aria-label="${escapeHtml(category.title)}">
+                    <img src="${category.cover}" loading="lazy" alt="${escapeHtml(category.alt)}" onerror="this.closest('.category-cover-item').style.display='none'">
+                    <span class="cover-overlay"><span class="category-cover-title">${escapeHtml(category.title)}</span></span>
+                </button>
+            `).join('');
+        }
+
+        if (!$all('.category-group', container).length) {
+            container.innerHTML = catalogData.map(category => `
+                <section class="category-group" id="${category.id}" aria-labelledby="${category.id}-title">
+                    <div class="category-header-block">
+                        <h3 class="category-group-title" id="${category.id}-title">${escapeHtml(category.title)}</h3>
+                        <button class="btn-back" type="button" data-action="close-category">← До категорій</button>
+                    </div>
+                    <p class="category-seo-text">${escapeHtml(category.text)}</p>
+                    <div class="catalog-grid">
+                        ${category.items.map(item => `
+                            <article class="catalog-item" data-image-src="${item.src}" data-title="${escapeHtml(item.title)}" data-category="${escapeHtml(category.title)}">
+                                <img src="${item.src}" loading="lazy" alt="${escapeHtml(item.title)} — ${escapeHtml(category.title)}" onerror="this.closest('.catalog-item').style.display='none'">
+                                <span class="item-text-overlay"><h4>${escapeHtml(item.title)}</h4></span>
+                            </article>
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
+        }
+    }
+
+    function init() {
+        fetchCatalog(); 
+        enhanceModalAccessibility();
+        bindCatalogItems();
+        bindCategoryCovers();
+        bindAnalytics();
+        addShareButtons();
+        bindHistory();
+        handleInitialHash();
+        window.setTimeout(handleInstagramWidgetFallback, 2500);
+    }
 
     function $(selector, root = document) {
         return root.querySelector(selector);
