@@ -14,6 +14,7 @@
             
             catalogData = await response.json();
             renderCatalogIfEmpty();
+            setMissingAltText();
         } catch (error) {
             console.error('Дані каталогу недоступні:', error);
         }
@@ -53,18 +54,6 @@
                 </section>
             `).join('');
         }
-    }
-
-    function init() {
-        fetchCatalog(); 
-        enhanceModalAccessibility();
-        bindCatalogItems();
-        bindCategoryCovers();
-        bindAnalytics();
-        addShareButtons();
-        bindHistory();
-        handleInitialHash();
-        window.setTimeout(handleInstagramWidgetFallback, 2500);
     }
 
     function $(selector, root = document) {
@@ -124,55 +113,6 @@
                 .then(registration => console.log('МАНГО PWA зареєстровано', registration))
                 .catch(error => console.warn('PWA не зареєстровано', error));
         });
-    }
-
-    function renderCatalogIfEmpty() {
-        const menu = $('#categories-cover-menu');
-        const container = $('#catalog-container') || $('.catalog-container');
-
-        if (!menu || !container) {
-            return;
-        }
-
-        const shouldRenderMenu = !$all('.category-cover-item', menu).length;
-        const shouldRenderGroups = !$all('.category-group', container).length;
-
-        if (shouldRenderMenu) {
-            menu.innerHTML = categories.map(category => `
-                <button class="category-cover-item" type="button" data-category-id="${category.id}" aria-label="${escapeHtml(category.title)}">
-                    <img src="${category.cover}" loading="lazy" alt="${escapeHtml(category.alt)}" onerror="this.closest('.category-cover-item').style.display='none'">
-                    <span class="cover-overlay"><span class="category-cover-title">${escapeHtml(category.title)}</span></span>
-                </button>
-            `).join('');
-        }
-
-        if (shouldRenderGroups) {
-            container.innerHTML = categories.map(category => `
-                <section class="category-group" id="${category.id}" aria-labelledby="${category.id}-title">
-                    <div class="category-header-block">
-                        <h3 class="category-group-title" id="${category.id}-title">${escapeHtml(category.title)}</h3>
-                        <button class="btn-back" type="button" data-action="close-category">← До категорій</button>
-                    </div>
-                    <p class="category-seo-text">${escapeHtml(category.text)}</p>
-                    <div class="catalog-grid">
-                        ${Array.from({ length: category.count }, (_, index) => productCard(category, index + 1)).join('')}
-                    </div>
-                </section>
-            `).join('');
-        }
-    }
-
-    function productCard(category, number) {
-        const title = productNames[(number - 1) % productNames.length];
-        const src = `${category.id}/${number}.webp`;
-        const alt = `${title} — ${category.title} МАНГО Новоселиця`;
-
-        return `
-            <article class="catalog-item" data-image-src="${src}" data-title="${escapeHtml(title)}" data-category="${escapeHtml(category.title)}" aria-label="${escapeHtml(alt)}">
-                <img src="${src}" loading="lazy" alt="${escapeHtml(alt)}" onerror="this.closest('.catalog-item').style.display='none'">
-                <span class="item-text-overlay"><h4>${escapeHtml(title)}</h4></span>
-            </article>
-        `;
     }
 
     function hideCategoryGroups() {
@@ -493,8 +433,7 @@
     }
 
     function init() {
-        renderCatalogIfEmpty();
-        setMissingAltText();
+        fetchCatalog();
         enhanceModalAccessibility();
         bindCatalogItems();
         bindCategoryCovers();
