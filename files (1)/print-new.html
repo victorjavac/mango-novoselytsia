@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>QR-код для відгуків МАНГО</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #211219;
+            --paper: #FBF7F4;
+            --rose: #C99AA0;
+            --wine: #7C2D42;
+            --wine-deep: #5C1F31;
+            --gold: #AC8A4E;
+            --muted: #7A6871;
+            --line: rgba(33, 18, 25, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #E9E2E4;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Karla', sans-serif;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .a4-page {
+            position: relative;
+            width: 210mm;
+            min-height: 297mm;
+            background: var(--paper);
+            box-shadow: 0 24px 70px rgba(33, 18, 25, 0.18);
+            overflow: hidden;
+            padding: 22mm 20mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* faint pattern-paper grid, echoes the site's "викрійка" motif */
+        .a4-page::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 9mm, rgba(124,45,66,0.045) 9mm, rgba(124,45,66,0.045) 9.2mm),
+                repeating-linear-gradient(90deg, transparent, transparent 9mm, rgba(124,45,66,0.045) 9mm, rgba(124,45,66,0.045) 9.2mm);
+            pointer-events: none;
+        }
+
+        /* corner registration ticks, like on a dressmaker's pattern sheet */
+        .tick {
+            position: absolute;
+            width: 9mm;
+            height: 9mm;
+            border: 0.6mm solid var(--wine);
+            opacity: 0.55;
+            z-index: 2;
+        }
+        .tick.tl { top: 10mm; left: 10mm; border-right: none; border-bottom: none; }
+        .tick.tr { top: 10mm; right: 10mm; border-left: none; border-bottom: none; }
+        .tick.bl { bottom: 10mm; left: 10mm; border-right: none; border-top: none; }
+        .tick.br { bottom: 10mm; right: 10mm; border-left: none; border-top: none; }
+
+        .page-inner {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            justify-content: center;
+            gap: 6mm;
+        }
+
+        .logo-image {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2mm;
+        }
+
+        .logo-image img {
+            max-width: 110mm;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 3mm;
+            font-family: 'Karla', sans-serif;
+            font-size: 3.2mm;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--wine);
+        }
+        .eyebrow::before,
+        .eyebrow::after {
+            content: '';
+            width: 8mm;
+            height: 0.4mm;
+            background: var(--wine);
+            opacity: 0.6;
+        }
+
+        .headline {
+            font-family: 'Fraunces', serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-size: 13mm;
+            line-height: 1.05;
+            color: var(--ink);
+            letter-spacing: -0.005em;
+        }
+        .headline em {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--wine);
+        }
+
+        .subheadline {
+            font-size: 4.4mm;
+            color: var(--muted);
+            line-height: 1.55;
+            max-width: 125mm;
+        }
+
+        .stars {
+            font-size: 10mm;
+            color: var(--gold);
+            letter-spacing: 2mm;
+            line-height: 1;
+            margin: 1mm 0;
+        }
+
+        .qr-frame {
+            position: relative;
+            padding: 6mm;
+            background: #fff;
+            border: 0.4mm solid var(--line);
+            box-shadow: 0 14mm 30mm rgba(33, 18, 25, 0.12);
+            margin: 2mm 0;
+        }
+        .qr-frame::before {
+            content: '';
+            position: absolute;
+            inset: 3mm;
+            border: 0.3mm dashed rgba(124, 45, 66, 0.3);
+            pointer-events: none;
+        }
+
+        .qr-code {
+            display: block;
+            width: 68mm;
+            height: 68mm;
+            object-fit: contain;
+        }
+
+        .note {
+            font-size: 3.6mm;
+            color: var(--muted);
+            max-width: 120mm;
+            line-height: 1.55;
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 90mm;
+            height: 0.3mm;
+            background: repeating-linear-gradient(90deg, var(--line) 0, var(--line) 2mm, transparent 2mm, transparent 4mm);
+            margin: 1mm 0;
+        }
+
+        .footer-text {
+            position: relative;
+            z-index: 3;
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 5mm;
+            color: var(--wine);
+            text-align: center;
+            padding-top: 6mm;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            html, body {
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            body {
+                padding: 0;
+                display: block;
+            }
+
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 210mm;
+                height: 297mm;
+                min-height: 0;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                page-break-after: avoid;
+            }
+
+            .a4-page::before,
+            .tick,
+            .stars,
+            .qr-frame,
+            .footer-text {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="a4-page">
+        <span class="tick tl"></span>
+        <span class="tick tr"></span>
+        <span class="tick bl"></span>
+        <span class="tick br"></span>
+
+        <div class="page-inner">
+            <div class="logo-image">
+                <img src="logo_print.jpg" alt="МАНГО">
+            </div>
+
+            <div class="eyebrow"><span>Бутик білизни МАНГО</span></div>
+
+            <div class="headline">Ваш відгук<br><em>важливий</em> для нас</div>
+
+            <div class="subheadline">Покажіть, що ви задоволені покупкою, та допоможіть іншим знайти найкращий вибір нижньої білизни.</div>
+
+            <div class="stars">★★★★★</div>
+
+            <div class="qr-frame">
+                <img src="qr.png" alt="QR код для відгуків" class="qr-code">
+            </div>
+
+            <div class="note">Наведіть камеру телефона на код, щоб перейти до сторінки відгуків.</div>
+
+            <div class="divider"></div>
+        </div>
+
+        <div class="footer-text">Дякуємо, що обираєте нас</div>
+    </div>
+</body>
+</html>
