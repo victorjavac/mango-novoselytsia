@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сторінку не знайдено — МАНГО Новоселиця</title>
+    <meta name="robots" content="noindex,follow">
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .error-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            background:
+                radial-gradient(circle at 8% 0%, rgba(247, 235, 232, 0.92), transparent 34rem),
+                linear-gradient(180deg, #fffdfb 0%, #fff8f4 48%, #ffffff 100%);
+        }
+        .error-code {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(64px, 12vw, 140px);
+            line-height: 1;
+            color: var(--rose, #c98f84);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .error-page h1 {
+            max-width: 480px;
+            margin: 0 auto 18px;
+        }
+        .error-page p {
+            max-width: 460px;
+            margin: 0 auto 32px;
+        }
+        .error-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-page">
+        <div class="error-code">404</div>
+        <h1>Такої сторінки не існує</h1>
+        <p>Можливо, посилання застаріло або ви неправильно ввели адресу. Але наш каталог білизни, купальників і піжам нікуди не подівся.</p>
+        <div class="error-actions">
+            <a href="/" class="btn-cta btn-route"><i class="fas fa-home"></i> На головну</a>
+            <a href="viber://chat?number=%2B380507559456" class="btn-cta btn-viber"><i class="fab fa-viber"></i> Написати у Viber</a>
+        </div>
+    </div>
+    <footer class="main-footer">© 2026 МАНГО. Всі права захищені.</footer>
+</body>
+</html>
