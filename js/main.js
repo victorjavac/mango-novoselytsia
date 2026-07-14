@@ -203,6 +203,9 @@
         const fullTitle = category ? `${title} · ${category}` : title;
         image.src = imageSrc;
         heading.textContent = fullTitle;
+        if (viberLink) {
+            viberLink.style.display = '';
+        }
 
         modal.classList.add('active');
         modal.style.display = 'flex';
@@ -494,6 +497,8 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.innerText = "Відгук клієнтки";
             instaBtn.style.display = 'none'; 
             modal.classList.add('active');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         });
     });
 });
