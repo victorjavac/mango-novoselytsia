@@ -44,6 +44,9 @@
   .header-icons { display: flex; gap: 16px; }
   .header-icons a { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all .2s; }
   .header-icons a:hover { background: var(--wine); color: var(--paper); border-color: var(--wine); }
+  .header-icons a.ig-icon { background: linear-gradient(135deg, #f7b267, #dc5c82 46%, #6e5ef7); color: #fff; border: none; }
+  .header-icons a.ig-icon:hover { opacity: .85; background: linear-gradient(135deg, #f7b267, #dc5c82 46%, #6e5ef7); }
+  .btn-insta { background: linear-gradient(135deg, #f7b267, #dc5c82 46%, #6e5ef7); color: #fff; }
 
   /* ===== HERO ===== */
   .hero {
@@ -91,7 +94,7 @@
   .cat-card .overlay span { font-family: 'Fraunces', serif; font-style: italic; color: var(--paper); font-size: 22px; }
 
   /* ===== FOOTER ===== */
-  footer.site-footer { background: var(--ink); color: rgba(251,247,244,0.7); text-align: center; padding: 40px 20px; font-size: 13px; letter-spacing: 0.05em; }
+  footer.site-footer { background: #0a0a0a; color: #777777; text-align: center; padding: 30px 20px; font-size: 13px; letter-spacing: 0.05em; border-top: 1px solid #1f1f1f; }
   footer.site-footer .fname { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-size: 18px; margin-bottom: 8px; }
 
   @media (max-width: 900px) {
@@ -107,10 +110,10 @@
 <header class="site-header">
   <div class="logo-mark">МАНГО<span>Новоселиця</span></div>
   <div class="header-icons">
-    <a href="#"><i class="fab fa-instagram"></i></a>
-    <a href="#"><i class="fab fa-facebook-f"></i></a>
-    <a href="#"><i class="fab fa-viber"></i></a>
-    <a href="#"><i class="fas fa-phone"></i></a>
+    <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="ig-icon"><i class="fab fa-instagram"></i></a>
+    <a href="https://www.facebook.com/ol.ga.tarasova.449868" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+    <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener"><i class="fab fa-viber"></i></a>
+    <a href="tel:+380507559456"><i class="fas fa-phone"></i></a>
   </div>
 </header>
 
@@ -119,17 +122,18 @@
   <span class="tick br"></span>
   <div class="hero-grid">
     <div>
-      <div class="eyebrow"><span>Бутик білизни · Новоселиця</span></div>
-      <h1>Білизна,<br>підібрана <em>особисто</em><br>для вас</h1>
-      <p class="desc">Завітайте у МАНГО на Хотинській, 9а. Оля особисто проведе професійний брафітинг — точний підбір форми та розміру бюстгальтера.</p>
+      <div class="eyebrow"><span>Бутик білизни у Новоселиці</span></div>
+      <h1>Жіноча білизна,<br>купальники<br>та піжами</h1>
+      <p class="desc">Завітайте у МАНГО на Хотинській, 9а. Допоможемо підібрати розмір, покажемо наявність і відкладемо обрану модель для примірки.</p>
       <div class="hero-actions">
-        <a href="#" class="btn btn-p"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
-        <a href="#" class="btn btn-o"><i class="fab fa-viber"></i> Написати у Viber</a>
+        <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn btn-p"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
+        <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-o"><i class="fab fa-viber"></i> Вайбер</a>
+        <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="btn btn-insta"><i class="fab fa-instagram"></i> Новинки</a>
       </div>
       <div class="hero-meta">
         <div><strong>9а</strong>вул. Хотинська</div>
         <div><strong>09–19</strong>Пн–Пт</div>
-        <div><strong>A–J</strong>Розмірний ряд</div>
+        <div><strong>✨</strong>Примірка · доставка по Україні</div>
       </div>
     </div>
     <div class="hero-visual">
