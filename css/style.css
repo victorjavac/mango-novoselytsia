@@ -1,18 +1,18 @@
 /* MANGO premium CSS. Save as css/style.css */
 
 :root {
-    --ink: #171313;
-    --graphite: #302729;
-    --muted: #75686b;
-    --cream: #fffaf7;
-    --blush: #f7ebe8;
-    --rose: #c98f84;
-    --rose-dark: #9b5f58;
-    --gold: #c6a15b;
+    --ink: #211219;
+    --graphite: #2E1B24;
+    --muted: #7A6871;
+    --cream: #FBF7F4;
+    --blush: #F3E6E9;
+    --rose: #C99AA0;
+    --rose-dark: #7C2D42;
+    --gold: #AC8A4E;
     --white: #ffffff;
-    --line: rgba(48, 39, 41, 0.12);
-    --shadow: 0 18px 55px rgba(48, 39, 41, 0.10);
-    --shadow-strong: 0 28px 80px rgba(48, 39, 41, 0.18);
+    --line: rgba(33, 18, 25, 0.14);
+    --shadow: 0 18px 55px rgba(33, 18, 25, 0.10);
+    --shadow-strong: 0 28px 80px rgba(33, 18, 25, 0.18);
     --radius-xl: 30px;
     --radius-lg: 22px;
     --radius-md: 16px;
@@ -37,7 +37,7 @@ body {
     background:
         radial-gradient(circle at 8% 0%, rgba(247, 235, 232, 0.92), transparent 34rem),
         linear-gradient(180deg, #fffdfb 0%, #fff8f4 48%, #ffffff 100%);
-    font-family: 'Comfortaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Karla', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     text-rendering: geometricPrecision;
 }
 
@@ -81,7 +81,7 @@ select {
 }
 
 .header-logo {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Fraunces', Georgia, serif;
     font-size: clamp(24px, 2.4vw, 34px);
     line-height: 1;
     letter-spacing: 0.24em;
@@ -94,7 +94,7 @@ select {
     display: block;
     margin-top: 7px;
     color: var(--muted);
-    font-family: 'Comfortaa', sans-serif;
+    font-family: 'Karla', sans-serif;
     font-size: 10px;
     letter-spacing: 0.22em;
 }
@@ -173,7 +173,7 @@ h3,
 .section-title,
 .category-cover-title {
     color: var(--ink);
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Fraunces', Georgia, serif;
     font-weight: 500;
     letter-spacing: 0.035em;
 }
@@ -212,8 +212,8 @@ p {
     overflow: hidden;
     padding-top: 112px;
     background:
-        linear-gradient(90deg, rgba(255, 250, 247, 0.88), rgba(255, 250, 247, 0.50)),
-        url('../img/physical-banner.png') center right / cover no-repeat;
+        linear-gradient(90deg, rgba(251, 247, 244, 0.90), rgba(251, 247, 244, 0.55)),
+        url('../img/hero-model.jpg') center right / cover no-repeat;
 }
 
 .main-header::before {
@@ -320,7 +320,7 @@ p {
     gap: 12px;
     min-height: 52px;
     border: 1px solid var(--ink);
-    border-radius: 999px;
+    border-radius: 3px;
     padding: 15px 30px;
     background: var(--ink);
     color: #fff;
@@ -330,7 +330,7 @@ p {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 16px 34px rgba(48, 39, 41, 0.18);
+    box-shadow: 0 10px 24px rgba(33, 18, 25, 0.14);
     transition: transform var(--ease), box-shadow var(--ease), background var(--ease), color var(--ease), border-color var(--ease);
 }
 
@@ -397,7 +397,7 @@ p {
 .premium-card h2,
 .premium-card h3 {
     margin-bottom: 18px;
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Fraunces', Georgia, serif;
 }
 
 .premium-list {
@@ -422,7 +422,10 @@ p {
 }
 
 .catalog-section {
-    background: linear-gradient(180deg, rgba(255, 250, 247, 0.8), rgba(255, 255, 255, 0.95));
+    background:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(124, 45, 66, 0.035) 39px, rgba(124, 45, 66, 0.035) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(124, 45, 66, 0.035) 39px, rgba(124, 45, 66, 0.035) 40px),
+        linear-gradient(180deg, rgba(251, 247, 244, 0.85), rgba(255, 255, 255, 0.95));
 }
 
 .section-kicker {
@@ -493,7 +496,7 @@ p {
 }
 
 .item-text-overlay h4 {
-    font-family: 'Comfortaa', sans-serif;
+    font-family: 'Karla', sans-serif;
     font-size: 16px;
     font-weight: 700;
 }
@@ -806,6 +809,18 @@ p {
     }
 }
 
+/* --- Плавна поява секцій при скролі --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 700ms ease, transform 700ms ease;
+}
+
+.reveal.reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -949,7 +964,7 @@ body > footer.main-footer {
     color: #777777;
     padding: 30px 20px;
     text-align: center;
-    font-family: 'Comfortaa', sans-serif;
+    font-family: 'Karla', sans-serif;
     font-size: 13px;
     border-top: 1px solid #1f1f1f;
 }
@@ -983,11 +998,11 @@ body > footer.main-footer {
     transition: all 0.3s ease;
 }
 
-/* Мобільний вигляд: кнопка праворуч, піднімається вище контактів */
+/* Мобільний вигляд: кнопка праворуч, піднімається вище блоку float-contact (3 кнопки ≈ 170px) */
 @media (max-width: 820px) {
     .scroll-to-top {
         right: 12px;
-        bottom: 170px; /* Ставимо її ВИЩЕ блоку float-contact, який теж справа */
+        bottom: 170px;
         width: 44px;
         height: 44px;
     }
@@ -1041,7 +1056,7 @@ body > footer.main-footer {
 }
 
 .certificate-content h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', serif;
     font-size: 2rem;
     margin-bottom: 15px;
     color: #333;
