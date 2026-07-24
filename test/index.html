@@ -97,6 +97,44 @@
   footer.site-footer { background: #0a0a0a; color: #777777; text-align: center; padding: 30px 20px; font-size: 13px; letter-spacing: 0.05em; border-top: 1px solid #1f1f1f; }
   footer.site-footer .fname { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-size: 18px; margin-bottom: 8px; }
 
+  /* ===== FEATURES STRIP ===== */
+  .features-section { padding: 20px 6vw 90px; }
+  .features-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .feature-card { background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 32px 26px; text-align: center; box-shadow: 0 12px 30px rgba(33,18,25,0.06); }
+  .feature-card .ficon { width: 52px; height: 52px; margin: 0 auto 18px; border-radius: 50%; background: var(--blush, #F3E6E9); display: flex; align-items: center; justify-content: center; color: var(--wine); font-size: 19px; }
+  .feature-card h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; margin-bottom: 10px; }
+  .feature-card p { font-size: 14px; line-height: 1.65; color: var(--muted); }
+
+  /* ===== CONTACT / VISIT SECTION ===== */
+  .visit-section { padding: 0 6vw 100px; }
+  .visit-card {
+    max-width: 1100px; margin: 0 auto; position: relative; overflow: hidden;
+    background: var(--ink); border-radius: 6px; padding: 60px 6vw;
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 50px; align-items: center;
+  }
+  .visit-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 38px, rgba(251,247,244,0.03) 38px, rgba(251,247,244,0.03) 39px);
+    pointer-events: none;
+  }
+  .visit-text { position: relative; z-index: 2; color: var(--paper); }
+  .visit-text .eyebrow span { color: var(--gold); }
+  .visit-text .eyebrow::before { background: var(--gold); }
+  .visit-text h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: clamp(28px, 3vw, 40px); margin-bottom: 16px; }
+  .visit-text p { color: rgba(251,247,244,0.65); font-size: 15px; line-height: 1.75; max-width: 420px; margin-bottom: 30px; }
+  .visit-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .visit-actions .btn-p { background: var(--gold); color: var(--ink); }
+  .visit-actions .btn-o { border-color: rgba(251,247,244,0.3); color: var(--paper); }
+  .visit-info { position: relative; z-index: 2; display: grid; gap: 18px; }
+  .visit-info-row { display: flex; gap: 16px; align-items: flex-start; color: var(--paper); }
+  .visit-info-row .vi-icon { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(251,247,244,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gold); }
+  .visit-info-row strong { display: block; font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; margin-bottom: 3px; }
+  .visit-info-row span { font-size: 13px; color: rgba(251,247,244,0.6); }
+
+  @media (max-width: 900px) {
+    .visit-card { grid-template-columns: 1fr; padding: 44px 28px; }
+  }
+
   @media (max-width: 900px) {
     .hero-grid { grid-template-columns: 1fr; }
     .hero-visual { order: -1; max-width: 420px; margin: 0 auto; }
@@ -111,7 +149,8 @@
   <div class="logo-mark">МАНГО<span>Новоселиця</span></div>
   <div class="header-icons">
     <a href="https://www.instagram.com/mango_olya_lingeri/" target="_blank" rel="noopener" class="ig-icon"><i class="fab fa-instagram"></i></a>
-    <a href="https://www.facebook.com/ol.ga.tarasova.449868" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://www.facebook.com/ol.ga.tarasova.449868" target="_blank" rel="noopener" title="Facebook — сторінка Ольги"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://www.facebook.com/mangolingerie" target="_blank" rel="noopener" title="Facebook — сторінка МАНГО"><i class="fab fa-facebook"></i></a>
     <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener"><i class="fab fa-viber"></i></a>
     <a href="tel:+380507559456"><i class="fas fa-phone"></i></a>
   </div>
@@ -133,6 +172,7 @@
       <div class="hero-meta">
         <div><strong>9а</strong>вул. Хотинська</div>
         <div><strong>09–19</strong>Пн–Пт</div>
+        <div><strong>09–16</strong>Сб–Нд</div>
         <div><strong>✨</strong>Примірка · доставка по Україні</div>
       </div>
     </div>
@@ -153,6 +193,54 @@
     <div class="cat-card"><img src="../pajamas/1.webp" alt="Піжами"><div class="overlay"><span>Піжами</span></div></div>
     <div class="cat-card"><img src="../tops/1.webp" alt="Топи"><div class="overlay"><span>Топи</span></div></div>
     <div class="cat-card"><img src="../shop/1.webp" alt="Наш магазин"><div class="overlay"><span>Наш магазин</span></div></div>
+  </div>
+</section>
+
+<section class="features-section">
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="ficon"><i class="fas fa-ruler"></i></div>
+      <h3>Індивідуальний брафітинг</h3>
+      <p>Оля особисто допомагає підібрати точний розмір і форму бюстгальтера з урахуванням особливостей фігури.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ficon"><i class="fas fa-store"></i></div>
+      <h3>Комфортна примірка</h3>
+      <p>Затишний магазин, дзеркала, спокійна атмосфера та жодного поспіху під час вибору.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ficon"><i class="fas fa-truck"></i></div>
+      <h3>Доставка по Україні</h3>
+      <p>Якщо немає можливості прийти — відправимо замовлення Новою поштою або Укрпоштою.</p>
+    </div>
+  </div>
+</section>
+
+<section class="visit-section">
+  <div class="visit-card">
+    <div class="visit-text">
+      <div class="eyebrow"><span>Завітайте до нас</span></div>
+      <h2>Чекаємо вас<br>у Новоселиці</h2>
+      <p>Прийдіть на примірку особисто, або напишіть нам — підкажемо розмір і наявність, відкладемо модель до вашого приходу.</p>
+      <div class="visit-actions">
+        <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn btn-p"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
+        <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-o"><i class="fab fa-viber"></i> Написати у Viber</a>
+      </div>
+    </div>
+    <div class="visit-info">
+      <div class="visit-info-row">
+        <span class="vi-icon"><i class="fas fa-location-dot"></i></span>
+        <div><strong>вул. Хотинська, 9а</strong><span>м. Новоселиця, Чернівецька область</span></div>
+      </div>
+      <div class="visit-info-row">
+        <span class="vi-icon"><i class="fas fa-clock"></i></span>
+        <div><strong>Пн–Пт 09:00–19:00</strong><span>Сб–Нд 09:00–16:00</span></div>
+      </div>
+      <div class="visit-info-row">
+        <span class="vi-icon"><i class="fas fa-phone"></i></span>
+        <div><strong>+380 50 755 9456</strong><span>Дзвінки та Viber</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
