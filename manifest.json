@@ -3,8 +3,8 @@
   "short_name": "МАНГО",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fdfdfd",
-  "theme_color": "#ffffff",
+  "background_color": "#FBF7F4",
+  "theme_color": "#7C2D42",
   "icons": [
     {
       "src": "launchericon-192x192.png",

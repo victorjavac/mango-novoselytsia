@@ -29,6 +29,9 @@ jobs:
       - name: Generate products.json
         run: node generate-catalog.js
 
+      - name: Exclude design mockup from deploy
+        run: rm -rf test
+
       - name: Upload site as Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

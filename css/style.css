@@ -368,7 +368,6 @@ p {
 }
 
 .cards-grid,
-.reviews-grid,
 .features-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -378,7 +377,6 @@ p {
 }
 
 .premium-card,
-.review-card,
 .feature-item,
 .info-contacts,
 .modal-content {
@@ -389,7 +387,6 @@ p {
 }
 
 .premium-card,
-.review-card,
 .feature-item {
     padding: clamp(26px, 3.2vw, 40px);
 }
@@ -672,34 +669,6 @@ p {
     display: none;
 }
 
-.reviews-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.review-head {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
-}
-
-.review-avatar {
-    width: 44px;
-    height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--rose);
-    color: #fff;
-    font-weight: 700;
-}
-
-.stars {
-    color: #f2b01e;
-    letter-spacing: 2px;
-}
-
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -819,7 +788,6 @@ p {
     }
 
     .cards-grid,
-    .reviews-grid,
     .features-grid {
         grid-template-columns: 1fr;
     }
