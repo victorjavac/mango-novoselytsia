@@ -910,18 +910,26 @@ p {
     padding: 0 15px;
 }
 
-.review-screen {
-    width: 100%;
-    height: auto;
+.review-frame {
+    padding: 10px;
+    background: var(--cream);
+    border: 1px solid rgba(198, 161, 91, 0.16);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
-    border: 1px solid rgba(198, 161, 91, 0.16);
     transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.review-screen:hover {
+.review-frame:hover {
     transform: translateY(-6px) scale(1.02);
     box-shadow: var(--shadow-strong);
+}
+
+.review-screen {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1.5px dashed rgba(172, 138, 78, 0.5);
 }
 
 .centered-action {
