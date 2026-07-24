@@ -434,7 +434,14 @@ p {
     text-align: center;
 }
 
-.main-categories-grid,
+.main-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(16px, 2vw, 26px);
+    max-width: 1220px;
+    margin: 0 auto;
+}
+
 .catalog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -443,7 +450,18 @@ p {
     margin: 0 auto;
 }
 
-.category-cover-item,
+.category-cover-item {
+    position: relative;
+    min-height: 280px;
+    overflow: hidden;
+    border: 1px solid rgba(198, 161, 91, 0.16);
+    border-radius: var(--radius-xl);
+    background: var(--white);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+}
+
 .catalog-item {
     position: relative;
     min-height: 280px;
@@ -786,9 +804,33 @@ p {
 
     .cards-grid,
     .reviews-grid,
-    .features-grid,
-    .catalog-grid {
+    .features-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Карусель фото товарів усередині категорії — свайп замість довгої сітки, без обмеження за кількістю фото */
+    .category-group .catalog-grid {
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: 20px;
+        gap: 14px;
+        max-width: 100%;
+        margin: 0;
+        padding: 4px 20px 18px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .category-group .catalog-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-group .catalog-item {
+        flex: 0 0 auto;
+        width: min(74vw, 300px);
+        scroll-snap-align: start;
     }
 
     .category-header-block {
