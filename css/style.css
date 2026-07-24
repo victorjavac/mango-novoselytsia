@@ -547,7 +547,10 @@ p {
 }
 
 .info-section {
-    background: #fff;
+    background:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(124, 45, 66, 0.035) 39px, rgba(124, 45, 66, 0.035) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(124, 45, 66, 0.035) 39px, rgba(124, 45, 66, 0.035) 40px),
+        #fff;
 }
 
 .info-container {
@@ -570,7 +573,9 @@ p {
 
 .feature-item strong {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(172, 138, 78, 0.45);
     color: var(--ink);
     font-size: 17px;
 }
@@ -586,6 +591,27 @@ p {
     padding: clamp(26px, 3.2vw, 38px);
 }
 
+.corner-marks {
+    position: relative;
+}
+
+.corner-marks::before {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    pointer-events: none;
+    opacity: 0.55;
+    background:
+        linear-gradient(var(--gold), var(--gold)) top left / 16px 2px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) top left / 2px 16px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) top right / 16px 2px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) top right / 2px 16px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) bottom left / 16px 2px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) bottom left / 2px 16px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) bottom right / 16px 2px no-repeat,
+        linear-gradient(var(--gold), var(--gold)) bottom right / 2px 16px no-repeat;
+}
+
 .address,
 .work-time {
     margin-top: 18px;
@@ -596,6 +622,7 @@ p {
     height: 390px;
     margin-top: 24px;
     overflow: hidden;
+    border: 1px solid rgba(198, 161, 91, 0.35);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
 }
