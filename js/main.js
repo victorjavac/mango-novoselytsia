@@ -386,14 +386,16 @@
                     try {
                         await navigator.share(shareData);
                         track('share_category');
+                        return;
                     } catch (err) {
                         console.info('Шеринг скасовано', err);
-                        // Фоллбек: копіювання в буфер, якщо шеринг не вдався
-                        if (navigator.clipboard) {
-                            await navigator.clipboard.writeText(window.location.href);
-                            alert('Посилання скопійовано.');
-                        }
                     }
+                }
+
+                // Фоллбек: копіювання в буфер, якщо Web Share API недоступний або шеринг не вдався
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Посилання скопійовано.');
                 }
             });
 
