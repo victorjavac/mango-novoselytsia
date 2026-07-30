@@ -3,8 +3,6 @@
 (() => {
     'use strict';
 
-    const VIBER_LINK = 'viber://chat?number=%2B380507559456';
-
     let catalogData = [];
 
     async function fetchCatalog() {
@@ -80,14 +78,6 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    }
-
-    function escapeJs(value) {
-        return String(value)
-            .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
-            .replace(/"/g, '&quot;')
-            .replace(/\n/g, ' ');
     }
 
     function throttle(func, limit) {
