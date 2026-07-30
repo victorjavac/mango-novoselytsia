@@ -1048,6 +1048,44 @@ body > footer.main-footer {
     transform: translateY(0);
 }
 
+/* --- TOAST-СПОВІЩЕННЯ --- */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(18px, 4vw, 36px);
+    z-index: 1400;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 40px);
+    padding: 14px 22px;
+    border-top: 3px solid var(--gold);
+    border-radius: var(--radius-md);
+    background: var(--ink);
+    box-shadow: var(--shadow-strong);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 16px);
+    transition: opacity 320ms ease, transform 320ms ease;
+}
+
+.toast i {
+    color: var(--gold);
+    font-size: 16px;
+}
+
+.toast-message {
+    color: var(--cream);
+    font-family: 'Karla', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.toast.toast-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
 /* --- UTILITY CLASSES --- */
 .text-google-blue {
     color: #4285f4;

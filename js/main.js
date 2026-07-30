@@ -80,6 +80,32 @@
             .replace(/'/g, '&#039;');
     }
 
+    let toastHideTimer = null;
+    let toastRemoveTimer = null;
+
+    function showToast(message) {
+        clearTimeout(toastHideTimer);
+        clearTimeout(toastRemoveTimer);
+
+        let toast = $('.toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            toast.innerHTML = '<i class="fas fa-circle-check"></i><span class="toast-message"></span>';
+            document.body.appendChild(toast);
+        }
+
+        toast.querySelector('.toast-message').textContent = message;
+        requestAnimationFrame(() => toast.classList.add('toast-visible'));
+
+        toastHideTimer = setTimeout(() => {
+            toast.classList.remove('toast-visible');
+            toastRemoveTimer = setTimeout(() => toast.remove(), 350);
+        }, 2500);
+    }
+
     function throttle(func, limit) {
         let inThrottle;
         return function(...args) {
@@ -395,7 +421,7 @@
                 // Фоллбек: копіювання в буфер, якщо Web Share API недоступний або шеринг не вдався
                 if (navigator.clipboard) {
                     await navigator.clipboard.writeText(window.location.href);
-                    alert('Посилання скопійовано.');
+                    showToast('Посилання скопійовано.');
                 }
             });
 
