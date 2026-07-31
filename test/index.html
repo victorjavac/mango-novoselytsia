@@ -191,7 +191,14 @@
   .visit-actions { display: flex; gap: 14px; flex-wrap: wrap; }
   .visit-actions .btn-p { background: var(--gold); color: var(--ink); }
   .visit-actions .btn-o { border-color: rgba(251,247,244,0.3); color: var(--paper); }
-  .visit-info { position: relative; z-index: 2; display: grid; gap: 18px; }
+  .visit-info {
+    position: relative; z-index: 2; display: grid; gap: 18px;
+    background: rgba(58,17,29,0.72);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(198,161,91,0.25);
+    border-radius: 4px;
+    padding: 28px 26px;
+  }
   .visit-info-row { display: flex; gap: 16px; align-items: flex-start; color: var(--paper); }
   .visit-info-row .vi-icon { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(251,247,244,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gold); }
   .visit-info-row strong { display: block; font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; margin-bottom: 3px; }
