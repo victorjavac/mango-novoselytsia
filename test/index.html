@@ -97,6 +97,33 @@
   footer.site-footer { background: #0a0a0a; color: #777777; text-align: center; padding: 30px 20px; font-size: 13px; letter-spacing: 0.05em; border-top: 1px solid #1f1f1f; }
   footer.site-footer .fname { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-size: 18px; margin-bottom: 8px; }
 
+  /* ===== BENTO АСОРТИМЕНТ ===== */
+  .bento-section { padding: 20px 6vw 90px; text-align: center; }
+  .bento-grid {
+    max-width: 1200px; margin: 0 auto; text-align: left;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 130px; grid-auto-flow: dense; gap: 16px;
+  }
+  .bento-tile {
+    position: relative; display: block; grid-row: span 2;
+    overflow: hidden; border-radius: 3px;
+    box-shadow: 0 14px 34px rgba(33,18,25,0.12);
+  }
+  .bento-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .bento-tile:hover img { transform: scale(1.06); }
+  .bento-tile .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(33,18,25,0.75)); display: flex; align-items: flex-end; padding: 18px; }
+  .bento-tile .overlay span { font-family: 'Fraunces', serif; font-style: italic; color: var(--paper); font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+  .bento-tile .overlay i { font-size: 12px; }
+  .bento-wide { grid-column: span 2; }
+  .bento-tall { grid-row: span 4; }
+  .bento-lg { grid-column: span 2; grid-row: span 4; }
+  .bento-lg .overlay span { font-size: 22px; }
+
+  @media (max-width: 720px) {
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
+    .bento-wide, .bento-lg { grid-column: span 2; }
+  }
+
   /* ===== FEATURES STRIP ===== */
   .features-section { padding: 20px 6vw 90px; }
   .features-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
@@ -105,16 +132,55 @@
   .feature-card h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; margin-bottom: 10px; }
   .feature-card p { font-size: 14px; line-height: 1.65; color: var(--muted); }
 
+  /* ===== ПОДАРУНКОВИЙ СЕРТИФІКАТ ===== */
+  .cert-section { padding: 0 6vw 100px; }
+  .cert-card {
+    max-width: 1000px; margin: 0 auto;
+    display: flex; align-items: center; gap: 50px;
+    background: #fff; border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: 0 20px 50px rgba(33,18,25,0.1);
+    overflow: hidden;
+  }
+  .cert-image { flex: 1; min-width: 45%; align-self: stretch; }
+  .cert-image img { width: 100%; height: 100%; object-fit: cover; display: block; min-height: 340px; }
+  .cert-content { flex: 1; padding: 20px 50px 20px 10px; }
+  .cert-content h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: clamp(26px, 3vw, 36px); margin-bottom: 14px; }
+  .cert-content p { color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 400px; margin-bottom: 26px; }
+
+  @media (max-width: 780px) {
+    .cert-card { flex-direction: column; }
+    .cert-image img { min-height: 260px; }
+    .cert-content { padding: 30px 24px 40px; text-align: center; }
+    .cert-content p { margin-left: auto; margin-right: auto; }
+  }
+
   /* ===== CONTACT / VISIT SECTION ===== */
   .visit-section { padding: 0 6vw 100px; }
+  .visit-card-wrap { position: relative; max-width: 1100px; margin: 0 auto; }
+  .visit-pin {
+    position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--paper); border: 2px dashed var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wine); font-size: 20px;
+    box-shadow: 0 14px 30px rgba(33,18,25,0.25);
+    z-index: 5;
+  }
   .visit-card {
-    max-width: 1100px; margin: 0 auto; position: relative; overflow: hidden;
-    background: var(--ink); border-radius: 6px; padding: 60px 6vw;
+    position: relative; overflow: hidden;
+    border-radius: 6px; padding: 60px 6vw;
     display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 50px; align-items: center;
   }
   .visit-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg, transparent, transparent 38px, rgba(251,247,244,0.03) 38px, rgba(251,247,244,0.03) 39px);
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background: url('img/storefront-clean.webp') center 15% / cover no-repeat;
+    filter: brightness(1.18) saturate(1.08);
+  }
+  .visit-card::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background:
+      repeating-linear-gradient(45deg, transparent, transparent 38px, rgba(251,247,244,0.03) 38px, rgba(251,247,244,0.03) 39px),
+      linear-gradient(90deg, rgba(92,31,49,0.95) 0%, rgba(92,31,49,0.90) 38%, rgba(92,31,49,0.68) 55%, rgba(92,31,49,0.30) 75%, rgba(92,31,49,0.06) 100%);
     pointer-events: none;
   }
   .visit-text { position: relative; z-index: 2; color: var(--paper); }
@@ -177,7 +243,7 @@
       </div>
     </div>
     <div class="hero-visual">
-      <div class="frame"><img src="model-photo.jpg" alt="МАНГО"></div>
+      <div class="frame"><img src="img/hero-01.webp" alt="Мереживний бюстгальтер МАНГО з півоніями"></div>
     </div>
   </div>
 </section>
@@ -192,7 +258,47 @@
     <div class="cat-card"><img src="../sets/1.webp" alt="Комплекти"><div class="overlay"><span>Комплекти</span></div></div>
     <div class="cat-card"><img src="../pajamas/1.webp" alt="Піжами"><div class="overlay"><span>Піжами</span></div></div>
     <div class="cat-card"><img src="../tops/1.webp" alt="Топи"><div class="overlay"><span>Топи</span></div></div>
-    <div class="cat-card"><img src="../shop/1.webp" alt="Наш магазин"><div class="overlay"><span>Наш магазин</span></div></div>
+    <div class="cat-card"><img src="img/shop-interior.webp" alt="Наш магазин"><div class="overlay"><span>Наш магазин</span></div></div>
+  </div>
+</section>
+
+<section class="bento-section">
+  <div class="kicker-line"><span>Асортимент</span></div>
+  <h2>Що ви знайдете в МАНГО</h2>
+  <p>Живі фото прямо з нашого залу — бюстгальтери, купальники та домашній одяг. Точний розмір і наявність підкажемо у Viber або Instagram.</p>
+  <div class="bento-grid">
+    <a class="bento-tile bento-lg" href="../index.html#catalog-anchor">
+      <img src="img/bras-flatlay-02.webp" loading="lazy" alt="Бюстгальтери МАНГО, флетлей">
+      <div class="overlay"><span>Бюстгальтери <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile bento-wide" href="../index.html#catalog-anchor">
+      <img src="img/bras-shop-03.webp" loading="lazy" alt="Стіна бюстгальтерів у залі МАНГО">
+      <div class="overlay"><span>У нашому залі <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile bento-tall" href="../index.html#catalog-anchor">
+      <img src="img/swimwear-01.webp" loading="lazy" alt="Флетлей купальників МАНГО">
+      <div class="overlay"><span>Купальники <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile bento-wide" href="../index.html#catalog-anchor">
+      <img src="img/bras-shop-06.webp" loading="lazy" alt="Мереживні бюстгальтери різних кольорів">
+      <div class="overlay"><span>Мереживо та кольори <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile bento-wide" href="../index.html#catalog-anchor">
+      <img src="img/loungewear-03.webp" loading="lazy" alt="Піжами на манекенах у МАНГО">
+      <div class="overlay"><span>Піжами та домашній одяг <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile" href="../index.html#catalog-anchor">
+      <img src="img/loungewear-02.webp" loading="lazy" alt="Піжами на манекенах у МАНГО">
+      <div class="overlay"><span>Затишні комплекти <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile" href="../index.html#catalog-anchor">
+      <img src="img/swimwear-02.webp" loading="lazy" alt="Купальники на манекенах у МАНГО">
+      <div class="overlay"><span>Купальники <i class="fas fa-arrow-right"></i></span></div>
+    </a>
+    <a class="bento-tile" href="../index.html#catalog-anchor">
+      <img src="img/bras-flatlay-01.webp" loading="lazy" alt="Бралети МАНГО, флетлей">
+      <div class="overlay"><span>Бралети <i class="fas fa-arrow-right"></i></span></div>
+    </a>
   </div>
 </section>
 
@@ -216,29 +322,44 @@
   </div>
 </section>
 
-<section class="visit-section">
-  <div class="visit-card">
-    <div class="visit-text">
-      <div class="eyebrow"><span>Завітайте до нас</span></div>
-      <h2>Чекаємо вас<br>у Новоселиці</h2>
-      <p>Прийдіть на примірку особисто, або напишіть нам — підкажемо розмір і наявність, відкладемо модель до вашого приходу.</p>
-      <div class="visit-actions">
-        <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn btn-p"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
-        <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-o"><i class="fab fa-viber"></i> Написати у Viber</a>
-      </div>
+<section class="cert-section">
+  <div class="cert-card">
+    <div class="cert-image"><img src="img/certificate-07.webp" loading="lazy" alt="Подарунковий сертифікат МАНГО"></div>
+    <div class="cert-content">
+      <div class="eyebrow"><span>Ідеальний подарунок</span></div>
+      <h2>Подарунковий сертифікат</h2>
+      <p>Коли хочеться зробити приємно, але складно вгадати розмір — подаруйте сертифікат МАНГО на будь-яку суму. Оформимо і підкажемо, як вручити.</p>
+      <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-p"><i class="fab fa-viber"></i> Написати про сертифікат</a>
     </div>
-    <div class="visit-info">
-      <div class="visit-info-row">
-        <span class="vi-icon"><i class="fas fa-location-dot"></i></span>
-        <div><strong>вул. Хотинська, 9а</strong><span>м. Новоселиця, Чернівецька область</span></div>
+  </div>
+</section>
+
+<section class="visit-section">
+  <div class="visit-card-wrap">
+    <span class="visit-pin"><i class="fas fa-location-dot"></i></span>
+    <div class="visit-card">
+      <div class="visit-text">
+        <div class="eyebrow"><span>Як нас знайти</span></div>
+        <h2>Чекаємо вас<br>у Новоселиці</h2>
+        <p>Прийдіть на примірку особисто, або напишіть нам — підкажемо розмір і наявність, відкладемо модель до вашого приходу.</p>
+        <div class="visit-actions">
+          <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn btn-p"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
+          <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-o"><i class="fab fa-viber"></i> Написати у Viber</a>
+        </div>
       </div>
-      <div class="visit-info-row">
-        <span class="vi-icon"><i class="fas fa-clock"></i></span>
-        <div><strong>Пн–Пт 09:00–19:00</strong><span>Сб–Нд 09:00–16:00</span></div>
-      </div>
-      <div class="visit-info-row">
-        <span class="vi-icon"><i class="fas fa-phone"></i></span>
-        <div><strong>+380 50 755 9456</strong><span>Дзвінки та Viber</span></div>
+      <div class="visit-info">
+        <div class="visit-info-row">
+          <span class="vi-icon"><i class="fas fa-location-dot"></i></span>
+          <div><strong>вул. Хотинська, 9а</strong><span>м. Новоселиця, Чернівецька область</span></div>
+        </div>
+        <div class="visit-info-row">
+          <span class="vi-icon"><i class="fas fa-clock"></i></span>
+          <div><strong>Пн–Пт 09:00–19:00</strong><span>Сб–Нд 09:00–16:00</span></div>
+        </div>
+        <div class="visit-info-row">
+          <span class="vi-icon"><i class="fas fa-phone"></i></span>
+          <div><strong>+380 50 755 9456</strong><span>Дзвінки та Viber</span></div>
+        </div>
       </div>
     </div>
   </div>
