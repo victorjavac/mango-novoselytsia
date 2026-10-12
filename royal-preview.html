@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МАНГО — Royal Cinematic</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#390b20;color:#fff8ed;font-family:Georgia,serif}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:radial-gradient(circle at 70% 30%,#81324c,#390b20 70%);overflow:hidden}
+.label{font:12px Arial,sans-serif;letter-spacing:5px;color:#dfbb80;animation:appear 1.5s both}
+h1{font-size:clamp(70px,14vw,160px);font-weight:normal;letter-spacing:12px;margin:20px 0;animation:rise 1.6s .3s both}
+p{font-size:clamp(17px,2.5vw,26px);animation:rise 1.6s .7s both}
+a{display:inline-block;color:#dfbb80;border:1px solid #dfbb80;text-decoration:none;padding:17px 30px;margin-top:30px;font:13px Arial,sans-serif;letter-spacing:2px;transition:.4s;animation:rise 1.6s 1s both}
+a:hover{background:#dfbb80;color:#390b20;transform:translateY(-5px)}
+@keyframes appear{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="hero">
+<div class="label">БУТИК ЖІНОЧОЇ БІЛИЗНИ</div>
+<h1>МАНГО</h1>
+<p>Елегантність, яку відчуваєш</p>
+<a href="index.html">Переглянути каталог →</a>
+</main>
+</body>
+</html>
