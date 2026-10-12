@@ -501,6 +501,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .text-google-blue { color: #4285f4; }
 </style>
+
+<style id="mango-royal-motion">
+/* Royal cinematic motion, layered over existing shop layout */
+.hero{overflow:hidden}.hero .eyebrow,.hero h1,.hero .desc,.hero .hero-actions,.hero .hero-meta{animation:mangoRise .95s cubic-bezier(.22,1,.36,1) both}.hero h1{animation-delay:.12s}.hero .desc{animation-delay:.24s}.hero .hero-actions{animation-delay:.36s}.hero .hero-meta{animation-delay:.48s}.hero h1 em{color:#e6c78b;font-weight:400}.hero-visual .frame{overflow:hidden;animation:mangoReveal 1.4s cubic-bezier(.22,1,.36,1) both}.hero-visual img{animation:mangoPhoto 1.8s cubic-bezier(.22,1,.36,1) both;transition:transform 1.2s ease}.hero-visual .frame:hover img{transform:scale(1.045)}.bento-tile img{transition:transform .9s cubic-bezier(.22,1,.36,1)}.bento-tile:hover img{transform:scale(1.06)}.mango-cinematic-enter{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,1,.36,1)}.mango-cinematic-enter.mango-cinematic-visible{opacity:1;transform:none}@keyframes mangoRise{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:translateY(0)}}@keyframes mangoReveal{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0)}}@keyframes mangoPhoto{from{transform:scale(1.09)}to{transform:scale(1)}}@media(prefers-reduced-motion:reduce){.hero .eyebrow,.hero h1,.hero .desc,.hero .hero-actions,.hero .hero-meta,.hero-visual .frame,.hero-visual img{animation:none!important}.mango-cinematic-enter{opacity:1!important;transform:none!important;transition:none!important}.bento-tile img{transition:none!important}}
+</style>
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2TRM6HS"
@@ -530,8 +535,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="hero-grid">
     <div>
       <div class="eyebrow"><span>Бутик білизни у Новоселиці</span></div>
-      <h1>Жіноча білизна,<br>купальники<br>та піжами</h1>
-      <p class="desc">Завітайте у МАНГО на Хотинській, 9а. Допоможемо підібрати розмір, покажемо наявність і відкладемо обрану модель для примірки.</p>
+      <h1>Білизна, в якій<br><em>комфортно бути собою.</em></h1>
+      <p class="desc">У МАНГО допоможемо знайти те, що пасує саме вам: від щоденної білизни до купальників і затишного домашнього одягу. Завітайте на примірку або запитайте про наявність онлайн.</p>
       <div class="hero-actions">
         <a href="https://g.page/r/CUvGEdAAMeq4EBM" target="_blank" rel="noopener" class="btn btn-p" onclick="track('route_hero_click')"><i class="fas fa-location-arrow"></i> Прокласти маршрут</a>
         <a href="viber://chat?number=%2B380507559456" target="_blank" rel="noopener" class="btn btn-o" onclick="track('viber_hero_click')"><i class="fab fa-viber"></i> Вайбер</a>
@@ -752,5 +757,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </footer>
 
 <script src="js/main.js" defer></script>
+
+<script id="mango-royal-reveal">
+(function(){if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;var nodes=document.querySelectorAll('.catalog-section .section-title,.bento-section .section-title,.bento-tile,.features-section .section-title,.reviews-section .section-title,.founder-section .section-title,.visit-section .section-title');var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('mango-cinematic-visible');io.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px 40px 0px'});nodes.forEach(function(el){el.classList.add('mango-cinematic-enter');io.observe(el)})})();
+</script>
 </body>
 </html>
