@@ -63,12 +63,12 @@
     }
 
     function track(eventName, params = {}) {
-        if (typeof window.gtag === 'function') {
-            window.gtag('event', eventName, {
-                transport_type: 'beacon',
-                ...params
-            });
-        }
+        // Send site interactions to the active GTM container, not the retired GA4 stream.
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: eventName,
+            ...params
+        });
     }
 
     function escapeHtml(value) {
