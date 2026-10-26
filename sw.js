@@ -1,5 +1,5 @@
-const STATIC_CACHE_NAME = 'mango-static-v4';
-const DYNAMIC_CACHE_NAME = 'mango-dynamic-v4';
+const STATIC_CACHE_NAME = 'mango-static-v5';
+const DYNAMIC_CACHE_NAME = 'mango-dynamic-v5';
 const STATIC_ASSETS = [
     './',
     './index.html',
